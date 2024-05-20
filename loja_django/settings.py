@@ -33,6 +33,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'produto',
+    'pedido',
+    'perfil',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -141,7 +144,7 @@ MESSAGE_TAGS = {
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 7
 SESSION_SAVE_EVERY_REQUEST = False
 
-SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+#SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
