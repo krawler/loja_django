@@ -1,0 +1,4 @@
+sudo pip install django --break-system-packages
+sudo pip install django-debug-toolbar --break-system-packages
+sudo pip install pillow --break-system-packages
+sudo pip install django-crispy-forms --break-system-packages
