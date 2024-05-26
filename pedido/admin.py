@@ -6,7 +6,8 @@ class ItemPedidoInLine(admin.TabularInline):
     extra = 1
 
 class PedidoAdmin(admin.ModelAdmin):
-    line = [
+    display_fields = ['usuario', 'status', 'total']
+    inlines = [
         ItemPedidoInLine
     ]
 
