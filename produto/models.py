@@ -55,9 +55,9 @@ class Produto(models.Model):
 
         super().save(*args, **kwargs)
 
-        max_image_size = 800    
-        if self.imagem:
-            self.resize(self.imagem, max_image_size)
+       # max_image_size = 800    
+       # if self.imagem:
+        #    self.resize(self.imagem, max_image_size)
 
 
     def __str__(self):
