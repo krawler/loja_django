@@ -1,1 +1,6 @@
 /venv
+/pedido/__pycache__
+/perfil/__pycache__
+/utils/__pycache__
+/pedido/migrations/__pycache__
+/templatetags/__pycache__
