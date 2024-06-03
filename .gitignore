@@ -1,6 +1,12 @@
 /venv
 /pedido/__pycache__
+/produto/__pycache__
 /perfil/__pycache__
 /utils/__pycache__
 /pedido/migrations/__pycache__
-/templatetags/__pycache__
+/produto/migrations/__pycache__
+/perfil/migrations/__pycache__
+/produto/templatetags/__pycache__
+/produto_imagens/
+loja_django/__pycache__
+db.sqlite3
