@@ -11,19 +11,23 @@
             
             <div class="card">
                 {% if produto.imagem %}
-                  <img class="card-img-top" src="{{ produto.imagem.url }}" alt="Card image cap">
+                  <a href="{{produto.slug}}">  
+                    <img class="card-img-top" src="{{ produto.imagem.url }}" alt="Card image cap">
+                  </a>
                 {% endif %} 
 
                 <div class="card-body">
                     <h5 class="card-title">{{ produto.nome }}</h5>
                     <p class="card-text">{{ produto.descricao }}</p>
                     <div class="container product-price-block text-center">
-                        <span class="product-price">
-                            {{ produto.preco_marketing_promocional | formata_preco }}
-                        </span>
-                        <span class="product-old-price text-muted">
-                            {{ produto.preco_marketing | formata_preco }}
-                        </span>
+                        {% if produto.preco_marketing_promocional > 0 %}
+                            <span class="product-price">
+                                {{ produto.preco_marketing_promocional|formata_preco }}
+                            </span>
+                        {% endif %}
+                            <span class="product-old-price text-muted">
+                                {{ produto.preco_marketing|formata_preco }}
+                            </span>
                     </div>
                 </div>
                 <div class="card-footer bg-transparent border-top-light-custom text-center">
