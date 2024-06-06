@@ -13,7 +13,7 @@ class ListaProdutos(ListView):
     model = Produto
     template_name = 'produto/lista.html' 
     context_object_name = 'produtos'
-    paginate_by = 3
+    paginate_by = 6
 
 class DetalheProduto(DetailView):
     model = Produto
@@ -143,3 +143,8 @@ class Carrinho(View):
 class Finalizar(View):
     def get(self, *args, **kwargs):
         return HttpResponse('Finalizar')
+
+class Tabela(ListView):
+    model = Produto
+    template_name = 'produto/tabela.html'
+    context_object_name = 'produtos'
