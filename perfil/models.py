@@ -9,13 +9,14 @@ class PerfilUsuario(models.Model):
 
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
     idade = models.PositiveIntegerField()
-    data_nascimento = models.DateField()
+    #TODO: implementar componente datepicker 
+    data_nascimento = models.DateField(null=True, blank=True)
     cpf = models.CharField(max_length=11)
     endereco = models.CharField(max_length=50)
     numero = models.CharField(max_length=5)
-    complemento = models.CharField(max_length=30)
-    bairro = models.CharField(max_length=50)
-    cep = models.CharField(max_length=8)
+    complemento = models.CharField(max_length=30, null=True, blank=True)
+    bairro = models.CharField(max_length=50, null=True, blank=True)
+    cep = models.CharField(max_length=8, null=True, blank=True)
     cidade = models.CharField(max_length=30)
     estado = models.CharField(
         max_length=2,
