@@ -10,4 +10,5 @@ urlpatterns = [
     path('removerdocarrinho/', views.RemoverCarrinho.as_view(), name="removerdocarrinho"),
     path('carrinho/', views.Carrinho.as_view(), name="carrinho"),
     path('finalizar/', views.Finalizar.as_view(), name="finalizar"),
+    path('tabela/', views.Tabela.as_view(), name="tabela")
 ]
