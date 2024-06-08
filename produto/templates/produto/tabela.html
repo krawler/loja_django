@@ -4,4 +4,61 @@
 
 {% block conteudo %}
 
+<h1>Listagem de produtos</h1>
+
+<table id="table_id" class="display">
+    <thead>
+        <tr>
+            <th>nome</th>
+            <th>descricao</th>
+            <th>slug</th>
+            <th>Preço</th>
+            <th>Preço promocional</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for produto in produtos %}
+        <tr>
+            <td>{{produto.nome}}</td>
+            <td>{{produto.descricao}}</td>
+            <td>{{produto.slug}}</td>
+            <td>{{produto.preco_marketing}}</td>
+            <td>{{produto.preco_marketing_promocional}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script>
+    $(document).ready(function(){
+        
+        $.noConflict();
+
+        const table = $('#table_id').DataTable({
+            columnDefs: [
+                            {
+                                orderable: false,
+                                targets: [1, 2, 3]
+                            }
+                        ]
+        });
+
+        table.on('mouseenter', 'td', function () {
+            let colIdx = table.cell(this).index().column;
+         
+            table
+                .cells()
+                .nodes()
+                .each((el) => el.classList.remove('highlight'));
+         
+            table
+                .column(colIdx)
+                .nodes()
+                .each((el) => el.classList.add('highlight'));
+        });
+
+        
+    })
+</script> 
+
 {% endblock conteudo %}
