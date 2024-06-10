@@ -2,7 +2,7 @@ from django.db import models
 import os
 from django.conf import settings
 from PIL import Image
-from django.utils.text import slugify
+from django.utils.text import slugify 
 
 # Create your models here.
 
