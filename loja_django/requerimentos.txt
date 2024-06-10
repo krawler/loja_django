@@ -2,3 +2,5 @@ sudo pip install django --break-system-packages
 sudo pip install django-debug-toolbar --break-system-packages
 sudo pip install pillow --break-system-packages
 sudo pip install django-crispy-forms --break-system-packages
+pip install crispy-bootstrap4
+pip install django-smart-selects
