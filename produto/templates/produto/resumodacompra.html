@@ -17,36 +17,36 @@
             <dd class="col-lg-4">{{usuario.last_name}}</dd>
 
             <dt class="col-lg-2">Idade:</dt>
-            <dd class="col-lg-4">55</dd>
+            <dd class="col-lg-4">{{perfil.idade}}</dd>
             <dt class="col-lg-2">Nascimento:</dt>
-            <dd class="col-lg-4">30 de Abril de 1898</dd>
+            <dd class="col-lg-4">{{perfil.data_nascimento}}</dd>
 
             <dt class="col-lg-2">CPF:</dt>
-            <dd class="col-lg-4">11111111111</dd>
+            <dd class="col-lg-4">{{perfil.cpf}}</dd>
             <dt class="col-lg-2">E-mail:</dt>
-            <dd class="col-lg-4">email@gmail.com</dd>
+            <dd class="col-lg-4">{{usuario.email}}</dd>
         </dl>
 
         <p class="lead">Dados de endereço</p>
         <p>Caso precise editar, <a href="#">clique aqui</a></p>
         <dl class="row">
             <dt class="col-lg-2">Endereço:</dt>
-            <dd class="col-lg-4">Av. Filho Junior</dd>
+            <dd class="col-lg-4">{{perfil.endereco}}</dd>
             <dt class="col-lg-2">Número:</dt>
-            <dd class="col-lg-4">12</dd>
+            <dd class="col-lg-4">{{perfil.numero}}</dd>
 
             <dt class="col-lg-2">Complemento:</dt>
-            <dd class="col-lg-4">Casa</dd>
-            <dt class="col-lg-2">Nascimento:</dt>
-            <dd class="col-lg-4">Centro</dd>
+            <dd class="col-lg-4">{{perfil.complemento}}</dd>
+            <dt class="col-lg-2">Bairro:</dt>
+            <dd class="col-lg-4">{{perfil.bairro}}</dd>
 
             <dt class="col-lg-2">Cidade:</dt>
-            <dd class="col-lg-4">São Paulo</dd>
+            <dd class="col-lg-4">{{perfil.cidade}}</dd>
             <dt class="col-lg-2">Estado:</dt>
-            <dd class="col-lg-4">SP</dd>
+            <dd class="col-lg-4">{{perfil.estado}}</dd>
 
             <dt class="col-lg-2">CEP:</dt>
-            <dd class="col-lg-4">00000000</dd>
+            <dd class="col-lg-4">{{perfil.cep}}</dd>
         </dl>
     </div>
 </div>
@@ -67,5 +67,6 @@
         </p>
     </div>
 </div>
+<button type="submit" class="btn btn-primary btn-block btn-lg">Realizar pedido e pagar</button>
 
 {% endblock %}
