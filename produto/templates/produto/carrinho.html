@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% load omfilters %}
+
 {% load static %}
 
 {% block conteudo %}
@@ -59,14 +60,23 @@
             <table class="table">
                 <tr>
                     <td class="font-weight-bold">Total</td>
-                    <td>R$ {{request.session.carrinho|cart_total_preco}}</td>
+                    <td>
+                      {% if request.session.carrinho %}  
+                        {{request.session.carrinho|cart_total_preco}}
+                      {% endif %}
+                    </td>
                 </tr>
             </table>
         </div>
     </div>
     <div class="col-lg mt-auto">
-        <a class="btn btn-lg btn-block btn-primary" href="#">
-            Finalizar a compra
+        {% if request.user.is_authenticated %}
+        <a class="btn btn-lg btn-block btn-primary" href="{% url 'produto:resumodacompra' %}">
+            Comprar
+        </a>
+        {% else %}
+        <a class="btn btn-lg btn-block btn-primary" href="{% url 'perfil:criar' %}">
+            Entrar ou cadastrar com seu usuário
         </a>
     </div>
 </div>
