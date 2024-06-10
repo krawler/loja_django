@@ -118,11 +118,19 @@ class Login(View):
         
         usuario = authenticate(self.request, username=username, password=password)
         
-        if usuario:
-            login(self.request, user=usuario)
+        if not usuario:
+            messages.error(
+                self.request,
+                "Usuário ou senha inválidos"
+            )
+            return redirect('perfil:criar')
+        
+        login(self.request, user=usuario)
+        
+        print(self.request.user)
         
         if self.request.session.get('carrinho'):
-            print(self.request.session.get('carrinho')) 
+            return redirect('produto:carrinho')             
             
         return redirect('produto:lista')        
 
