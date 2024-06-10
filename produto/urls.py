@@ -9,6 +9,7 @@ urlpatterns = [
     path('adicionaraocarrinho/', views.AdicionarCarrinho.as_view(), name="adicionaraocarrinho"),
     path('removerdocarrinho/', views.RemoverCarrinho.as_view(), name="removerdocarrinho"),
     path('carrinho/', views.Carrinho.as_view(), name="carrinho"),
-    path('finalizar/', views.Finalizar.as_view(), name="finalizar"),
-    path('tabela/', views.Tabela.as_view(), name="tabela")
+    path('resumodacompra/', views.ResumoDaCompra.as_view(), name="resumodacompra"),
+    path('tabela/', views.Tabela.as_view(), name="tabela"),
+    path('variacoes/', views.Variacoes_json.as_view(), name="variacoes")
 ]
