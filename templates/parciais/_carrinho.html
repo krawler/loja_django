@@ -5,14 +5,21 @@
 <div class="table-responsive">
     <table class="table">
         <thead>
-            <th>Nome e variação</th>
+            <th style="width: 15%">Imagem</th>
+            <th style="width: 40%">Nome e variação</th>
             <th></th>
             <th>Quantidade</th>
             <th>Total</th>
+            <th>Remover</th>
         </thead>
         <tbody>
         {% for item in carrinho.values %}
             <tr>
+                <td class="d-none d-lg-block">
+                    {% if item.imagem %}
+                        <img class="cart-img" src={% get_media_prefix %}{{item.imagem|remove_aspas}}>
+                    {% endif %}    
+                </td>
                 <td>
                     <a href="{% url 'produto:detalhe' item.slug %}">
                       {{ item.produto_nome }} - {{ item.variacao_nome }}
@@ -25,10 +32,12 @@
                     {% else %}
                         R$  {{ item.preco_quantitativo }}
                     {% endif %}    
+                </td> 
+                <td>
                     <a class="ml-3" href="{% url 'produto:removerdocarrinho' %}?vid={{item.variacao_id}}">
                         <i class="fas fa-times-circle text-danger" aria-hidden="true"></i>
                     </a>
-                </td> 
+                </td>
             </tr>
         {% endfor %}
         </tbody>    

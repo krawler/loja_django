@@ -138,18 +138,19 @@ class Carrinho(View):
         context = {
             'carrinho': self.request.session.get('carrinho')
         }
-        pprint(self.request.session.get('carrinho'))
         return render(self.request, 'produto/carrinho.html', context)
 
 class ResumoDaCompra(View):
+    
     def get(self, *args, **kwargs):
         if not self.request.user.is_authenticated:
             return redirect('perfil:criar')
         
+        perfil = PerfilUsuario.objects.filter(usuario=self.request.user).first()
         contexto = {
             'usuario': self.request.user,
             'carrinho': self.request.session['carrinho'],
-            'perfil': PerfilUsuario.objects.filter(usuario=self.request.user)
+            'perfil': perfil
         }
         return render(self.request, 'produto/resumodacompra.html', contexto)
 

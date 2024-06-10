@@ -16,6 +16,7 @@
                 <tr>
                     <th class="d-none d-lg-block">Imagem</th>
                     <th>Nome e variação</th>
+                    <th></th>
                     <th>Quantidade</th>
                     <th>Total</th>
                 </tr>
@@ -59,17 +60,18 @@
         <div class='table-responsive'>
             <table class="table">
                 <tr>
-                    <td class="font-weight-bold">Total</td>
-                    <td>
+                    <td style="text-align: right">
                       {% if request.session.carrinho %}  
-                        {{request.session.carrinho|cart_total_preco}}
+                        <p class="lead">
+                        {{request.session.carrinho|cart_total_preco|formata_preco}}
+                        </p>
                       {% endif %}
                     </td>
                 </tr>
             </table>
         </div>
     </div>
-    <div class="col-lg mt-auto">
+    <div class="col-lg mt-auto" style="margin-bottom:40px;">
         {% if request.user.is_authenticated %}
         <a class="btn btn-lg btn-block btn-primary" href="{% url 'produto:resumodacompra' %}">
             Comprar
@@ -78,6 +80,7 @@
         <a class="btn btn-lg btn-block btn-primary" href="{% url 'perfil:criar' %}">
             Entrar ou cadastrar com seu usuário
         </a>
+        {% endif %}
     </div>
 </div>
 
