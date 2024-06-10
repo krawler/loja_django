@@ -1,11 +1,12 @@
 from django.shortcuts import render, get_list_or_404, reverse, redirect, get_object_or_404
-
+from django.core import serializers
 from django.views.generic.list import ListView
 from django.views import View
 from django.views.generic.detail import DetailView
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 from produto.models import Produto, Variacao 
+from perfil.models import PerfilUsuario
 from pprint import pprint
 import json
 
@@ -140,11 +141,27 @@ class Carrinho(View):
         pprint(self.request.session.get('carrinho'))
         return render(self.request, 'produto/carrinho.html', context)
 
-class Finalizar(View):
+class ResumoDaCompra(View):
     def get(self, *args, **kwargs):
-        return HttpResponse('Finalizar')
+        if not self.request.user.is_authenticated:
+            return redirect('perfil:criar')
+        
+        contexto = {
+            'usuario': self.request.user,
+            'carrinho': self.request.session['carrinho'],
+            'perfil': PerfilUsuario.objects.filter(usuario=self.request.user)
+        }
+        return render(self.request, 'produto/resumodacompra.html', contexto)
 
 class Tabela(ListView):
     model = Produto
     template_name = 'produto/tabela.html'
     context_object_name = 'produtos'
+
+class Variacoes_json(ListView):
+    def get(self, *args, **kwargs):
+        produto_id = self.request.GET.get('produtoid')
+        produto = Produto.objects.filter(id=produto_id).first()
+        qs_data = Variacao.objects.filter(produto=produto)
+        json_data = serializers.serialize('json', qs_data)
+        return JsonResponse(json_data, safe=False)
