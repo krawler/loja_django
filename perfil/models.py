@@ -10,14 +10,14 @@ class PerfilUsuario(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
     idade = models.PositiveIntegerField()
     #TODO: implementar componente datepicker 
-    data_nascimento = models.DateField(null=True, blank=True)
-    cpf = models.CharField(max_length=11)
-    endereco = models.CharField(max_length=50)
+    data_nascimento = models.DateField(null=False, blank=True)
+    cpf = models.CharField(max_length=14)
+    endereco = models.CharField(null=False, max_length=50)
     numero = models.CharField(max_length=5)
     complemento = models.CharField(max_length=30, null=True, blank=True)
     bairro = models.CharField(max_length=50, null=True, blank=True)
-    cep = models.CharField(max_length=8, null=True, blank=True)
-    cidade = models.CharField(max_length=30)
+    cep = models.CharField(max_length=9, null=False, blank=True)
+    cidade = models.CharField(null=False, max_length=30)
     estado = models.CharField(
         max_length=2,
         default='SP',
@@ -58,11 +58,13 @@ class PerfilUsuario(models.Model):
     def clean(self):
         error_messages = {}
 
+        self.cpf = self.cpf.replace('-','').replace('.','')
+        
         if not valida_cpf(self.cpf):
             error_messages['cpf'] = 'Digite um CPF válido'
         
         if re.search(r'[^0-9]', self.cpf):
-            error_messages = 'CEP inválido, digite os 8 digitos do CEP'
+            error_messages = 'CPF inválido, digite os 11 digitos do CPF'
 
         if error_messages:
             raise ValidationError(error_messages)
