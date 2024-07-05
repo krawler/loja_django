@@ -21,7 +21,7 @@
                     <input type="password" name="password" placeholder="Digite sua senha"
                            class="form-control" id="exampleInputPassword">
                 </div>
-                <button type="submit" class="btn btn-primary btn-block btn-lg">Cadastrar</button>
+                <button type="submit" class="btn btn-primary btn-block btn-lg">Login</button>
             </form>   
 
         </div>
@@ -32,9 +32,9 @@
             <h4>Cadastro</h4>
             <p>Caso ainda não tenha cadastro, utilize o formulário</p>
         {% endblock %}
-        <form method="POST" action="">
-            
-            {% csrf_token %}           
+
+        <form method="POST" action="">            
+            {% csrf_token %}          
             {{userform|crispy}}
             {{perfilform|crispy}}
             
@@ -48,5 +48,9 @@
         </form>
     </div>
 </div>
-
 {% endblock %}
+<script>
+   $(document).ready(function(){
+       
+   });
+</script>
