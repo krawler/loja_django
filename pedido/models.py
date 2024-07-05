@@ -6,6 +6,7 @@ class Pedido(models.Model):
     
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     total = models.FloatField()
+    qtd_total = models.FloatField(default=0)
     status = models.CharField(
         default='C',
         max_length=1,
