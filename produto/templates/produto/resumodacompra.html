@@ -9,7 +9,7 @@
         <h2>Resumo da sua compra</h2>
 
         <p class="lead">Dados do usuário</p>
-        <p>Caso precise editar, <a href="/userprofile/update/">clique aqui</a></p>
+        <p>Caso precise editar, <a href="{% url 'perfil:criar' %}">clique aqui</a></p>
         <dl class="row">
             <dt class="col-lg-2">Nome:</dt>
             <dd class="col-lg-4">{{usuario.first_name}}</dd>
@@ -28,7 +28,6 @@
         </dl>
 
         <p class="lead">Dados de endereço</p>
-        <p>Caso precise editar, <a href="#">clique aqui</a></p>
         <dl class="row">
             <dt class="col-lg-2">Endereço:</dt>
             <dd class="col-lg-4">{{perfil.endereco}}</dd>
@@ -58,15 +57,35 @@
         {% include 'parciais/_carrinho.html' %}
     </div>
 </div>
-
 <div class="row mt-3">
     <div class="col">
         <p class="lead text-right">
             <strong>Total do carrinho</strong>
-            {{carrinho|cart_total_preco|formata_preco}}
+            <span id="total_carrinho">
+                {{carrinho|cart_total_preco|formata_preco}}
+            </span>
         </p>
     </div>
 </div>
-<button type="submit" class="btn btn-primary btn-block btn-lg">Realizar pedido e pagar</button>
+<div class="row mt-3">
+    <div class="col">
+        <p class="lead">Opções de fretes</p>
+        <p>Selecione uma opção de envio para {{perfil.endereco}}, {{perfil.numero}}, em {{perfil.cidade}}, CEP: {{perfil.cep}}</p>
+        {% include 'parciais/_fretes.html' %}
+    </div>
+</div>
+<div class="row mt-3">
+    <div class="col">
+        <p class="lead text-right">
+            <strong>Total da compra</strong>
+            <span id="total_compra">
+                
+            </span>
+        </p>
+    </div>
+</div>
+<a href="{% url 'pedido:pagar' %}">
+    <button type="submit" class="btn btn-primary btn-block btn-lg">Realizar pedido e pagar</button>
+</a>
 
 {% endblock %}
