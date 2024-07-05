@@ -2,9 +2,13 @@
 
 {% load omfilters %}
 
+{% load static %}
+
 {% block conteudo %}
 
-<h1>Listagem de produtos</h1>
+<h1 style="text-align: center">Listagem de produtos</h1>
+
+<br />
 
 <table id="table_id" class="display">
     <thead>
@@ -19,7 +23,7 @@
     </thead>
     <tbody>
         {% for produto in produtos %}
-        <tr>
+        <tr data-image="{% get_media_prefix %}{{produto.imagem|remove_aspas}}">
             <td class="dt-control" id="{{produto.id}}"></td> 
             <td>{{produto.nome}}</td>
             <td>{{produto.descricao}}</td>
@@ -36,7 +40,15 @@
         
         $.noConflict();
 
-        const table = $('#table_id').DataTable();
+        const table = $('#table_id').DataTable({
+            colReorder: true,
+            keys: true,
+            layout: {
+                topStart: {
+                    buttons: ['print', 'excel', 'pdf', 'csv', 'colvis' ]
+                }
+            }
+        });
 
         table.on('requestChild.dt', function (e, row) {
             row.child(format(row.data())).show();
@@ -50,16 +62,20 @@
 
             if (row.child.isShown()) {
                 row.child.hide();
+                $("#tabela_variacoes").remove();
+                $(".titulo_h5").remove();
+                $(".linha_detalhe").remove();
             }
             else {
-                row.child(format(row.data(), id_produto)).show();
+                row.child(format(row.data(), id_produto, $(this).parent().attr("data-image"))).show();
                 showTabelaVariacoes(id_produto);
             }
         });        
     });
 
-    function format(d, id_produto) {
+    function format(d, id_produto, imagem) {
         return (
+            '<div class="col" style="float:left; width:70%">' +
             '<dl>' +
             '<dt>Nome:</dt>' +
             '<dd>' +
@@ -72,8 +88,11 @@
             '<dt>Descrição:</dt>' +
             '<dd>'+ d[2] +'</dd>' +
             '</dl>' +
+            '</div>' +
+            '<div style="float:right">' +
+            '<img class="cart-img" src="'+ imagem +'" />' +
+            '</div>' +   
             '</br>'
-            //showTabelaVariacoes(id_produto)
         );
     }
 
@@ -86,6 +105,7 @@
     }
 
     async function getTabelaVariacoes(id){        
+
         return $.ajax({
                     type: "GET",
                     dataType: "json",
@@ -101,10 +121,10 @@
     function getTableFromDataArray(dataText, id_produto){
         const dataObj = JSON.parse(dataText);
         let title = ''
-        let tableHeader =   '<tr>'+
+        let tableHeader =   '<tr class="linha_detalhe">'+
                             '<td colspan=\"6\">'+
-                            '<h5 style="text-align:center">Listagem das variações do produto #'+ id_produto +'</h4>' +   
-                            '<table id=\"table_id\" style=\"margin-left:10%; width:80%\">' +
+                            '<h5 class="titulo_h5" style="text-align:center">Lista de variações do produto #'+ id_produto +'</h4>' +   
+                            '<table id=\"tabela_variacoes\" style=\"margin-left:10%; width:80%\">' +
                             '<thead>' +
                                 '<tr>' +
                                     '<th style="width:35%">Nome da variação</th>'+
@@ -119,7 +139,7 @@
                 '<td>'+row.fields.nome+'</td>'+                            
                 '<td style="text-align:right; width:10%">'+formata_preco(row.fields.preco)+'</td>'+
                 '<td style="text-align:right; width:20%">'+formata_preco(row.fields.preco_promocional)+'</td>'+
-                '<td style="text-align:right; width:20%">'+'</td>'+
+                '<td style="text-align:center; width:20%">'+row.fields.estoque+'</td>'+
             '</tr>'; 
         });             
         return ( title +
