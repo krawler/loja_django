@@ -1,9 +1,9 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404, redirect, reverse
 from django.views.generic import ListView
 from django.views import View
+from datetime import datetime
 from . import forms
 from .models import PerfilUsuario
-from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
@@ -15,6 +15,7 @@ class BasePerfil(View):
     template_name = 'perfil/criar.html'
     
     def setup(self, *args, **kwargs):
+        
         super().setup(*args, **kwargs)
         
         self.carrinho = copy.deepcopy(self.request.session.get('carrinho'), {})
@@ -22,13 +23,24 @@ class BasePerfil(View):
         
         if self.request.user.is_authenticated:
             self.perfil = PerfilUsuario.objects.filter(usuario=self.request.user).first()
+            self.usuario = User.objects.filter(username=self.request.user).first()
+            #TODO: refatorar
+            if self.perfil.data_nascimento:
+                data_nasc = datetime.strptime(str(self.perfil.data_nascimento), '%Y-%m-%d').date()
+                data_nasc_br = data_nasc.strftime('%d/%m/%Y')
+                self.perfil.data_nascimento = data_nasc_br
             self.context = {
-                'userform': forms.UserForm(
+                'userform': 
+                            forms.UserForm(
                                 data=self.request.POST or None, 
                                 usuario=self.request.user,
                                 instance=self.request.user,    
                             ),
-                'perfilform': forms.PerfilForm(data=self.request.POST or None)
+                'perfilform': 
+                            forms.PerfilForm(
+                                data=self.request.POST or None,
+                                instance=self.perfil, 
+                                perfil=self.perfil)
             }
         else:
             self.context = {
@@ -48,25 +60,34 @@ class Criar(BasePerfil):
     
     def post(self, *args, **kwargs):
         
-        if not self.userform.is_valid() or not self.perfilform.is_valid():
-            return self.renderizar
-        
+        if not self.request.user.is_authenticated:
+            if not self.userform.is_valid() or not self.perfilform.is_valid():
+                messages.error(
+                self.request,
+                'Há erros no formulário, por favor verifique nos campos abaixo'   
+                )
+                return self.renderizar
+            
+        http_referer = self.request.META.get('HTTP_REFERER',reverse('produto:lista'))               
         username = self.userform.cleaned_data.get('username')
         password = self.userform.cleaned_data.get('password')
-        email = self.userform.cleaned_data.get('email')
+        print(password)
+        email = self.userform.data.get('email')
         first_name = self.userform.cleaned_data.get('first_name')
         last_name = self.userform.cleaned_data.get('last_name')
         
         if self.request.user.is_authenticated:
             usuario = get_object_or_404(User, username=self.request.user.username)
-             
+            
             usuario.username = username
             if password:
-               usuario.set_password(password)               
+               usuario.set_password(password)           
             usuario.email = email 
             usuario.first_name = first_name
             usuario.last_name = last_name
-            usuario.save()
+            usuario.save(force_update=True)
+            
+            return redirect(http_referer)
             
             if not self.perfil:
                 self.perfilform.cleaned_data['usuario'] = usuario
@@ -75,7 +96,7 @@ class Criar(BasePerfil):
             else:
                 perfil = self.perfilform.save(commit=False)
                 perfil.usuario = usuario
-                perfil.save()
+                perfil.save(force_update=True)
         else:
             usuario = self.userform.save(commit=False)
             usuario.set_password(password)
@@ -93,6 +114,7 @@ class Criar(BasePerfil):
             )
             if authentica:
                 login(self.request, user=usuario)
+                
         
         self.request.session['carrinho'] = self.carrinho
         self.request.session.save()       
@@ -126,8 +148,6 @@ class Login(View):
             return redirect('perfil:criar')
         
         login(self.request, user=usuario)
-        
-        print(self.request.user)
         
         if self.request.session.get('carrinho'):
             return redirect('produto:carrinho')             
