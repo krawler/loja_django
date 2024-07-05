@@ -4,6 +4,8 @@ register = Library()
 
 @register.filter
 def formata_preco(val):
+    if isinstance(val, str):
+        val = float(val)
     return f'R$ {val:.2f}'.replace('.', ',')
 
 @register.filter
