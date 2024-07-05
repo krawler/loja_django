@@ -1,0 +1,68 @@
+{% load static %}
+
+{% load omfilters %}
+
+<div class="table-responsive">
+    <table class="table" id="table_fretes">
+        <thead>
+            <th style="width: 15%"></th>
+            <th style="width: 40%">Transportadora</th>
+            <th></th>
+            <th>Preço</th>
+            <th class="text-center">Tempo de envio:</th>
+        </thead>
+        <tbody>
+        {% for frete in fretes %}
+            {% if frete.price %}
+                <tr>
+                    <td class="d-none d-lg-block">
+                        {% if frete.company.picture %}
+                            <img class="cart-img" src={{frete.company.picture|remove_aspas}}>
+                        {% endif %}    
+                    </td>
+                    <td>{{frete.name}} <td>                       
+                    <td>{{frete.price|formata_preco}}</td>                        
+                    <td class="text-center">{{frete.delivery_time}} dias</td> 
+                </tr>
+            {% endif %}
+        {% endfor %}
+        </tbody>  
+    </table>
+</div>
+
+<script>
+    $(document).ready(function(){
+       
+       $.noConflict();
+
+       $("#total_compra").html($("#total_carrinho").text().trim());
+
+       $('#table_fretes tbody tr').click(
+         function(){
+            $('.selected').removeClass('selected');
+            $(this).addClass('selected');
+            let total_compra = calcula_total_geral(this);
+            $("#total_compra").html(formata_preco(total_compra));
+         }
+       );
+
+       function formata_strval_conv_float(strval){
+            return strval.replace('R$ ', '').replace(',','.');
+       }
+
+       function formata_preco(numero){
+           return numero.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+       }
+
+       function calcula_total_geral(row){
+            
+            const celula_valor = $(row).children('td')[3];
+            const valor_selecionado = parseFloat(formata_strval_conv_float(celula_valor.textContent)); 
+            
+            const str_total_carrinho = $("#total_carrinho").text().trim().replace('R$ ', '');
+            const total_carrinho = parseFloat(str_total_carrinho);
+            
+            return valor_selecionado + total_carrinho;
+       }
+    });   
+</script>
