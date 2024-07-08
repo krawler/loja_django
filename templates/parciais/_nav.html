@@ -34,7 +34,13 @@
                     {% endif %}    
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="{% url 'perfil:criar' %}">Entrar ou se cadastrar</a>
+                    <a class="dropdown-item" href="{% url 'perfil:criar' %}">
+                    {% if request.user.is_authenticated %} 
+                        Ver ou alterar seu cadastro    
+                    {% else %}
+                        Entrar ou se cadastrar
+                    {% endif %}    
+                    </a>
                     <a class="dropdown-item" href="{% url 'pedido:meuspedidos' %}">Meus Pedidos</a>
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="{% url 'perfil:logout' %}">Logout</a>
