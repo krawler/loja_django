@@ -1,20 +1,42 @@
 from django.shortcuts import render, get_list_or_404, reverse, redirect, get_object_or_404
 from django.core import serializers
+from django.core.paginator import Paginator
 from django.views.generic.list import ListView
 from django.views import View
 from django.views.generic.detail import DetailView
 from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
+from django.db.models import Q, Count, QuerySet
 from produto.models import Produto, Variacao 
 from perfil.models import PerfilUsuario
-from pprint import pprint
+from pedido.models import ItemPedido
 import json
+import requests
 
-class ListaProdutos(ListView):    
+class DispachProdutosMaisVendidos(View):
+
+    def dispatch(self, *args, **kwargs):
+        agg_count_pedidos = ItemPedido.objects.values('produto_id').annotate(num_pedidos=Count('id')).order_by('-num_pedidos')[:3]
+        itens = list(agg_count_pedidos)
+        id_produtos = []
+        for item in itens:
+            id_produtos.append(item['produto_id'])
+        self.produtos_mais_vendidos = Produto.objects.filter(id__in=id_produtos)
+
+        #return render(request, "list.html", {"page_obj": page_obj})
+
+        return super().dispatch(*args, **kwargs)
+    
+class ListaProdutos(DispachProdutosMaisVendidos, ListView):    
     model = Produto
     template_name = 'produto/lista.html' 
     context_object_name = 'produtos'
     paginate_by = 6
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['produtos_mais_vendidos'] = self.produtos_mais_vendidos     
+        return context
 
 class DetalheProduto(DetailView):
     model = Produto
@@ -27,8 +49,7 @@ class AdicionarCarrinho(View):
         http_referer = self.request.META.get('HTTP_REFERER', reverse('produto:lista'))
         variacao_id = self.request.GET.get('vid')
         
-        #TODO: testes de sessão, remover
-        #self.request.session.clear()
+        #TODO: verificar no fonte do otavio um if para limpar sessao
         
         if not variacao_id:
             messages.error(
@@ -101,7 +122,7 @@ class AdicionarCarrinho(View):
             f'Produto {produto_nome} {variacao_nome} adicionado no seu carrinho'
         )
         
-        return redirect(http_referer)
+        return redirect('produto:carrinho')
 
 class RemoverCarrinho(View):
     
@@ -142,27 +163,96 @@ class Carrinho(View):
 
 class ResumoDaCompra(View):
     
+    #verificar validate do token, transferir para arquivo
+    bearer_token = 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiZWU4OWMyMmE1ZTIyNjlmNWQyOTA1MzJiMzVjYzY2ZjMyY2FlMDIyZDM1OGEwMDFmMTNhZGViZTNjN2VjYzBmY2IxNDM1NzAzMDI4MjgxMTMiLCJpYXQiOjE3MTkwMTAzMTIuOTA1NjI3LCJuYmYiOjE3MTkwMTAzMTIuOTA1NjI5LCJleHAiOjE3NTA1NDYzMTIuODkxMDIzLCJzdWIiOiI5YzU3YzA5NS0wZTVhLTRmODEtYjlhOC0yYmM4ZTAzZDI4NzciLCJzY29wZXMiOlsic2hpcHBpbmctY2FsY3VsYXRlIiwiZWNvbW1lcmNlLXNoaXBwaW5nIl19.ZlVxabpqdJe8K_PYL9bo0MaElGo9YwxCCCEaPsA5GLOW_q82syoirhkLUsHg82DZUvLVeJH5W8jGAWyqAp8VxOc22YL-3rLLKiFTLQvsapO1vS9j6C9YXXQx0PXzkvBIknIri--1L5lpaRR9nPj3bp_OQULIOsnYkzI2aJ8H8OQ5XA3HT-b7lEqMOoyrpZbHGNtHXaOYL0NWyFb9Bft2Nbez10oRy5uEPm9svUj6RruLjbRMFIIBkGkdqjpSMtcAwCJCQm8OyDgdLxA16YseXkx6Gc32FkiuB_gaORxw_LckOIgO6z4f15PMkytB_MGsHDT7sIv6pXyd9d11qu_aXjHEXxcWuJ_4QszDmKnfXRQ8JJ4JYmw6F2W18sJSynuaSId2te8Sh3gBIkb-wCUC2e89uYXf33eI40SZ0cIgIHqJ4xd11qWtS-I7TzdDjWWPOILf2wdRwXNwiHr5QVsBIm0eoqmud65I9ttIKL9JTQ_JlT0E0f-4iLV392_LabJ8R9ikQq03AC5JwlhEcg3fogIITWLs3K6MNlxcPooVpSmr97u-1fmuDk_naE2mzCwS_4nI8N3QyufO4q-Vzfi6xEYsvsVhtyufU0sJRq3X9DgwJtupip2VGwmfoLoXmrAEXnCNKwdfdNj9T1ePzVMkWSWWM2wnYsrpLbQLkpNVIOg'
+    
+    def get_lista_frete_melhorenvio(self, perfil):
+        
+        url = 'https://melhorenvio.com.br/api/v2/me/shipment/calculate'
+        
+        perfil = PerfilUsuario.objects.filter(usuario=self.request.user).first()    
+        data = {
+            "from" : {
+                "postal_code": "18910066",
+            },
+            "to" : {
+              "postal_code" : perfil.cep,  
+            }, 
+            "package": {
+                "height": 4,
+                "width": 12,
+                "length": 17,
+                "weight": 0.3
+            }    
+        }
+        headers = { 
+                    "Authorization" :  self.bearer_token,
+                    "Content-Type" : "Application/json",
+                    "Accept" : "Application/json"
+                  }
+        try:
+            response = requests.post(url, headers=headers, json=data)
+            return response.json()
+        except Exception as error:
+            print(error)
+    
     def get(self, *args, **kwargs):
+        
         if not self.request.user.is_authenticated:
             return redirect('perfil:criar')
         
         perfil = PerfilUsuario.objects.filter(usuario=self.request.user).first()
+        if perfil is None:
+            messages.error(self.request, 'Usuario sem perfil')
+            return redirect('perfil:criar')
+        
+        if not self.request.session.get('carrinho'):
+            messages.error(
+                self.request,
+                'Carrinho vazio'
+            )
+            return redirect('produto:lista')
+        
+        fretes = self.get_lista_frete_melhorenvio(perfil)                       
+        
         contexto = {
             'usuario': self.request.user,
             'carrinho': self.request.session['carrinho'],
-            'perfil': perfil
+            'perfil': perfil,
+            'fretes': fretes
         }
         return render(self.request, 'produto/resumodacompra.html', contexto)
+
 
 class Tabela(ListView):
     model = Produto
     template_name = 'produto/tabela.html'
     context_object_name = 'produtos'
 
+
 class Variacoes_json(ListView):
+    
     def get(self, *args, **kwargs):
         produto_id = self.request.GET.get('produtoid')
         produto = Produto.objects.filter(id=produto_id).first()
         qs_data = Variacao.objects.filter(produto=produto)
         json_data = serializers.serialize('json', qs_data)
         return JsonResponse(json_data, safe=False)
+
+class Busca(ListaProdutos):
+
+    
+    def get_queryset(self, *args, **kwargs):
+        termo = self.request.GET.get('termo') or self.request.session.get('termo')
+        qs = super().get_queryset(*args, **kwargs)
+        
+        if not termo:
+            return qs
+        
+        self.request.session['termo'] = termo
+        qs = qs.filter(
+            Q(nome__icontains=termo) | Q(descricao__icontains=termo) | Q(descricao_longa__icontains=termo)
+        )
+        
+        self.request.session.save()
+        return qs
