@@ -1,10 +1,8 @@
 from django.db import models
-import os
 from django.conf import settings
 from PIL import Image
 from django.utils.text import slugify 
-
-# Create your models here.
+import os
 
 class Produto(models.Model):
     nome = models.CharField(max_length=200)
@@ -22,10 +20,6 @@ class Produto(models.Model):
             ('S', 'Simples'),
         )
     )
-
-    def get_preco_formatado(self):
-        return f'{self.preco_marketing:.2f}'.replace('.',',')
-        get_preco_formatado.short_description = 'Preço'
 
     @staticmethod
     def resize(img, new_width=800):
@@ -55,10 +49,6 @@ class Produto(models.Model):
 
         super().save(*args, **kwargs)
 
-       # max_image_size = 800    
-       # if self.imagem:
-        #    self.resize(self.imagem, max_image_size)
-
 
     def __str__(self):
         return self.nome   
@@ -72,6 +62,7 @@ class Variacao(models.Model):
     preco = models.FloatField()
     preco_promocional = models.FloatField(default=0)
     estoque = models.PositiveBigIntegerField(default=1)
+    id_preco_stripe = models.CharField(max_length=50, blank=True, null=True)
 
     def __str__(self):
         return self.produto.nome + '  -  ' + self.nome
