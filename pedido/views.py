@@ -77,7 +77,6 @@ class SalvarPedido(View):
             vid = variacao.id
             svid = str(vid)
             estoque = variacao.estoque
-            pprint(carrinho)
             qtd_carrinho = carrinho[svid]['quantidade']
             preco_unt = carrinho[svid]['preco_unitario']
             preco_unt_promo = carrinho[svid]['preco_unitario_promocional']
@@ -138,9 +137,9 @@ class CompraConcluida(View):
         pedido = Pedido.objects.filter(id=pedido_id).first()
         contexto = {                   
                     'pedido': pedido 
-                   }
-        py_email = PyEmail('august.rafael@gmail.com')
-        py_email.set_body()
+                   }       
+        py_email = PyEmail(pedido.usuario.email)
+        py_email.set_body(username=self.request.user, nro_pedido=pedido_id, request=self.request)
         py_email.enviar()
         return render(self.request, 'pedido/compraconcluida.html', contexto)
     
