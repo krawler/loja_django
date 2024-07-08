@@ -4,6 +4,7 @@ from django.views import View
 from datetime import datetime
 from . import forms
 from .models import PerfilUsuario
+from produto.models import Produto
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
@@ -67,11 +68,9 @@ class Criar(BasePerfil):
                 'Há erros no formulário, por favor verifique nos campos abaixo'   
                 )
                 return self.renderizar
-            
-        http_referer = self.request.META.get('HTTP_REFERER',reverse('produto:lista'))               
+                      
         username = self.userform.cleaned_data.get('username')
         password = self.userform.cleaned_data.get('password')
-        print(password)
         email = self.userform.data.get('email')
         first_name = self.userform.cleaned_data.get('first_name')
         last_name = self.userform.cleaned_data.get('last_name')
@@ -86,8 +85,6 @@ class Criar(BasePerfil):
             usuario.first_name = first_name
             usuario.last_name = last_name
             usuario.save(force_update=True)
-            
-            return redirect(http_referer)
             
             if not self.perfil:
                 self.perfilform.cleaned_data['usuario'] = usuario
@@ -106,20 +103,37 @@ class Criar(BasePerfil):
             perfil.usuario = usuario
             perfil.save()
         
-        if password:
-            authentica = authenticate(
-                self.request,
-                username=username,
-                password=password
-            )
-            if authentica:
-                login(self.request, user=usuario)
-                
+            if password:
+                authentica = authenticate(
+                    self.request,
+                    username=username,
+                    password=password
+                )
+                if authentica:
+                    login(self.request, user=usuario)
         
         self.request.session['carrinho'] = self.carrinho
         self.request.session.save()       
-        
-        return self.renderizar
+       
+        return redirect('perfil:cadastro_concluido')
+            
+
+class Cadastro_concluido(View):
+    model = PerfilUsuario
+    context_object_name = 'perfil'
+    template_name = 'perfil/cadastro_concluido.html'
+    paginate_by = 3
+
+    def get(self, *args, **kwargs):
+         usuario = self.request.user
+         perfil = PerfilUsuario.objects.filter(usuario=usuario).get() 
+         produtos = Produto.objects.all()[:3:1]
+         contexto = {
+            'usuario': usuario,
+            'perfil' : perfil,
+            'produtos': produtos
+         }    
+         return render(self.request, self.template_name, contexto)
 
 class Atualizar(View):
     pass
@@ -128,8 +142,6 @@ class Login(View):
     def post(self, *args, **kwargs):
         username = self.request.POST.get('username')
         password = self.request.POST.get('password')
-        
-        print('usuario logado')
         
         if not username or not password:
             messages.error(
