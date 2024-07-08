@@ -2,6 +2,15 @@
 
 {% load crispy_forms_tags %}
 
+<script>
+    $(document).ready(function(){
+        $("#id_data_nascimento").datepicker({
+            format: "dd/mm/yyyy",
+            language: "pt-BR"
+        });
+    });
+</script>
+
 {% block conteudo %}
 
 <div class="row">
@@ -49,8 +58,3 @@
     </div>
 </div>
 {% endblock %}
-<script>
-   $(document).ready(function(){
-       
-   });
-</script>
