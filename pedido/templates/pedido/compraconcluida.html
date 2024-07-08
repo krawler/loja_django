@@ -8,7 +8,7 @@
         <h3>{{pedido}}</h3>
         <div class="row mt-4">
             <h5 class="col-lg-4">Sua compra foi feita com sucesso</h5>
-            <p class="ml-3">Um email foi enviado para você com as informações dessa compra, se quiser acompanhar veja em &nbsp;
+            <p class="ml-3">Um email foi enviado para {{request.user.email}} com as informações dessa compra, se quiser acompanhar veja em &nbsp;
                 <a href="{% url 'pedido:meuspedidos' %}">pedidos</a></p>     
         </div>
         <div class="row">
