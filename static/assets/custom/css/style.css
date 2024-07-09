@@ -31,6 +31,14 @@
     }
 }
 
+@media (min-width: 62em) {
+    .card-columns_produtos_rodape {
+        -webkit-column-count: 4;
+        -moz-column-count: 4;
+        column-count: 4;
+    }
+}
+
 ul.errorlist  {
     list-style-type: none;
     margin: 5px 0;
@@ -90,7 +98,41 @@ ul.errorlist li {
     text-align: center;
 }
 
+.text-right {
+    text-align: right;
+}
+
+.bottom_40pixel{
+    margin-bottom: 40px;
+}
+
+.img_produtos_mais_vendidos{
+    max-width: 250px;  
+    min-height: auto; 
+    float:left;  
+}
+
 tbody > tr.selected > * {
     box-shadow: inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.9);
     color : rgb(var(--dt-row-selected-text));
+}
+
+#id_data_nascimento, #id_cpf, #id_cep{
+    max-width: 150px;
+}
+
+#id_idade{
+    max-width: 50px;
+}
+
+#id_numero{
+    max-width: 90px;
+}
+
+#id_bairro, #id_cidade, #id_estado, #id_password, #id_password2, #id_username, #id_first_name, #id_last_name{
+    max-width: 350px;
+}
+
+#id_email, #id_endereco, #id_complemento {
+    max-width: 600px;
 }

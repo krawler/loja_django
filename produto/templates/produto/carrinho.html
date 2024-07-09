@@ -60,7 +60,7 @@
         <div class='table-responsive'>
             <table class="table">
                 <tr>
-                    <td style="text-align: right">
+                    <td class="text-right">
                       {% if request.session.carrinho %}  
                         <p class="lead">
                         {{request.session.carrinho|cart_total_preco|formata_preco}}
@@ -71,12 +71,12 @@
             </table>
         </div>
     </div>
-    <div class="col-lg mt-auto" style="margin-bottom:40px;">
+    <div class="col-lg mt-auto bottom_40pixel">
         <a class="btn btn-lg btn-block btn-primary" href="{% url 'produto:lista' %}">
             Continuar comprando
         </a>    
     </div>    
-    <div class="col-lg mt-auto" style="margin-bottom:40px;">
+    <div class="col-lg mt-auto bottom_40pixel">
         {% if request.user.is_authenticated %}
         <a class="btn btn-lg btn-block btn-primary" href="{% url 'produto:resumodacompra' %}">
             Finalizar compra
