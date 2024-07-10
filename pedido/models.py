@@ -1,3 +1,4 @@
+from datetime import date, datetime
 from django.db import models
 from django.contrib.auth.models import User
 from produto.models import Variacao, Produto
@@ -5,6 +6,8 @@ from produto.models import Variacao, Produto
 class Pedido(models.Model):
     
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    data_emissao = models.DateField(default=date.today())
+    hora_emissao = models.TimeField(default=datetime.now())
     total = models.FloatField()
     qtd_total = models.FloatField(default=0)
     status = models.CharField(
