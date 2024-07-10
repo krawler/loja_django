@@ -25,7 +25,8 @@ class UserForm(forms.ModelForm):
     password2 = forms.CharField(
         required=False,
         widget=forms.PasswordInput(),
-        label='Cofirmação de senha'
+        label='Cofirmação de senha',
+        help_text='Digite a senha igual ao campo acima'
     )
     
     def __init__(self, usuario=None, *args, **kwargs):
