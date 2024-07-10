@@ -2,16 +2,27 @@
 
 {% load crispy_forms_tags %}
 
+{% block conteudo %}
+
 <script>
     $(document).ready(function(){
-        $("#id_data_nascimento").datepicker({
-            format: "dd/mm/yyyy",
-            language: "pt-BR"
+        $("#id_cep").blur(() => {
+            let cep = $("#id_cep").val().replace("-", "")
+            let url_call = "https://viacep.com.br/ws/" + cep + "/json/"; 
+             $.ajax({
+                        url: url_call,
+                        type: 'GET',
+                        async: true,
+                        success: function(response){
+                            $("#id_bairro").val(response.bairro);
+                            $("#id_cidade").val(response.localidade);
+                            $("#id_endereco").val(response.logradouro);
+                        }
+                    },                
+            );
         });
     });
 </script>
-
-{% block conteudo %}
 
 <div class="row">
     {% if not request.user.is_authenticated %}
@@ -30,7 +41,9 @@
                     <input type="password" name="password" placeholder="Digite sua senha"
                            class="form-control" id="exampleInputPassword">
                 </div>
-                <button type="submit" class="btn btn-primary btn-block btn-lg">Login</button>
+                <button type="submit" id="btn_login_perfil" class="btn btn-primary btn-block btn-lg">
+                    Login
+                </button>
             </form>   
 
         </div>
@@ -49,7 +62,7 @@
             
             <div class="row">
                 <div class="col">
-                    <button type="submit" class="btn btn-primary btn-block btn-lg">
+                    <button type="submit" class="btn btn-primary btn-lg btn-cadastro-perfil">
                         Enviar
                     </button>
                 </div>
