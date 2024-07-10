@@ -8,6 +8,7 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 from django.db.models import Q, Count, QuerySet
 from produto.models import Produto, Variacao 
+from produto.produto_service import ProdutoService
 from perfil.models import PerfilUsuario
 from pedido.models import ItemPedido
 import json
@@ -16,16 +17,13 @@ import requests
 class DispachProdutosMaisVendidos(View):
 
     def dispatch(self, *args, **kwargs):
-        agg_count_pedidos = ItemPedido.objects.values('produto_id').annotate(num_pedidos=Count('id')).order_by('-num_pedidos')[:3]
-        itens = list(agg_count_pedidos)
-        id_produtos = []
-        for item in itens:
-            id_produtos.append(item['produto_id'])
-        self.produtos_mais_vendidos = Produto.objects.filter(id__in=id_produtos)
-
-        #return render(request, "list.html", {"page_obj": page_obj})
-
+        self.produtos_mais_vendidos = ProdutoService().get_produtos_mais_vendidos()
         return super().dispatch(*args, **kwargs)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['produtos_mais_vendidos'] = self.produtos_mais_vendidos     
+        return context
     
 class ListaProdutos(DispachProdutosMaisVendidos, ListView):    
     model = Produto
@@ -33,12 +31,8 @@ class ListaProdutos(DispachProdutosMaisVendidos, ListView):
     context_object_name = 'produtos'
     paginate_by = 6
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['produtos_mais_vendidos'] = self.produtos_mais_vendidos     
-        return context
 
-class DetalheProduto(DetailView):
+class DetalheProduto(DispachProdutosMaisVendidos, DetailView):
     model = Produto
     template_name = 'produto/detalhe.html' 
     context_object_name = 'produto'
@@ -153,11 +147,12 @@ class RemoverCarrinho(View):
         
         return redirect(http_referer)
 
-class Carrinho(View):
+class Carrinho(DispachProdutosMaisVendidos, View):
     
     def get(self, *args, **kwargs):
         context = {
-            'carrinho': self.request.session.get('carrinho')
+            'carrinho': self.request.session.get('carrinho'),
+            'produtos_mais_vendidos': self.produtos_mais_vendidos
         }
         return render(self.request, 'produto/carrinho.html', context)
 
@@ -219,7 +214,8 @@ class ResumoDaCompra(View):
             'usuario': self.request.user,
             'carrinho': self.request.session['carrinho'],
             'perfil': perfil,
-            'fretes': fretes
+            'fretes': fretes,
+            'produtos_mais_vendidos': ProdutoService().get_produtos_mais_vendidos()
         }
         return render(self.request, 'produto/resumodacompra.html', contexto)
 
