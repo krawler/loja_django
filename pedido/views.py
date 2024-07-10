@@ -5,8 +5,10 @@ from django.views.generic.detail import DetailView
 from django.http import HttpResponse
 from django.contrib import messages
 from produto.models import Variacao, Produto
+from produto.produto_service import ProdutoService
 from .models import Pedido, ItemPedido
 from .email.py_email import PyEmail 
+from datetime import datetime, date
 from pprint import pprint
 import stripe
 
@@ -108,7 +110,9 @@ class SalvarPedido(View):
         pedido = Pedido(usuario=self.request.user, 
                         total=valor_total_carrinho, 
                         qtd_total=qtd_total_carrinho,
-                        status='C')   
+                        status='C',
+                        data_emissao=date.today(),
+                        hora_emissao=datetime.now())   
         pedido.save()
         
          
@@ -135,8 +139,10 @@ class CompraConcluida(View):
     def get(self, *args, **kwargs):
         pedido_id =  self.request.session.get('pedido_id')   
         pedido = Pedido.objects.filter(id=pedido_id).first()
+        produtos_mais_vendidos = ProdutoService().get_produtos_mais_vendidos()
         contexto = {                   
-                    'pedido': pedido 
+                    'pedido': pedido, 
+                    'produtos_mais_vendidos': produtos_mais_vendidos
                    }       
         py_email = PyEmail(pedido.usuario.email)
         py_email.set_body(username=self.request.user, nro_pedido=pedido_id, request=self.request)
@@ -152,11 +158,21 @@ class MeusPedidos(DispachLoginRequired, ListView):
     def get(self, *args, **kwargs):
         usuario = self.request.user
         pedidos = Pedido.objects.filter(usuario=usuario)
-        contexto = {'pedidos': pedidos}
+        produtos_mais_vendidos = ProdutoService().get_produtos_mais_vendidos()
+        contexto = {
+            'pedidos': pedidos,
+            'produtos_mais_vendidos': produtos_mais_vendidos
+        }
         return render(self.request, self.template_name, contexto)
 
 class Detalhe(DispachLoginRequired, DetailView):
     model = Pedido
+    produtos_mais_vendidos = ProdutoService().get_produtos_mais_vendidos()
     context_object_name = 'pedido'
     template_name = 'pedido/detalhe.html'
     pk_url_kwarg = 'pk'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['produtos_mais_vendidos'] = self.produtos_mais_vendidos     
+        return context
