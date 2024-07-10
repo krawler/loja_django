@@ -5,10 +5,10 @@ from datetime import datetime
 from . import forms
 from .models import PerfilUsuario
 from produto.models import Produto
+from produto.produto_service import ProdutoService
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
-
 import copy
 
 class BasePerfil(View):
@@ -21,7 +21,7 @@ class BasePerfil(View):
         
         self.carrinho = copy.deepcopy(self.request.session.get('carrinho'), {})
         self.perfil = None
-        
+
         if self.request.user.is_authenticated:
             self.perfil = PerfilUsuario.objects.filter(usuario=self.request.user).first()
             self.usuario = User.objects.filter(username=self.request.user).first()
@@ -41,12 +41,14 @@ class BasePerfil(View):
                             forms.PerfilForm(
                                 data=self.request.POST or None,
                                 instance=self.perfil, 
-                                perfil=self.perfil)
+                                perfil=self.perfil),
+                'produtos_mais_vendidos' : ProdutoService().get_produtos_mais_vendidos() 
             }
         else:
             self.context = {
                 'userform': forms.UserForm(data=self.request.POST or None),
-                'perfilform': forms.PerfilForm(data=self.request.POST or None)
+                'perfilform': forms.PerfilForm(data=self.request.POST or None),
+                'produtos_mais_vendidos' : ProdutoService().get_produtos_mais_vendidos() 
             }
             
         self.userform = self.context['userform']
