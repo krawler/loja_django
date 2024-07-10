@@ -79,6 +79,26 @@ ul.errorlist li {
     }
 }
 */
+.very-weak {
+    color: red;
+}
+
+.weak{
+    color: orange;
+}
+
+.mediocre{
+    color: mediumorchid; 
+}
+
+.strong{
+    color: mediumblue;
+}
+
+.very-strong{
+    color: darkblue;
+}
+
 .form-group textarea {
     width: 100%;
 }
@@ -108,8 +128,24 @@ ul.errorlist li {
 
 .img_produtos_mais_vendidos{
     max-width: 250px;  
-    min-height: auto; 
-    float:left;  
+    height: 380px;
+    border:none;
+}
+
+.img_produtos_mais_vendidos img{
+    max-height: 230px;
+}
+
+.card-body-carroussel{
+    padding: 0.5rem;
+}
+
+.card-footer-rodape{
+    padding: 0.50rem 1.25rem;
+}
+
+.btn-cadastro-perfil{
+    width: 350px;
 }
 
 tbody > tr.selected > * {
@@ -117,12 +153,16 @@ tbody > tr.selected > * {
     color : rgb(var(--dt-row-selected-text));
 }
 
+#exampleInputPassword, #username, #btn_login_perfil{
+    max-width:350px;
+}
+
 #id_data_nascimento, #id_cpf, #id_cep{
     max-width: 150px;
 }
 
 #id_idade{
-    max-width: 50px;
+    max-width: 100px;
 }
 
 #id_numero{
