@@ -132,8 +132,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+# para Heroku ativa STATIC_ROOT
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-STATICFILES_DIRS = [os.path.join('static')]
+#STATICFILES_DIRS = [os.path.join('static')]
 
 # TODO: colocar o media url e root
 
