@@ -1,1 +1,1 @@
-web:gunicorn -b 127.0.0.1:8001 loja_django.wsgi.application --worker-tmp-dir /dev/shm --log-file - 
+web:gunicorn -b 127.0.0.1:8000 loja_django.wsgi.application --worker-tmp-dir /dev/shm --log-file - 
