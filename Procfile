@@ -1,1 +1,1 @@
-web:gunicorn loja_django:produto --worker-tmp-dir /dev/shm --log-file - 
+web:gunicorn loja_django:loja_django --worker-tmp-dir /dev/shm --log-file - 
