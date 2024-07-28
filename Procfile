@@ -1,1 +1,1 @@
-web: gunicorn -b loja-django-ac6c5ad21656.herokuapp.com:80 loja_django.wsgi.application
+web: gunicorn -b 127.0.0.1:80 loja_django.wsgi.application
