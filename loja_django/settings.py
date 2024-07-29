@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     # TODO: Remover debug toolbar
     'debug_toolbar',
@@ -62,6 +63,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
      # TODO: remover debug toolbar
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'loja_django.urls'
@@ -134,7 +136,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 # para Heroku ativa STATIC_ROOT
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_BASE = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(STATIC_BASE, 'staticfiles')
+
 STATICFILES_DIRS = [os.path.join('static')]
 
 # TODO: colocar o media url e root
@@ -161,5 +165,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
+
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 django_heroku.settings(locals())
