@@ -166,10 +166,6 @@ INTERNAL_IPS = [
     '127.0.0.1',
 ]
 
-STORAGES = {
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
+STATICFILES_STORAGE : "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-django_heroku.settings(locals())
+django_heroku.settings(locals(), staticfiles=False)
