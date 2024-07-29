@@ -8,7 +8,7 @@
 /produto/migrations/__pycache__
 /perfil/migrations/__pycache__
 /produto/templatetags/__pycache__
-/produto_imagens/
+
 loja_django/__pycache__
 db.sqlite3
 
