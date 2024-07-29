@@ -1,1 +1,2 @@
-web:gunicorn loja_django.wsgi 
+web: gunicorn loja_django.wsgi 
+heroku ps:scale web=1 
