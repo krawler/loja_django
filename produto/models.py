@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.contrib.auth.models import User
 from PIL import Image
 from django.utils.text import slugify 
 import os
@@ -59,7 +60,7 @@ class Variacao(models.Model):
     
     nome = models.CharField(max_length=255, blank=True, null=True)
     produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
-    preco = models.FloatField()
+    preco = models.FloatField(default=0)
     preco_promocional = models.FloatField(default=0)
     estoque = models.PositiveBigIntegerField(default=1)
     id_preco_stripe = models.CharField(max_length=50, blank=True, null=True)
@@ -70,3 +71,15 @@ class Variacao(models.Model):
     class Meta:
         verbose_name = 'Variação'
         verbose_name_plural = 'variações'        
+
+class SessaoCarrinho(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
+    Variacao = models.ForeignKey(Variacao, on_delete=models.CASCADE, null=False)
+    quantidade = models.PositiveIntegerField(null=False)
+    preco_quantitativo = models.FloatField()
+    preco_quantitativo_promocional = models.FloatField()
+    slug = models.TextField(null=True)
+
+    class Meta:
+        verbose_name = "Carrinho da sessão salva"
+        db_table = "sessao_carrinho"   
