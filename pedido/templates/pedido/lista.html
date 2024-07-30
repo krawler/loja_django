@@ -10,15 +10,17 @@
         <div class="table-responsive">
             <table class="table table-striped">
                 <tr>
+                    <th scope="col" class="text-center">Pedido</th>
+                    <th scope="col" class="text-center">Data de emissão</th>
                     <th scope="col" class="text-center">Qtd. Itens</th>
                     <th scope="col" class="text-center">Status</th>
                     <th scope="col" class="text-center">Total</th>
                     <th scope="col" class="text-center">Mais detalhes</th>
-                    <th scope="col" class="text-center">Pedido</th>
                 </tr>
-                {% for pedido in pedidos %}
+                {% for pedido in page_obj %}
                 <tr>
-                    <th scope="row">{{pedido}}</td>                    
+                    <th scope="row">{{pedido}}</td>                  
+                    <td class="text-center">{{pedido.data_emissao|date:"d/m/Y"}}</td>  
                     <td class="text-center">{{pedido.qtd_total}}</td>
                     <td class="text-center">{{pedido.get_status_display}}</td>
                     <td class="text-center">{{pedido.total|formata_preco}}</td>
