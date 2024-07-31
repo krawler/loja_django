@@ -19,7 +19,7 @@
             <dt class="col-lg-2">Idade:</dt>
             <dd class="col-lg-4">{{perfil.idade}}</dd>
             <dt class="col-lg-2">Nascimento:</dt>
-            <dd class="col-lg-4">{{perfil.data_nascimento}}</dd>
+            <dd class="col-lg-4">{{perfil.data_nascimento|formata_br_date}}</dd>
 
             <dt class="col-lg-2">CPF:</dt>
             <dd class="col-lg-4">{{perfil.cpf}}</dd>
@@ -35,9 +35,9 @@
             <dd class="col-lg-4">{{perfil.numero}}</dd>
 
             <dt class="col-lg-2">Complemento:</dt>
-            <dd class="col-lg-4">{{perfil.complemento}}</dd>
+            <dd class="col-lg-4">{{perfil.complemento|none_to_blank}}</dd>
             <dt class="col-lg-2">Bairro:</dt>
-            <dd class="col-lg-4">{{perfil.bairro}}</dd>
+            <dd class="col-lg-4">{{perfil.bairro|none_to_blank}}</dd>
 
             <dt class="col-lg-2">Cidade:</dt>
             <dd class="col-lg-4">{{perfil.cidade}}</dd>
