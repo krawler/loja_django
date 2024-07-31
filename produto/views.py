@@ -42,8 +42,7 @@ class AdicionarCarrinho(View):
     def get(self, *args, **kwargs):
         http_referer = self.request.META.get('HTTP_REFERER', reverse('produto:lista'))
         variacao_id = self.request.GET.get('vid')
-        
-        #TODO: verificar no fonte do otavio um if para limpar sessao
+        qtd_form_param = self.request.GET.get('quantidade')
         
         if not variacao_id:
             messages.error(
@@ -61,7 +60,7 @@ class AdicionarCarrinho(View):
         variacao_nome = variacao.nome or ''
         preco_unitario = variacao.preco
         preco_unitario_promocional = variacao.preco_promocional
-        quantidade = 1
+        quantidade = qtd_form_param if qtd_form_param is not None else 1 
         slug = produto.slug
         imagem = json.dumps(str(produto.imagem))
         
@@ -81,9 +80,9 @@ class AdicionarCarrinho(View):
         if variacao_id in carrinho:
             quantidade_carrinho = carrinho[variacao_id]['quantidade']
             #TODO: pegar quantidade dinamicamente
-            quantidade_carrinho += 1
+            quantidade_carrinho += quantidade
             
-            if variacao_estoque < quantidade_carrinho:
+            if variacao_estoque < int(quantidade_carrinho):
                 messages.error(
                     self.request,
                     f'Estoque insuficiente para {quantidade_carrinho}x no produto {produto_nome}.' 
@@ -104,13 +103,15 @@ class AdicionarCarrinho(View):
                 'preco_unitario_promocional' : preco_unitario_promocional,
                 'quantidade' : quantidade,
                 'slug' : slug,
-                'preco_quantitativo_promocional': preco_unitario_promocional * quantidade,
-                'preco_quantitativo' : preco_unitario * quantidade,
+                'preco_quantitativo_promocional': preco_unitario_promocional * float(quantidade),
+                'preco_quantitativo' : preco_unitario * float(quantidade),
                 'imagem' : imagem
             }
-                  
+
+        ProdutoService().insert_item_session_carrinho(carrinho[variacao_id], self.request.user)
+
         self.request.session.save()  
-        
+
         messages.success(
             self.request,
             f'Produto {produto_nome} {variacao_nome} adicionado no seu carrinho'
@@ -143,13 +144,20 @@ class RemoverCarrinho(View):
             f'Produto {carrinho["produto_nome"]} {carrinho["variacao_nome"]} removido do seu carrinho'
         )
         del self.request.session['carrinho'][variacao_id]
+        
+        variacao = Variacao.objects.filter(id=variacao_id).first()
+        ProdutoService().delete_item_session_carrinho(self.request.user, variacao)
+        
         self.request.session.save()
         
         return redirect(http_referer)
 
 class Carrinho(DispachProdutosMaisVendidos, View):
+    #TODO: salvar os itens da sessao quando carrega o carrinho
+
     
     def get(self, *args, **kwargs):
+
         context = {
             'carrinho': self.request.session.get('carrinho'),
             'produtos_mais_vendidos': self.produtos_mais_vendidos
