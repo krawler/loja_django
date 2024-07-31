@@ -37,7 +37,10 @@
             <form action="{% url 'produto:adicionaraocarrinho' %}" id="form-add-to-cart">
                 {% if produto.variacao_set %}
                     <div class="form-group">
-                        <select id="select-variacoes" name="vid" class="form-control form-control-lg">
+                        <input type="number" id="quantidade" name="quantidade" value="1" 
+                            class="form-control form-control-lg input_qtd">
+                        <select id="select-variacoes" name="vid" 
+                        class="form-control form-control-lg input_variacao">
                             {% for variacao in produto.variacao_set.all %}
                                 {% if variacao.preco_promocional %}
                                     <option data-preco="{{variacao.preco|formata_preco}}" 
@@ -63,7 +66,7 @@
                         </select>
                     </div>
                 {% endif %}    
-                <div class="text-left">
+                <div class="btn-add-cart">
                     <button type="submit" class="btn btn-primary btn-lg btn-block">
                         <i class="fa fa-shopping-cart" aria-hidden="true"></i>
                         Adicionar ao carrinho
