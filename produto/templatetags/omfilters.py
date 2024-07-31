@@ -21,6 +21,7 @@ def remove_aspas(val):
 def none_to_blank(val):
     if val is None:
         return "-"
+    return val    
 
 @register.filter
 def cart_total_qtd(carrinho):
