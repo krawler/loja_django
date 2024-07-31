@@ -78,9 +78,9 @@ class AdicionarCarrinho(View):
         carrinho = self.request.session['carrinho']
         
         if variacao_id in carrinho:
-            quantidade_carrinho = carrinho[variacao_id]['quantidade']
+            quantidade_carrinho = float(carrinho[variacao_id]['quantidade'])
             #TODO: pegar quantidade dinamicamente
-            quantidade_carrinho += quantidade
+            quantidade_carrinho += float(quantidade)
             
             if variacao_estoque < int(quantidade_carrinho):
                 messages.error(
