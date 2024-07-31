@@ -41,9 +41,11 @@
                         Entrar ou se cadastrar
                     {% endif %}    
                     </a>
-                    <a class="dropdown-item" href="{% url 'pedido:meuspedidos' %}">Meus Pedidos</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="{% url 'perfil:logout' %}">Logout</a>
+                    {% if request.user.is_authenticated %}
+                        <a class="dropdown-item" href="{% url 'pedido:meuspedidos' %}">Meus Pedidos</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'perfil:logout' %}">Sair</a>
+                    {% endif %}
                 </div>
             </li>
         </ul>
