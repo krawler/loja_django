@@ -10,9 +10,10 @@
 /produto/templatetags/__pycache__
 
 loja_django/__pycache__
-db.sqlite3
 
+db.sqlite3
 produto_produto.sql
+stripe_backup_code.txt
 
 produto/migrations/
 .produto_produto.sql.kate-swp
