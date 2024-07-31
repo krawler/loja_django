@@ -1,7 +1,11 @@
 from django.views import View
 from pedido.models import ItemPedido
+from django.contrib.auth.models import User
 from django.db.models import Q, Count, QuerySet
-from produto.models import Produto
+from decimal import Decimal
+from produto.models import Produto, SessaoCarrinho, Variacao
+
+import json
 
 class ProdutoService():
 
@@ -12,3 +16,34 @@ class ProdutoService():
         for item in itens:
             id_produtos.append(item['produto_id'])
         return Produto.objects.filter(id__in=id_produtos)
+    
+    def insert_item_session_carrinho(self, sessao_carrinho, user):
+        variacao_sessao = Variacao.objects.filter(id=sessao_carrinho['variacao_id']).first()
+        usuario = User.objects.filter(username=user).first()
+        if not user.is_anonymous:
+            variacao_user_sessao = SessaoCarrinho.objects.filter(Variacao=variacao_sessao, user=usuario).first()
+            if variacao_user_sessao is None:
+                sessao = SessaoCarrinho()
+                sessao.Variacao = variacao_sessao
+                sessao.user = usuario
+                sessao.quantidade = sessao_carrinho['quantidade']             
+                sessao.preco_quantitativo = sessao_carrinho['preco_quantitativo']
+                sessao.preco_quantitativo_promocional = sessao_carrinho['preco_quantitativo_promocional']
+                sessao.slug = sessao_carrinho['slug']
+                sessao.save()
+            else:
+                variacao_user_sessao.quantidade = sessao_carrinho['quantidade']
+                variacao_user_sessao.save()
+                #TODO Altera a quantidade
+        else:
+            print("Anonynous")
+
+    def limpa_session_carrinho_user(self, user):
+        if not user.is_anonymous:
+            SessaoCarrinho.objects.filter(user=user).delete()
+
+    def delete_item_session_carrinho(self, usuario, variacao):
+        SessaoCarrinho.objects.filter(user=usuario, Variacao=variacao).delete()
+
+    def getCarrinhoSessao(self, user):
+        return SessaoCarrinho.objects.filter(user=user).all()
