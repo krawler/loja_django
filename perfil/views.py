@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 import copy
+import json
 
 class BasePerfil(View):
     
@@ -63,13 +64,13 @@ class Criar(BasePerfil):
     
     def post(self, *args, **kwargs):
         
-        if not self.request.user.is_authenticated:
-            if not self.userform.is_valid() or not self.perfilform.is_valid():
-                messages.error(
-                self.request,
-                'Há erros no formulário, por favor verifique nos campos abaixo'   
-                )
-                return self.renderizar
+        if not self.userform.is_valid() or not self.perfilform.is_valid():    
+            msg = 'Há erros no formulário, por favor verifique nos campos abaixo'  
+            if not estado == uf:
+                msg += ' - '
+            messages.error(self.request, msg)             
+
+            return self.renderizar
                       
         username = self.userform.cleaned_data.get('username')
         password = self.userform.cleaned_data.get('password')
@@ -133,7 +134,8 @@ class Cadastro_concluido(View):
          contexto = {
             'usuario': usuario,
             'perfil' : perfil,
-            'produtos': produtos
+            'produtos': produtos,
+            'produtos_mais_vendidos' : ProdutoService().get_produtos_mais_vendidos() 
          }    
          return render(self.request, self.template_name, contexto)
 
@@ -163,7 +165,27 @@ class Login(View):
         
         login(self.request, user=usuario)
         
-        if self.request.session.get('carrinho'):
+        if not self.request.session.get('carrinho'):
+            self.request.session['carrinho'] = {}
+            self.request.session.save()
+            
+        carrinho_sessao = self.request.session['carrinho']
+        carrinho_bd = ProdutoService().getCarrinhoSessao(usuario) 
+        if carrinho_bd is not None:
+            for item in carrinho_bd:
+                carrinho_sessao[item.Variacao.id] = {
+                    'variacao_id': item.Variacao.id,
+                    'variacao_nome': item.Variacao.nome,
+                    'produto_nome': item.Variacao.produto.nome,
+                    'imagem': json.dumps(str(item.Variacao.produto.imagem)),
+                    'preco_quantitativo': item.preco_quantitativo,
+                    'preco_quantitativo_promocional': item.preco_quantitativo_promocional,
+                    'quantidade': item.quantidade,
+                    'slug': item.slug,
+                    'produto_id': item.Variacao.produto.id
+                }
+                    
+        if carrinho_sessao is not None:
             return redirect('produto:carrinho')             
             
         return redirect('produto:lista')        
@@ -171,8 +193,9 @@ class Login(View):
 
 class Logout(View):
     def get(self, *args, **kwargs):
-        carrinho = copy.deepcopy(self.request.session.get('carrinho'))
+        
+        carrinho = self.request.session.get('carrinho')
+        
         logout(self.request)
-        self.request.session['carrinho'] = carrinho
         self.request.session.save()
         return redirect('produto:lista')
