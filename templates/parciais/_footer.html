@@ -1,24 +1,24 @@
-
 {% load static %}
 
 {% load omfilters %}
 
+<div class="container mt-4 mb-4">
+<p class="lead">O que as pessoas estão mais comprando</p>
 <div class="row">
     <div class="col-lg-12">
-        <div class="card-columns">
+        <div class="card-columns_produtos_rodape">
 
             {% for produto in produtos_mais_vendidos %}   
             
-            <div class="card">
+            <div class="card img_produtos_mais_vendidos">
                 {% if produto.imagem %}
-                  <a href="{{produto.slug}}">  
-                    <img class="card-img-top" src="{{ produto.imagem.url }}" alt="Card image cap">
+                  <a href="{% url 'produto:detalhe' produto.slug %}">  
+                    <img class="card-img-top " src="{{ produto.imagem.url }}" alt="Card image cap">
                   </a>
                 {% endif %} 
 
-                <div class="card-body">
+                <div class="card-body-carroussel">
                     <h5 class="card-title">{{ produto.nome }}</h5>
-                    <p class="card-text">{{ produto.descricao }}</p>
                     <div class="container product-price-block text-center">
                         {% if produto.preco_marketing_promocional > 0 %}
                             <span class="product-price">
@@ -30,8 +30,8 @@
                             </span>
                     </div>
                 </div>
-                <div class="card-footer bg-transparent border-top-light-custom text-center">
-                    <a href="{{produto.slug}}" class="btn btn-primary btn-sm m-1 btn-block">
+                <div class="card-footer-rodape bg-transparent border-top-light-custom text-center">
+                    <a href="{% url 'produto:detalhe' produto.slug %}" class="btn btn-primary btn-sm m-1 btn-block">
                         <i class="fa fa-shopping-cart" aria-hidden="true"></i>
                         Comprar
                     </a>
@@ -43,23 +43,33 @@
     </div>
 </div>
 
+</div>
 
 
-<script src="{% static 'assets/bootstrap/js/jquery-3.2.1.slim.min.js' %} "></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 
 <script src="{% static 'assets/bootstrap/js/popper.min.js' %} "></script>
 <script src="{% static 'assets/bootstrap/js/bootstrap.min.js' %} "></script>
 <script defer src="{% static 'assets/font-awesome/js/all.js' %} "></script>
 <script src="{% static 'assets/custom/js/scripts.js' %} "></script>
-
+<script src="{% static 'assets/custom/js/password_strength.js' %} "></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.pt-BR.min.js"></script>
 
 <script>
     $(document).ready(function(){
+
         $("#id_data_nascimento").datepicker({
             format: "dd/mm/yyyy",
             language: "pt-BR"
-        })
-    })
+        });
+
+        $("#id_cep").mask("00000-000");
+        $("id_data_nascimento").mask("00/00/0000");
+        $("#id_cpf").mask("000.000.000-00");
+
+        $("#id_password").passwordStrengthIndicator();
+        $("#id_password2").passwordStrengthIndicator();
+    });  
 </script>
