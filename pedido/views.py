@@ -4,6 +4,7 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.http import HttpResponse
 from django.contrib import messages
+from django.core.paginator import Paginator
 from produto.models import Variacao, Produto
 from produto.produto_service import ProdutoService
 from .models import Pedido, ItemPedido
@@ -70,6 +71,9 @@ class SalvarPedido(View):
     
     def get(self, *args, **kwargs):
         carrinho = self.request.session.get('carrinho')
+        if carrinho is None:
+            return redirect('pedido:compraconcluida') 
+        
         carrinho_variacao_ids = [v for v in carrinho]
         bd_variacoes = list(
             Variacao.objects.select_related('produto').filter(id__in=carrinho_variacao_ids)
@@ -79,9 +83,9 @@ class SalvarPedido(View):
             vid = variacao.id
             svid = str(vid)
             estoque = variacao.estoque
-            qtd_carrinho = carrinho[svid]['quantidade']
-            preco_unt = carrinho[svid]['preco_unitario']
-            preco_unt_promo = carrinho[svid]['preco_unitario_promocional']
+            qtd_carrinho = int(carrinho[svid]['quantidade'])
+            preco_unt = carrinho[svid]['preco_quantitativo']
+            preco_unt_promo = carrinho[svid]['preco_quantitativo_promocional']
             
             if estoque < qtd_carrinho:
                 carrinho[svid]['quantidade'] = estoque        
@@ -97,7 +101,7 @@ class SalvarPedido(View):
                 self.request.session.save()
                 return redirect('produto:carrinho')       
         
-        qtd_total_carrinho = sum([item['quantidade'] for item in carrinho.values()])
+        qtd_total_carrinho = sum([int(item['quantidade']) for item in carrinho.values()])
         valor_total_carrinho =  sum(
                                     [
                                         item.get('preco_quantitativo_promocional')
@@ -111,7 +115,7 @@ class SalvarPedido(View):
                         total=valor_total_carrinho, 
                         qtd_total=qtd_total_carrinho,
                         status='C',
-                        data_emissao=date.today(),
+                        data_emissao=datetime.today(),
                         hora_emissao=datetime.now())   
         pedido.save()
         
@@ -130,6 +134,7 @@ class SalvarPedido(View):
         ])
                                              
         del self.request.session['carrinho']
+        ProdutoService().limpa_session_carrinho_user(self.request.user)
         self.request.session['pedido_id'] = pedido.id 
         return redirect('pedido:compraconcluida')        
         
@@ -159,9 +164,14 @@ class MeusPedidos(DispachLoginRequired, ListView):
         usuario = self.request.user
         pedidos = Pedido.objects.filter(usuario=usuario)
         produtos_mais_vendidos = ProdutoService().get_produtos_mais_vendidos()
+        page = self.request.GET.get('page', 1)
+        paginator = Paginator(pedidos, per_page=10)
+        page_object = paginator.get_page(page)
         contexto = {
             'pedidos': pedidos,
-            'produtos_mais_vendidos': produtos_mais_vendidos
+            'produtos_mais_vendidos': produtos_mais_vendidos,
+            "page_obj": page_object,
+            "is_paginated": True
         }
         return render(self.request, self.template_name, contexto)
 
