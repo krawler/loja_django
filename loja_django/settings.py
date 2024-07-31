@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 from django.contrib.messages import constants
-import django_heroku
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -26,9 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'bd8cea0d007988fa518e366f1dbe9ca9aa5780a520770e26'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['https://loja-django-ac6c5ad21656.herokuapp.com']
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -42,7 +41,6 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     # TODO: Remover debug toolbar
     'debug_toolbar',
@@ -63,7 +61,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
      # TODO: remover debug toolbar
     'debug_toolbar.middleware.DebugToolbarMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'loja_django.urls'
@@ -136,8 +133,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 # para Heroku ativa STATIC_ROOT
-STATIC_BASE = os.path.join(BASE_DIR, 'static')
-STATIC_ROOT = os.path.join(STATIC_BASE, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_DIRS = [os.path.join('static')]
 
@@ -166,6 +162,3 @@ INTERNAL_IPS = [
     '127.0.0.1',
 ]
 
-STATICFILES_STORAGE : "whitenoise.storage.CompressedManifestStaticFilesStorage"
-
-django_heroku.settings(locals(), staticfiles=False)
