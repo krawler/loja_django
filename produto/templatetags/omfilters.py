@@ -25,7 +25,7 @@ def none_to_blank(val):
 
 @register.filter
 def cart_total_qtd(carrinho):
-    return sum([float(item['quantidade']) for item in carrinho.values()])
+    return sum([int(item['quantidade']) for item in carrinho.values()])
 
 @register.filter
 def cart_total_preco(carrinho):
