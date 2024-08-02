@@ -17,8 +17,8 @@
                     <th class="d-none d-lg-block">Imagem</th>
                     <th>Nome e variação</th>
                     <th></th>
-                    <th>Quantidade</th>
-                    <th>Total</th>
+                    <th class="text-center">Quantidade</th>
+                    <th class="text-center">Total</th>
                 </tr>
 
                 {% if carrinho.values %}                 
@@ -34,8 +34,8 @@
                                 {{ item.produto_nome }} - {{ item.variacao_nome }}
                                 </a>
                             <td>                       
-                            <td>{{ item.quantidade }}</td>                        
-                            <td>
+                            <td class="text-center">{{ item.quantidade }}</td>                        
+                            <td class="text-right">
                                 {% if item.preco_quantitativo_promocional %}
                                     R$  {{ item.preco_quantitativo_promocional }}
                                 {% else %}
