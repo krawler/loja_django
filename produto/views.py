@@ -103,8 +103,8 @@ class AdicionarCarrinho(View):
                 'preco_unitario_promocional' : preco_unitario_promocional,
                 'quantidade' : quantidade,
                 'slug' : slug,
-                'preco_quantitativo_promocional': preco_unitario_promocional * float(quantidade),
-                'preco_quantitativo' : preco_unitario * float(quantidade),
+                'preco_quantitativo_promocional': preco_unitario_promocional * int(quantidade),
+                'preco_quantitativo' : preco_unitario * int(quantidade),
                 'imagem' : imagem
             }
 
@@ -154,10 +154,8 @@ class RemoverCarrinho(View):
 
 class Carrinho(DispachProdutosMaisVendidos, View):
     #TODO: salvar os itens da sessao quando carrega o carrinho
-
     
     def get(self, *args, **kwargs):
-
         context = {
             'carrinho': self.request.session.get('carrinho'),
             'produtos_mais_vendidos': self.produtos_mais_vendidos
