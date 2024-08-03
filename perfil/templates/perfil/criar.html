@@ -7,10 +7,9 @@
 <script>
     $(document).ready(function(){
         
-        let cep = $("#id_cep").val().replace("-", "")
-        let url_call = "https://viacep.com.br/ws/" + cep + "/json/"; 
-        
         $("#id_cep").blur(() => {
+            let cep = $("#id_cep").val().replace("-", "")
+            let url_call = "https://viacep.com.br/ws/" + cep + "/json/"; 
             $.ajax({
                         url: url_call,
                         type: 'GET',

@@ -66,12 +66,9 @@ class Criar(BasePerfil):
         
         if not self.userform.is_valid() or not self.perfilform.is_valid():    
             msg = 'Há erros no formulário, por favor verifique nos campos abaixo'  
-            if not estado == uf:
-                msg += ' - '
             messages.error(self.request, msg)             
-
             return self.renderizar
-                      
+
         username = self.userform.cleaned_data.get('username')
         password = self.userform.cleaned_data.get('password')
         email = self.userform.data.get('email')
@@ -83,7 +80,7 @@ class Criar(BasePerfil):
             
             usuario.username = username
             if password:
-               usuario.set_password(password)           
+                usuario.set_password(password)           
             usuario.email = email 
             usuario.first_name = first_name
             usuario.last_name = last_name
@@ -117,7 +114,7 @@ class Criar(BasePerfil):
         
         self.request.session['carrinho'] = self.carrinho
         self.request.session.save()       
-       
+
         return redirect('perfil:cadastro_concluido')
             
 
