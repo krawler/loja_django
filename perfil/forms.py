@@ -5,30 +5,70 @@ from . import models
 
 class PerfilForm(forms.ModelForm):
     
+    data_nascimento = forms.DateField(
+        widget=forms.DateTimeInput(format='%d/%m/%Y'),
+        input_formats=['%d/%m/%Y'],
+        label='Data de nascimento'
+    )
+
+    cpf = forms.CharField(
+        widget=forms.TextInput(),
+        label='Documento CPF'
+    )
+
+    cep = forms.CharField(
+        widget=forms.TextInput(),
+        label='CEP'
+    )
+
     def __init__(self, perfil=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.perfil = perfil
-         
+    
     class Meta:
         model = models.PerfilUsuario
-        fields = ('idade', 'data_nascimento', 'cpf', 'endereco', 'numero', 'complemento', 
-                  'bairro', 'cep', 'cidade', 'estado')
+        fields = ('idade', 'data_nascimento', 'cpf', 'cep', 'endereco', 'numero', 'complemento', 
+                'bairro', 'cidade', 'estado')
 
 class UserForm(forms.ModelForm):
     
     password = forms.CharField(
         required=False,
         widget=forms.PasswordInput(),
-        label='Senha',
+        label='Senha*',
         help_text='Usuario logados podem deixar esse campo em branco para manter a senha'
     )
     password2 = forms.CharField(
         required=False,
         widget=forms.PasswordInput(),
-        label='Confirmação de senha',
+        label='Confirmação de senha*',
         help_text='Digite a senha igual ao campo acima'
     )
-    
+
+    first_name = forms.CharField(
+        required=True,
+        widget=forms.TextInput(),
+        label="Primeiro nome"
+    )
+
+    last_name = forms.CharField(
+        required=True,
+        widget=forms.TextInput(),
+        label='Ultimo nome'
+    )
+
+    username = forms.CharField(
+        required=True,
+        widget=forms.TextInput(),
+        label='nome de usuário'
+    )
+
+    email = forms.CharField(
+        required=True,
+        widget=forms.TextInput(),
+        label='Email'
+    )
+
     def __init__(self, usuario=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.usuario = usuario        
