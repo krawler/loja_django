@@ -4,3 +4,13 @@ sudo pip install pillow --break-system-packages
 sudo pip install django-crispy-forms --break-system-packages
 pip install crispy-bootstrap4
 pip install django-smart-selects
+django-heroku==0.3.1
+psycopg2==2.9.9
+
+soupsieve==2.5
+sqlparse==0.5.1
+stripe==10.5.0
+typing_extensions==4.12.2
+tzdata==2024.1
+urllib3==1.26.19
+whitenoise==6.7.0

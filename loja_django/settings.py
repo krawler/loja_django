@@ -27,7 +27,7 @@ SECRET_KEY = 'bd8cea0d007988fa518e366f1dbe9ca9aa5780a520770e26'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['raradmco.tx1.fcomet.com']
 
 
 # Application definition
@@ -42,8 +42,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # TODO: Remover debug toolbar
-    'debug_toolbar',
     'crispy_forms',
     "crispy_bootstrap4"
 ]
@@ -59,8 +57,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-     # TODO: remover debug toolbar
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'loja_django.urls'
@@ -132,8 +128,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
-# para Heroku ativa STATIC_ROOT
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# para remoto ativa STATIC_ROOT
+STATIC_ROOT = '/home5/raradmco/loja_django/static'
 
 STATICFILES_DIRS = [os.path.join('static')]
 
