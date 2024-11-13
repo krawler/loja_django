@@ -3,8 +3,9 @@ from .models import Produto, Variacao
 
 class VariacaoAdmin(admin.ModelAdmin):
     display_fields = ['nome','produto','preco','preco_promocional','estoque']
-    list_filter = ('produto','estoque',)
     search_fields = ('nome',)
+    list_per_page = 15
+    list_filter = ('produto','estoque',)
     
 class ItemVariacaoInline(admin.TabularInline):
     model = Variacao
@@ -16,8 +17,8 @@ class ProdutoAdmin(admin.ModelAdmin):
     inlines = [
         ItemVariacaoInline
     ]   
-    list_filter = ('slug',) 
     search_fields = ('nome',)
+    list_per_page = 15
 
 # Register your models here.
 admin.site.register(Produto, ProdutoAdmin)
