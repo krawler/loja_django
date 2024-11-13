@@ -10,6 +10,7 @@ class PedidoAdmin(admin.ModelAdmin):
     inlines = [
         ItemPedidoInLine
     ]
+    list_per_page = 15
 
 admin.site.register(Pedido, PedidoAdmin)
 admin.site.register(ItemPedido)

@@ -2,8 +2,9 @@ from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
+from django.core import serializers
 from django.core.paginator import Paginator
 from produto.models import Variacao, Produto
 from produto.produto_service import ProdutoService
@@ -176,6 +177,7 @@ class MeusPedidos(DispachLoginRequired, ListView):
         return render(self.request, self.template_name, contexto)
 
 class Detalhe(DispachLoginRequired, DetailView):
+
     model = Pedido
     produtos_mais_vendidos = ProdutoService().get_produtos_mais_vendidos()
     context_object_name = 'pedido'
@@ -186,3 +188,17 @@ class Detalhe(DispachLoginRequired, DetailView):
         context = super().get_context_data(**kwargs)
         context['produtos_mais_vendidos'] = self.produtos_mais_vendidos     
         return context
+
+class Tabela(ListView):
+    model = Pedido
+    template_name = 'pedido/tabela.html'
+    context_object_name = 'pedidos'
+    ordering = ['-id']
+
+class ItensPedido_json(ListView):
+    
+    def get(self, *args, **kwargs):
+        pedido_id = self.request.GET.get('pedidoid')
+        qs_data =  ItemPedido.objects.filter(id=pedido_id)
+        json_data = serializers.serialize('json', qs_data)
+        return JsonResponse(json_data, safe=False)
