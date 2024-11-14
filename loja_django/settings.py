@@ -131,6 +131,12 @@ STATIC_URL = 'static/'
 # para remoto ativa STATIC_ROOT
 STATIC_ROOT = '/home5/raradmco/loja_django/static'
 
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'live-static', 'media-root')
+
 STATICFILES_DIRS = [os.path.join('static')]
 
 # TODO: colocar o media url e root
