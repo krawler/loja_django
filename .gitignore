@@ -12,6 +12,7 @@
 loja_django/__pycache__
 
 db.sqlite3
+passenger.log
 produto_produto.sql
 stripe_backup_code.txt
 
