@@ -47,8 +47,8 @@ class Pagar(DispachLoginRequired, View):
             checkout_session = stripe.checkout.Session.create(
                 line_items=line_items,
                 mode='payment',
-                success_url='http://localhost:8000/pedido/salvarpedido',
-                cancel_url='http://localhost:8000/produto/resumodacompra',
+                success_url='https://raradmco.tx1.fcomet.com/loja-django/pedido/salvarpedido',
+                cancel_url='https://raradmco.tx1.fcomet.com/loja-django/produto/resumodacompra',
                 stripe_account='acct_1PRDqWFqNwY82ww5'
             )
         except Exception as e:
