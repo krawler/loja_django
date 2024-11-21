@@ -47,29 +47,6 @@
 </script>
 
 <div class="row">
-    {% if not request.user.is_authenticated %}
-        <div class="col-lg mt-3">
-            <h4>Login</h4>
-            <p>Se já fez o cadastro, basta entrar com seu usuário e senha abaixo:</p>
-            <form method="POST" action="{% url 'perfil:login' %}">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="InputUsuario">Usuário</label>
-                    <input type="text" name="username" id="username" placeholder="Digite seu usuário"
-                           class="form-control" aria-describedby="usuarioHelp">
-                </div>
-                <div class="form-group">
-                    <label for="InputUsuario">Senha</label>
-                    <input type="password" name="password" placeholder="Digite sua senha"
-                           class="form-control" id="exampleInputPassword">
-                </div>
-                <button type="submit" id="btn_login_perfil" class="btn btn-primary btn-block btn-lg">
-                    Login
-                </button>
-            </form>   
-
-        </div>
-    {% endif %}
     
     <div class="col-lg mt-3">
         {% block titulocadastro %}
