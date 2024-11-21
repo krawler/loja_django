@@ -8,7 +8,7 @@ from utils.validacpf import valida_cpf
 class PerfilUsuario(models.Model):
 
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
-    idade = models.PositiveIntegerField()
+    idade = models.PositiveIntegerField(editable=False)
     #TODO: implementar componente datepicker 
     data_nascimento = models.DateField(null=False, blank=True)
     cpf = models.CharField(max_length=14)

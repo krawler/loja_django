@@ -34,13 +34,15 @@
                     {% endif %}    
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="{% url 'perfil:criar' %}">
                     {% if request.user.is_authenticated %} 
-                        Ver ou alterar seu cadastro    
+                        <a class="dropdown-item" href="{% url 'perfil:atualizar' %}">
+                            Ver ou alterar seu cadastro   
+                        </a>     
                     {% else %}
-                        Entrar ou se cadastrar
+                        <a class="dropdown-item" href="{% url 'perfil:login' %}">
+                            Entrar ou se cadastrar
+                        </a>
                     {% endif %}    
-                    </a>
                     {% if request.user.is_authenticated %}
                         <a class="dropdown-item" href="{% url 'pedido:meuspedidos' %}">Meus Pedidos</a>
                         <div class="dropdown-divider"></div>

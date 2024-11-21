@@ -122,6 +122,11 @@ ul.errorlist li {
     text-align: right;
 }
 
+.flex-center{
+    position: absolute;
+    transform: translate(-50%, -50%);
+}
+
 .bottom_40pixel{
     margin-bottom: 40px;
 }
@@ -173,8 +178,16 @@ tbody > tr.selected > * {
     color : rgb(var(--dt-row-selected-text));
 }
 
-#exampleInputPassword, #username, #btn_login_perfil{
+#exampleInputPassword, #username{
     max-width:350px;
+}
+
+.btn_login{
+    max-width:350px;
+}
+
+.borderless{
+    border: none;
 }
 
 #id_data_nascimento, #id_cpf, #id_cep{
