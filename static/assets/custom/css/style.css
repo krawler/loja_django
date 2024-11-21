@@ -197,3 +197,12 @@ tbody > tr.selected > * {
     max-width: 600px;
 }
 
+.relative-field {
+    position: relative; 
+}
+
+.button_cep {
+    position: absolute;
+    right: 75%; 
+    top: 60%;
+}
