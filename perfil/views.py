@@ -137,44 +137,9 @@ class Cadastro_concluido(View):
          return render(self.request, self.template_name, contexto)
 
 class Atualizar(View):
-    def get(self, *args, **kwargs):
-        if not self.request.user.is_authenticated:
-            return redirect('perfil:login')    
-
-        if self.request.user.is_authenticated:
-            self.perfil = PerfilUsuario.objects.filter(usuario=self.request.user).first()
-            self.usuario = User.objects.filter(username=self.request.user).first()
-            #TODO: refatorar
-            if self.perfil.data_nascimento:
-                data_nasc = datetime.strptime(str(self.perfil.data_nascimento), '%Y-%m-%d').date()
-                data_nasc_br = data_nasc.strftime('%d/%m/%Y')
-                self.perfil.data_nascimento = data_nasc_br
-            self.context = {
-                'userform': 
-                            forms.UserForm(
-                                data=self.request.POST or None, 
-                                usuario=self.request.user,
-                                instance=self.request.user,    
-                            ),
-                'perfilform': 
-                            forms.PerfilForm(
-                                data=self.request.POST or None,
-                                instance=self.perfil, 
-                                perfil=self.perfil),
-                'produtos_mais_vendidos' : ProdutoService().get_produtos_mais_vendidos() 
-            }
-
-        return render(self.request, 'perfil/atualizar.html', self.context)
+    pass
 
 class Login(View):
-
-    def get(self, *args, **kwargs):
-        if self.request.user.is_authenticated:
-            return redirect('produto:lista')    
-
-        context = {'is_perfil_page': True}
-        return render(self.request, 'perfil/login.html', context)
-
     def post(self, *args, **kwargs):
         username = self.request.POST.get('username')
         password = self.request.POST.get('password')
