@@ -42,7 +42,7 @@ class UserForm(forms.ModelForm):
         required=False,
         widget=forms.PasswordInput(),
         label='Confirmação de senha*',
-        help_text='Digite a senha igual ao campo acima'
+        help_text='Digite a senha igual a senha informada no campo acima'
     )
 
     username = forms.CharField(
