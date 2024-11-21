@@ -10,7 +10,7 @@
         $("#id_cep").after('<button type="button" id="btn_cep" '+ 
                             'class="btn btn-primary button_cep"> '+
                             ' Buscar CEP </button>')
-                    .addClass('my-custom-field');
+                    .addClass('relative-field');
         
         $("#btn_cep").click(() => {
             findCep();     
@@ -85,9 +85,9 @@
         {% endblock %}
 
         <form method="POST" action="">            
-            {% csrf_token %}          
+            {% csrf_token %}   
+            {{perfilform|crispy}}       
             {{userform|crispy}}
-            {{perfilform|crispy}}
             <input type="hidden" name="uf" id="uf" value="{{perfilform.data.estado}}">
             <div class="row">
                 <div class="col">
