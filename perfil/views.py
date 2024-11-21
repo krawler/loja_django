@@ -140,6 +140,14 @@ class Atualizar(View):
     pass
 
 class Login(View):
+
+    def get(self, *args, **kwargs):
+
+        contexto = {
+    
+        }
+        return render(self.request, 'perfil/login.html', contexto)
+
     def post(self, *args, **kwargs):
         username = self.request.POST.get('username')
         password = self.request.POST.get('password')
