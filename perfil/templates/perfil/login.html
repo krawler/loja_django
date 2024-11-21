@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block conteudo %}
+
+<div class="container d-flex justify-content-center align-items-center vh-100"> 
+
+    {% if not request.user.is_authenticated %}
+    <div class="card borderless">
+        <h3>Login</h3>
+        <p class="mt-4">Se já fez o cadastro, basta entrar com seu usuário e senha abaixo:</p>
+
+        <div class="card-body">
+            <form method="POST" action="{% url 'perfil:login' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="InputUsuario">Usuário</label>
+                    <input type="text" name="username" id="username" placeholder="Digite seu usuário"
+                           class="form-control" aria-describedby="usuarioHelp">
+                </div>
+                <div class="form-group">
+                    <label for="InputUsuario">Senha</label>
+                    <input type="password" name="password" placeholder="Digite sua senha"
+                           class="form-control" id="exampleInputPassword">
+                </div>
+                <button type="submit" id="btn_login_perfil" class="btn btn-primary btn-block btn-lg btn_login">
+                    Entrar
+                </button>  
+           </div>
+        </form>  
+
+        <p class="mt-4">Se esqueceu sua senha, clique aqui para cadastrar uma nova senha:</p>
+        <div class="card-body">
+            <button type="submit" class="btn btn-primary btn-block btn-lg btn_login">
+                Esqueci minha senha
+            </button>    
+        </div>
+
+        <p class="mt-4">Se não tem cadastro, clique aqui para se cadastrar:</p>
+        <div class="card-body">
+            <a href="{% url 'perfil:criar' %}">
+                <button type="submit" class="btn btn-primary btn-block btn-lg btn_login">
+                Cadastrar
+                </button>    
+            </a>
+        </div>
+
+    </div>
+{% endif %}
+
+</div>
+{% endblock %}
