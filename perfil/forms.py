@@ -27,7 +27,7 @@ class PerfilForm(forms.ModelForm):
     
     class Meta:
         model = models.PerfilUsuario
-        fields = ('idade', 'data_nascimento', 'cpf', 'cep', 'endereco', 'numero', 'complemento', 
+        fields = ('data_nascimento', 'cpf', 'cep', 'endereco', 'numero', 'complemento', 
                 'bairro', 'cidade', 'estado')
 
 class UserForm(forms.ModelForm):
@@ -36,25 +36,13 @@ class UserForm(forms.ModelForm):
         required=False,
         widget=forms.PasswordInput(),
         label='Senha*',
-        help_text='Usuario logados podem deixar esse campo em branco para manter a senha'
+        help_text='Use uma letra maiuscula e um numero'
     )
     password2 = forms.CharField(
         required=False,
         widget=forms.PasswordInput(),
         label='Confirmação de senha*',
         help_text='Digite a senha igual ao campo acima'
-    )
-
-    first_name = forms.CharField(
-        required=True,
-        widget=forms.TextInput(),
-        label="Primeiro nome"
-    )
-
-    last_name = forms.CharField(
-        required=True,
-        widget=forms.TextInput(),
-        label='Ultimo nome'
     )
 
     username = forms.CharField(
@@ -75,7 +63,7 @@ class UserForm(forms.ModelForm):
         
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'username', 'password', 'password2', 'email')
+        fields = ('email', 'username', 'password', 'password2')
     
     def clean(self, *args, **kwargs):
         data = self.data
