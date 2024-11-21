@@ -12,9 +12,9 @@ class PerfilUsuario(models.Model):
     #TODO: implementar componente datepicker 
     data_nascimento = models.DateField(null=False, blank=True)
     cpf = models.CharField(max_length=14)
-    endereco = models.CharField(null=False, max_length=50)
-    numero = models.CharField(max_length=5)
-    complemento = models.CharField(max_length=30, null=True, blank=True)
+    endereco = models.CharField(null=False, max_length=100)
+    numero = models.CharField(max_length=15)
+    complemento = models.CharField(max_length=50, null=True, blank=True)
     bairro = models.CharField(max_length=50, null=True, blank=True)
     cep = models.CharField(max_length=9, null=False, blank=True)
     cidade = models.CharField(null=False, max_length=30)
