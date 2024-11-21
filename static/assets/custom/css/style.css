@@ -203,6 +203,9 @@ tbody > tr.selected > * {
 
 .button_cep {
     position: absolute;
-    right: 75%; 
+    right: 78%; 
     top: 22%;
+}
+.borderless{
+    border:none;
 }
