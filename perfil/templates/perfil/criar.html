@@ -9,7 +9,7 @@
 
         $("#id_cep").after('<button type="button" id="btn_cep" '+ 
                             'class="btn btn-primary button_cep"> '+
-                            ' Buscar CEP </button>')
+                            'Buscar</button>')
                     .addClass('relative-field');
         
         $("#btn_cep").click(() => {
@@ -76,7 +76,7 @@
     });
 </script>
 
-<div class="row">
+<div class="row ml-5">
     
     <div class="col-lg mt-3">
         {% block titulocadastro %}
@@ -85,8 +85,8 @@
         {% endblock %}
 
         <form method="POST" action="">            
-            {% csrf_token %}   
-            {{perfilform|crispy}}       
+            {% csrf_token %}          
+            {{perfilform|crispy}}
             {{userform|crispy}}
             <input type="hidden" name="uf" id="uf" value="{{perfilform.data.estado}}">
             <div class="row">
