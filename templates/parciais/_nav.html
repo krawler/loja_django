@@ -40,8 +40,11 @@
                         Ver ou alterar seu cadastro    
                     </a>    
                     {% else %}
+                    <a class="dropdown-item" href="{% url 'perfil:login' %}">
+                        Entrar na conta
+                    </a>    
                     <a class="dropdown-item" href="{% url 'perfil:criar' %}">
-                        Entrar ou se cadastrar
+                        Cadastrar nova conta
                     </a>    
                     {% endif %}    
                     
