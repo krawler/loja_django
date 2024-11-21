@@ -8,8 +8,9 @@
     $(document).ready(function(){
 
         $("#id_cep").after('<button type="button" id="btn_cep" '+ 
-                            'class="btn btn-primary "> '+
-                            ' Buscar CEP </button>');
+                            'class="btn btn-primary button_cep"> '+
+                            ' Buscar CEP </button>')
+                    .addClass('my-custom-field');
         
         $("#btn_cep").click(() => {
             findCep();     
@@ -80,7 +81,7 @@
     <div class="col-lg mt-3">
         {% block titulocadastro %}
             <h4>Cadastro</h4>
-            <p>Caso ainda não tenha cadastro, utilize o formulário</p>
+            <p>Utilize o formulário abaixo para realizar seu cadastro</p>
         {% endblock %}
 
         <form method="POST" action="">            
