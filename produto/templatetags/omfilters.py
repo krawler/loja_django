@@ -14,6 +14,10 @@ def formata_br_date(val):
     return val.strftime("%d/%m/%Y")
 
 @register.filter
+def formata_br_hora(val):
+    return val.strftime("%H:%M")
+
+@register.filter
 def remove_aspas(val):
     return str(val).replace('"', '')
 
