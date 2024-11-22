@@ -18,7 +18,7 @@
             <th>Situação</th>
             <th>Data de emissão</th>
             <th>Usuário</th>
-            <th>Quantidade total</th>
+            <th>Quantidade</th>
             <th>Valor total</th>
         </tr>
     </thead>
@@ -83,15 +83,15 @@
         return (
             '<div class="col" style="float:left; width:70%">' +
             '<dl>' +
-            '<dt>Nome:</dt>' +
+            '<dt>Numero:</dt>' +
             '<dd>' +
             d[1] +
             '</dd>' +
-            '<dt>Slug:</dt>' +
+            '<dt>Data e hora:</dt>' +
             '<dd>' +
             d[3] +
             '</dd>' +
-            '<dt>Descrição:</dt>' +
+            '<dt>Situação:</dt>' +
             '<dd>'+ d[2] +'</dd>' +
             '</dl>' +
             '</div>' +
@@ -126,7 +126,6 @@
         let title = ''
         let tableHeader =   '<tr class="linha_detalhe">'+
                             '<td colspan=\"6\">'+
-                            '<h5 class="titulo_h5" style="text-align:center">Lista de itens do pedido '+ id_pedido +'</h4>' +   
                             '<table id=\"tabela_variacoes\" style=\"margin-left:10%; width:80%\">' +
                             '<thead>' +
                                 '<tr>' +
