@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
+from django.core import serializers
 from django.views import View
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 from django.core.paginator import Paginator
 from produto.models import Variacao, Produto
