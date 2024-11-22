@@ -15,8 +15,9 @@
         <tr>
             <th></th>
             <th class="text-center" style="width: 10%">Número</th>
-            <th>Usuário</th>
+            <th>Situação</th>
             <th>Data de emissão</th>
+            <th>Usuário</th>
             <th>Quantidade total</th>
             <th>Valor total</th>
         </tr>
@@ -26,8 +27,9 @@
         <tr>
             <td class="dt-control" id="{{pedido.id}}"></td> 
             <td class="text-center">{{pedido.id}}</td>
-            <td>{{pedido.usuario.email}}</td>
+            <td class="text-center">{{pedido.status|get_status_extenso}}</td>
             <td>{{pedido.data_emissao|formata_br_date}}   às   {{pedido.hora_emissao|formata_br_hora}}</td>
+            <td>{{pedido.usuario.email}}</td>
             <td style="width: 10%">{{pedido.qtd_total}}</td>
             <td>{{pedido.total|formata_preco}}</td>
         </tr>
@@ -43,6 +45,7 @@
         const table = $('#table_id').DataTable({
             colReorder: true,
             keys: true,
+            pageLength:20,
             layout: {
                 topStart: {
                     buttons: ['print', 'excel', 'pdf', 'csv', 'colvis' ]
@@ -51,6 +54,7 @@
         });
 
         $('.buttons-colvis').children('span').html('Colunas');
+        $('.dt-search').children('label').html('Procurar')
 
         table.on('requestChild.dt', function (e, row) {
             row.child(format(row.data())).show();
