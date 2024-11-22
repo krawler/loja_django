@@ -9,4 +9,6 @@ urlpatterns = [
    path('compraconcluida/', views.CompraConcluida.as_view(), name="compraconcluida"),   
    path('meuspedidos', views.MeusPedidos.as_view(), name="meuspedidos"),
    path('detalhe/<int:pk>', views.Detalhe.as_view(), name="detalhe"),
+   path('tabela', views.Tabela.as_view(), name="tabela"),
+   path('itens-pedido', views.ItensPedido_json.as_view(), name="itens_pedido"),
 ]  
