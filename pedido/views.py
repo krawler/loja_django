@@ -186,3 +186,17 @@ class Detalhe(DispachLoginRequired, DetailView):
         context = super().get_context_data(**kwargs)
         context['produtos_mais_vendidos'] = self.produtos_mais_vendidos     
         return context
+
+class Tabela(ListView):
+    model = Pedido
+    template_name = 'pedido/tabela.html'
+    context_object_name = 'pedidos'
+    ordering = ['-id']
+
+class ItensPedido_json(ListView):
+    
+    def get(self, *args, **kwargs):
+        pedido_id = self.request.GET.get('pedidoid')
+        qs_data =  ItemPedido.objects.filter(id=pedido_id)
+        json_data = serializers.serialize('json', qs_data)
+        return JsonResponse(json_data, safe=False)
