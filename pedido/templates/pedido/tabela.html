@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% load omfilters %}
+
+{% load static %}
+
+{% block conteudo %}
+
+<h1 class="text-center">Listagem de pedidos</h1>
+
+<br />
+
+<table id="table_id" class="display">
+    <thead>
+        <tr>
+            <th></th>
+            <th class="text-center" style="width: 10%">Número</th>
+            <th>Usuário</th>
+            <th>Data de emissão</th>
+            <th>Quantidade total</th>
+            <th>Valor total</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for pedido in pedidos %}
+        <tr>
+            <td class="dt-control" id="{{pedido.id}}"></td> 
+            <td class="text-center">{{pedido.id}}</td>
+            <td>{{pedido.usuario.username}}</td>
+            <td>{{pedido.data_emissao}} às {{pedido.hora_emissao}}</td>
+            <td style="width: 10%">{{pedido.qtd_total|formata_int}}</td>
+            <td>{{pedido.total|formata_preco}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script>
+    $(document).ready(function(){
+        
+        $.noConflict();
+
+        const table = $('#table_id').DataTable({
+            colReorder: true,
+            keys: true,
+            layout: {
+                topStart: {
+                    buttons: ['print', 'excel', 'pdf', 'csv', 'colvis' ]
+                }
+            }
+        });
+
+        table.on('requestChild.dt', function (e, row) {
+            row.child(format(row.data())).show();
+        });        
+
+        table.on('click', 'td.dt-control', function (e) {
+            
+            let tr  = e.target.closest('tr');
+            let row = table.row(tr);
+            let id_pedido = $(this).attr("id")
+
+            if (row.child.isShown()) {
+                row.child.hide();
+                $("#tabela_variacoes").remove();
+                $(".titulo_h5").remove();
+                $(".linha_detalhe").remove();
+            }
+            else {
+                row.child(format(row.data(), id_pedido, $(this).parent().attr("data-image"))).show();
+                showTabelaItens(id_pedido);
+            }
+        });        
+    });
+
+    function format(d, id_produto, imagem) {
+        return (
+            '<div class="col" style="float:left; width:70%">' +
+            '<dl>' +
+            '<dt>Nome:</dt>' +
+            '<dd>' +
+            d[1] +
+            '</dd>' +
+            '<dt>Slug:</dt>' +
+            '<dd>' +
+            d[3] +
+            '</dd>' +
+            '<dt>Descrição:</dt>' +
+            '<dd>'+ d[2] +'</dd>' +
+            '</dl>' +
+            '</div>' +
+            '</br>'
+        );
+    }
+
+    async function showTabelaItens(id){     
+        
+        itens = await getTabelaItens(id); 
+          
+        table = getTableFromDataArray(itens, id);
+        $("#"+id).parent().after(table);   
+    }
+
+    async function getTabelaItens(id){        
+
+        return $.ajax({
+                    type: "GET",
+                    dataType: "json",
+                    url: "{% url 'pedido:itens_pedido' %}",
+                    data: "pedidoid=" + id,
+                    success: function(jsonData) { 
+                        return jsonData;
+                    }
+                });
+    }
+
+
+    function getTableFromDataArray(dataText, id_pedido){
+        const dataObj = JSON.parse(dataText);
+        let title = ''
+        let tableHeader =   '<tr class="linha_detalhe">'+
+                            '<td colspan=\"6\">'+
+                            '<h5 class="titulo_h5" style="text-align:center">Lista de itens do pedido '+ id_pedido +'</h4>' +   
+                            '<table id=\"tabela_variacoes\" style=\"margin-left:10%; width:80%\">' +
+                            '<thead>' +
+                                '<tr>' +
+                                    '<th style="width:35%">Nome do produto</th>'+
+                                    '<th>Variação</th>'+
+                                    '<th style="text-align:center">Quantidade</th>'+
+                                    '<th style="text-align:center">Preço</th>'+
+                                    '<th style="text-align:center">Preço promocional</th>'
+                                '</tr>'+
+                            '</thead>'; 
+        let tableRows = '';
+        dataObj.forEach(row => {
+            tableRows  += '<tr>'+                       
+                '<td>'+row.fields.produto+'</td>'+    
+                '<td>'+row.fields.variacao+'</td>'+                         
+                '<td style="text-align:center; width:20%">'+row.fields.quantidade+'</td>'+
+                '<td style="text-align:right; width:10%">'+formata_preco(row.fields.preco)+'</td>'+
+                '<td style="text-align:right; width:20%">'+formata_preco(row.fields.preco_promocional)+'</td>'+
+            '</tr>'; 
+        });             
+        return ( title +
+                 tableHeader +
+                    '<tbody>'+
+                        tableRows +                           
+                     '</tbody>'+
+                 '</table>' +
+                 '</td>' +
+                 '</tr>' 
+               );     
+    }
+
+    function formata_preco(numero)
+    {
+        return numero.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function apenasNumeros(string) 
+    {
+        var numsStr = string.replace(/[^0-9]/g,'');
+        return parseInt(numsStr);
+    }
+
+    
+</script> 
+
+{% endblock conteudo %}
