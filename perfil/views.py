@@ -43,13 +43,15 @@ class BasePerfil(View):
                                 data=self.request.POST or None,
                                 instance=self.perfil, 
                                 perfil=self.perfil),
-                'produtos_mais_vendidos' : ProdutoService().get_produtos_mais_vendidos() 
+                'produtos_mais_vendidos' : ProdutoService().get_produtos_mais_vendidos(),
+                'pagina_cadastro': True 
             }
         else:
             self.context = {
                 'userform': forms.UserForm(data=self.request.POST or None),
                 'perfilform': forms.PerfilForm(data=self.request.POST or None),
-                'produtos_mais_vendidos' : ProdutoService().get_produtos_mais_vendidos() 
+                'produtos_mais_vendidos' : ProdutoService().get_produtos_mais_vendidos(),
+                'pagina_cadastro': True 
             }
             
         self.userform = self.context['userform']
