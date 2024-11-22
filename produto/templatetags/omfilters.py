@@ -42,3 +42,14 @@ def cart_total_preco(carrinho):
             for item in carrinho.values()
         ]
     ) 
+
+
+@register.filter
+def get_status_extenso(val):
+    match val:
+        case 'A': return 'Aprovado'
+        case 'C': return 'Criado'
+        case 'R': return 'Reprovado'
+        case 'P': return 'Preparando'
+        case 'E': return 'Enviado'
+        case 'F': return 'Finalizado'

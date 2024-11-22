@@ -2,6 +2,7 @@
 
 {% load omfilters %}
 
+{% if not area_sem_produtos %}
 <div class="container mt-4 mb-4">
 <p class="lead">O que as pessoas estão mais comprando</p>
 <div class="row">
@@ -44,7 +45,7 @@
 </div>
 
 </div>
-
+{%  endif %}
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 

@@ -193,6 +193,11 @@ class Tabela(ListView):
     context_object_name = 'pedidos'
     ordering = ['-id']
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['area_sem_produtos'] = True     
+        return context
+
 class ItensPedido_json(ListView):
     
     def get(self, *args, **kwargs):

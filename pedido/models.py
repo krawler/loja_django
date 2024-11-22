@@ -18,7 +18,8 @@ class Pedido(models.Model):
             ('A', 'Aprovado'),
             ('C', 'Criado'),
             ('R', 'Reprovado'),
-            ('P', 'Enviado'),
+            ('P', 'Preparando'),
+            ('E', 'Enviado'),
             ('F', 'Finalizado'),
         )
     )
