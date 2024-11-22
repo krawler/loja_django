@@ -26,9 +26,9 @@
         <tr>
             <td class="dt-control" id="{{pedido.id}}"></td> 
             <td class="text-center">{{pedido.id}}</td>
-            <td>{{pedido.usuario.username}}</td>
-            <td>{{pedido.data_emissao}} às {{pedido.hora_emissao}}</td>
-            <td style="width: 10%">{{pedido.qtd_total|formata_int}}</td>
+            <td>{{pedido.usuario.email}}</td>
+            <td>{{pedido.data_emissao|formata_br_date}}   às   {{pedido.hora_emissao|formata_br_hora}}</td>
+            <td style="width: 10%">{{pedido.qtd_total}}</td>
             <td>{{pedido.total|formata_preco}}</td>
         </tr>
         {% endfor %}
@@ -49,6 +49,8 @@
                 }
             }
         });
+
+        $('.buttons-colvis').children('span').html('Colunas');
 
         table.on('requestChild.dt', function (e, row) {
             row.child(format(row.data())).show();
