@@ -58,7 +58,9 @@ class ProdutoSimples(models.Model):
     nome_produto = models.CharField(max_length=100)
     nome_variacao = models.CharField(max_length=100)
     preco = models.FloatField(default=0)
-    preco_promocional = models.FloatField(default=0)   
+    preco_promocional = models.FloatField(default=0)  
+    quantidade = models.FloatField(default=0)
+    estoque = models.IntegerField()
 
     class Meta:
         managed = False 
