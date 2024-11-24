@@ -203,6 +203,8 @@ class Tabela(ListView):
         for pedido in pedidos:
             perfil = pedido.usuario.perfilusuario
             pedido.perfil_data = perfil
+            data_ultima_compra = pedido_service.Pedido_Service().get_data_ultimo_pedido(user=pedido.usuario)
+            pedido.data_ultima_compra = data_ultima_compra
 
         return context
 
