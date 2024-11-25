@@ -139,6 +139,8 @@ class Cadastro_concluido(View):
          return render(self.request, self.template_name, contexto)
 
 class Atualizar(Criar):
+
+    template_name = 'perfil/atualizar.html'
     
     def get(self, *args, **kwargs):
         if not self.request.user.is_authenticated:
