@@ -59,6 +59,23 @@
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle active" href="#" id="navbarRelatorio" role="button"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">             
+                        Sistema    
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    
+                    <a class="dropdown-item" href="{% url 'pedido:tabela' %}">
+                        Pedidos    
+                    </a>       
+                    <a class="dropdown-item" href="{% url 'produto:tabela' %}">
+                        Produtos
+                    </a>  
+                </div>
+            </li>
+            {% endif %}
+            {% if request.user.is_authenticated %}
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle active" href="#" id="navbarRelatorio" role="button"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">             
                         Relatórios    
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
