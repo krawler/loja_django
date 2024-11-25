@@ -15,6 +15,7 @@ from .email.py_email import PyEmail
 from datetime import datetime, date
 from pprint import pprint
 import stripe
+import datetime
 
 class DispachLoginRequired(View):
     
@@ -200,7 +201,11 @@ class Tabela(ListView):
         context = super().get_context_data(**kwargs)
         context['area_sem_produtos'] = True
         pedidos = context['pedidos']
+        pedidos = Pedido.objects.filter(desativado=False)
         for pedido in pedidos:
+            
+            data_datetime = datetime.datetime.strptime(pedido.data_emissao, "%d/%m/%Y")
+            pedido.data_emissao = data_datetime
             perfil = pedido.usuario.perfilusuario
             pedido.perfil_data = perfil
             data_ultima_compra = pedido_service.Pedido_Service().get_data_ultimo_pedido(user=pedido.usuario)
@@ -219,6 +224,14 @@ class Atualizar_Pedido(View):
         pedido.status = para
         pedido.save()
         return JsonResponse(para, safe=False)
+
+class Desativar_Pedido(View):
+    
+    def post(self, *args, **kwargs):
+        pedido_id = self.request.POST.get('pedidoid')
+        pedido = pedido_service.Pedido_Service().desativar_pedido(pedidoid=pedido_id)
+        json_data = pedido.desativado
+        return JsonResponse(json_data, safe=False)
 
 
 class ItensPedido_json(ListView):
