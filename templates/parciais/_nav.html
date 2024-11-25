@@ -55,6 +55,29 @@
                     {% endif %}
                 </div>
             </li>
+            {% if request.user.is_authenticated %}
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle active" href="#" id="navbarRelatorio" role="button"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">             
+                        Relatórios    
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    
+                    <a class="dropdown-item" href="{% url 'perfil:atualizar' %}">
+                        Pedidos    
+                    </a>    
+                    <a class="dropdown-item" href="{% url 'perfil:login' %}">
+                        Usuários 
+                    </a>    
+                    <a class="dropdown-item" href="{% url 'perfil:criar' %}">
+                        Produtos
+                    </a>    
+                    <a class="dropdown-item" href="{% url 'pedido:meuspedidos' %}">
+                        Acessos
+                    </a>
+                </div>
+            </li>
+            {% endif %}
         </ul>
         <form class="form-inline my-2 my-lg-0" action="{% url 'produto:busca' %}">
             <input class="form-control mr-sm-2" type="search" placeholder="o que procura?" aria-label="Search" name="termo">
