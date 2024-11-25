@@ -1,7 +1,13 @@
 from produto.models import ProdutoSimples
+from .models import Pedido
 from django.db import connection
 
 class Pedido_Service():
+
+    def __new__(cls):
+        if not hasattr(cls, 'instance'):
+            cls.instance = super(Pedido_Service, cls).__new__(cls)
+        return cls.instance    
 
     def getItemsProdutos(self, pedido_id):
 
@@ -50,3 +56,9 @@ class Pedido_Service():
             case 'Preparando': return 'P'
             case 'Enviado': return 'E'
             case 'Finalizado': return 'F'
+
+    def desativar_pedido(self, pedidoid):
+        pedido = Pedido.objects.get(id=pedidoid)
+        pedido.desativado = True
+        pedido.save()
+        return pedido
