@@ -19,6 +19,7 @@ stripe_backup_code.txt
 produto/migrations/
 .produto_produto.sql.kate-swp
 pedido/migrations/
+perfil/migrations/
 loja_django/__pycache__/settings.cpython-311.pyc
 perfil/migrations/0001_initial.py
 perfil/migrations/0002_alter_perfilusuario_bairro_alter_perfilusuario_cep_and_more.py

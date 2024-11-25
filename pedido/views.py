@@ -1,12 +1,15 @@
 from django.shortcuts import render, redirect
+from django.core import serializers
 from django.views import View
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 from django.core.paginator import Paginator
-from produto.models import Variacao, Produto
+from produto.models import Variacao, Produto, ProdutoSimples
 from produto.produto_service import ProdutoService
+from . import pedido_service 
+from django.db import connection
 from .models import Pedido, ItemPedido
 from .email.py_email import PyEmail 
 from datetime import datetime, date
@@ -195,13 +198,33 @@ class Tabela(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['area_sem_produtos'] = True     
+        context['area_sem_produtos'] = True
+        pedidos = context['pedidos']
+        for pedido in pedidos:
+            perfil = pedido.usuario.perfilusuario
+            pedido.perfil_data = perfil
+            data_ultima_compra = pedido_service.Pedido_Service().get_data_ultimo_pedido(user=pedido.usuario)
+            pedido.data_ultima_compra = data_ultima_compra
+
         return context
+
+class Atualizar_Pedido(View):
+    
+    def post(self, *args, **kwargs):
+        pedido_id = self.request.POST.get('pedidoid')
+        de = self.request.POST.get('get')
+        para = self.request.POST.get('para')
+        para = pedido_service.Pedido_Service().get_sigla_status(para)
+        pedido = Pedido.objects.get(id=pedido_id)
+        pedido.status = para
+        pedido.save()
+        return JsonResponse(para, safe=False)
+
 
 class ItensPedido_json(ListView):
     
     def get(self, *args, **kwargs):
         pedido_id = self.request.GET.get('pedidoid')
-        qs_data =  ItemPedido.objects.filter(id=pedido_id)
-        json_data = serializers.serialize('json', qs_data)
+        produtos = pedido_service.Pedido_Service().getItemsProdutos(pedido_id=pedido_id)
+        json_data = serializers.serialize('json', produtos)
         return JsonResponse(json_data, safe=False)

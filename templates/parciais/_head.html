@@ -6,6 +6,8 @@
 <link rel="stylesheet" href="{% static 'assets/bootstrap/css/bootstrap.css'%}">
 <link rel="stylesheet" href="{% static 'assets/custom/css/style.css'%}">
 
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
+
 <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.css" />
 
 <link rel="stylesheet" href="https://cdn.datatables.net/colreorder/2.0.3/css/colReorder.dataTables.min.css" />
@@ -39,3 +41,80 @@
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.css" rel="stylesheet"/>
 
+<script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
+<script>
+    function showDialogModalStatus(id, status, token){
+        
+        $.ajaxSetup({
+            headers:
+            { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+        });
+        
+        $('.btnChangeStatus').on('click', function(){
+            var de = $(this).attr('data-status');
+            var para = getNextStep(de);
+
+            $('#dialog-confirm-status').dialog({
+                resizable: false,
+                height: "auto",
+                width: 400,
+                modal: true,
+                buttons: {
+                    "Mudar situação": function() {
+                        $.ajax({
+                                type: "POST",
+                                dataType: "json",
+                                url: "{% url 'pedido:atualizapedido' %}",
+                                data: {
+                                    "pedidoid" : id,
+                                    "de": de,
+                                    "para" : para,
+                                    "csrfmiddlewaretoken": $('meta[name="csrf-token"]').attr('content')
+                                },
+                                success: function(jsonData) { 
+                                    status_pedido  = '#status_' + id;
+                                    $(status_pedido).html(getStatusNameExtenso(jsonData)); 
+                                    $('#'+id).parent().children().eq(2).html(getStatusNameExtenso(jsonData));
+                                    return jsonData;
+                                }
+                            });
+                            $( this ).dialog( "close" );
+                    },
+                    Cancel: function() {
+                        $( this ).dialog( "close" );
+                    }
+                }
+            });
+        });
+    }
+
+    function showDialogModalDeactivate(){
+        $('.btn-delete').on('click', function(){
+            $("#dialog-confirm-deactivate").dialog({
+                resizable: false,
+                height: "auto",
+                width: 400,
+                modal: true,
+                buttons: {
+                        "Desativar": function() {
+                            $.ajax({
+                                type: "GET",
+                                dataType: "json",
+                                url: "{% url 'pedido:itens_pedido' %}",
+                                data: "pedidoid=" + id,
+                                success: function(jsonData) { 
+                                    return jsonData;
+                                }
+                            });
+                        $( this ).dialog( "Desativar" );
+                    },
+                    Cancel: function() {
+                        $( this ).dialog( "close" );
+                    }
+                }
+            });
+        });
+    }
+
+
+</script>
