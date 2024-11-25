@@ -40,3 +40,13 @@ class Pedido_Service():
 
             row = cursor.fetchone()
             return row[0]
+
+    def get_sigla_status(self, status):
+        
+        match status:
+            case 'Aprovado': return 'A'
+            case 'Criado': return 'C'
+            case 'Reprovado': return 'R'
+            case 'Preparando': return 'P'
+            case 'Enviado': return 'E'
+            case 'Finalizado': return 'F'
