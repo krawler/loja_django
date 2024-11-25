@@ -208,6 +208,19 @@ class Tabela(ListView):
 
         return context
 
+class Atualizar_Pedido(View):
+    
+    def post(self, *args, **kwargs):
+        pedido_id = self.request.POST.get('pedidoid')
+        de = self.request.POST.get('get')
+        para = self.request.POST.get('para')
+        para = pedido_service.Pedido_Service().get_sigla_status(para)
+        pedido = Pedido.objects.get(id=pedido_id)
+        pedido.status = para
+        pedido.save()
+        return JsonResponse(para, safe=False)
+
+
 class ItensPedido_json(ListView):
     
     def get(self, *args, **kwargs):
