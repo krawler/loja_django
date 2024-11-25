@@ -9,8 +9,7 @@ class PerfilUsuario(models.Model):
 
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
     idade = models.PositiveIntegerField()
-    #TODO: implementar componente datepicker 
-    data_nascimento = models.DateField(null=False, blank=True)
+    data_nascimento = models.DateField(null=True, blank=True)
     cpf = models.CharField(max_length=14)
     endereco = models.CharField(null=False, max_length=100)
     numero = models.CharField(max_length=15)
