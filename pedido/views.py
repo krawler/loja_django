@@ -201,16 +201,15 @@ class Tabela(ListView):
         context = super().get_context_data(**kwargs)
         context['area_sem_produtos'] = True
         pedidos = context['pedidos']
-        pedidos = Pedido.objects.filter(desativado=False)
-        for pedido in pedidos:
-            
-            data_datetime = datetime.datetime.strptime(pedido.data_emissao, "%d/%m/%Y")
-            pedido.data_emissao = data_datetime
+        pedidos = Pedido.objects.filter(desativado=False).order_by('id').reverse()
+        for pedido in pedidos:            
+            #data_datetime = datetime.datetime.strptime(pedido.data_emissao, "%d/%m/%Y")
+            #pedido.data_emissao = data_datetime
             perfil = pedido.usuario.perfilusuario
             pedido.perfil_data = perfil
             data_ultima_compra = pedido_service.Pedido_Service().get_data_ultimo_pedido(user=pedido.usuario)
             pedido.data_ultima_compra = data_ultima_compra
-
+        context['pedidos'] = pedidos
         return context
 
 class Atualizar_Pedido(View):
