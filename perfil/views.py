@@ -151,7 +151,7 @@ class Login(View):
     def get(self, *args, **kwargs):
 
         contexto = {
-    
+            'area_sem_produtos' : True
         }
         return render(self.request, 'perfil/login.html', contexto)
 
