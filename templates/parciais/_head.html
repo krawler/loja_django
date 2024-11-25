@@ -80,7 +80,7 @@
                             });
                             $( this ).dialog( "close" );
                     },
-                    Cancel: function() {
+                    Cancel: function() {                        
                         $( this ).dialog( "close" );
                     }
                 }
@@ -88,7 +88,7 @@
         });
     }
 
-    function showDialogModalDeactivate(){
+    function showDialogModalDeactivate(id){
         $('.btn-delete').on('click', function(){
             $("#dialog-confirm-deactivate").dialog({
                 resizable: false,
@@ -98,15 +98,19 @@
                 buttons: {
                         "Desativar": function() {
                             $.ajax({
-                                type: "GET",
+                                type: "POST",
                                 dataType: "json",
-                                url: "{% url 'pedido:itens_pedido' %}",
-                                data: "pedidoid=" + id,
+                                url: "{% url 'pedido:desativar' %}",
+                                data: {
+                                    "pedidoid" : id,
+                                    "csrfmiddlewaretoken": $('meta[name="csrf-token"]').attr('content')
+                                },
                                 success: function(jsonData) { 
-                                    return jsonData;
+                                    if(jsonData=="True")
+                                        return console.log("returned: " + jsonData);
                                 }
                             });
-                        $( this ).dialog( "Desativar" );
+                        $( this ).dialog( "close" );
                     },
                     Cancel: function() {
                         $( this ).dialog( "close" );
