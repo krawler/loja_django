@@ -11,4 +11,5 @@ urlpatterns = [
    path('detalhe/<int:pk>', views.Detalhe.as_view(), name="detalhe"),
    path('tabela', views.Tabela.as_view(), name="tabela"),
    path('itens-pedido', views.ItensPedido_json.as_view(), name="itens_pedido"),
+   path('atualizapedido/', views.Atualizar_Pedido.as_view(), name="atualizapedido")
 ]  
