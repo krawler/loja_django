@@ -5,11 +5,13 @@ from . import models
 
 class PerfilForm(forms.ModelForm):
     
+    '''
     data_nascimento = forms.DateField(
         widget=forms.DateTimeInput(format='%d/%m/%Y'),
         input_formats=['%d/%m/%Y'],
         label='Data de nascimento'
     )
+    '''
 
     cpf = forms.CharField(
         widget=forms.TextInput(),
@@ -27,7 +29,7 @@ class PerfilForm(forms.ModelForm):
     
     class Meta:
         model = models.PerfilUsuario
-        fields = ('data_nascimento', 'cpf', 'cep', 'endereco', 'numero', 'complemento', 
+        fields = ('cpf', 'cep', 'endereco', 'numero', 'complemento', 
                 'bairro', 'cidade', 'estado')
 
 class UserForm(forms.ModelForm):
