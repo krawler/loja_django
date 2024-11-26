@@ -6,7 +6,7 @@ from django.views.generic.detail import DetailView
 from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 from django.core.paginator import Paginator
-from produto.models import Variacao, Produto, ProdutoSimples
+from produto.models import Variacao, Produto, ProdutoSimples, SaidaProduto
 from produto.produto_service import ProdutoService
 from . import pedido_service 
 from django.db import connection
@@ -15,7 +15,6 @@ from .email.py_email import PyEmail
 from datetime import datetime, date
 from pprint import pprint
 import stripe
-import datetime
 
 class DispachLoginRequired(View):
     
@@ -136,7 +135,16 @@ class SalvarPedido(View):
                 imagem=v['imagem']
             ) for v in carrinho.values()
         ])
-                                             
+
+        for v in carrinho.values():
+            ProdutoService().salvar_saida_produto(variacao=Variacao.objects.filter(id=v['variacao_id']).first(),
+                                                    preco_final=v['preco_quantitativo_promocional'],
+                                                    quantidade=v['quantidade'],
+                                                    user=self.request.user,
+                                                    data=datetime.today(),
+                                                    hora=datetime.now(),
+                                                    pedido=pedido)
+        
         del self.request.session['carrinho']
         ProdutoService().limpa_session_carrinho_user(self.request.user)
         self.request.session['pedido_id'] = pedido.id 
@@ -166,7 +174,7 @@ class MeusPedidos(DispachLoginRequired, ListView):
     
     def get(self, *args, **kwargs):
         usuario = self.request.user
-        pedidos = Pedido.objects.filter(usuario=usuario)
+        pedidos = Pedido.objects.filter(usuario=usuario).order_by('id').reverse()
         produtos_mais_vendidos = ProdutoService().get_produtos_mais_vendidos()
         page = self.request.GET.get('page', 1)
         paginator = Paginator(pedidos, per_page=10)
@@ -191,7 +199,7 @@ class Detalhe(DispachLoginRequired, DetailView):
         context['produtos_mais_vendidos'] = self.produtos_mais_vendidos     
         return context
 
-class Tabela(ListView):
+class Tabela(DispachLoginRequired, ListView):
     model = Pedido
     template_name = 'pedido/tabela.html'
     context_object_name = 'pedidos'
@@ -212,7 +220,7 @@ class Tabela(ListView):
         context['pedidos'] = pedidos
         return context
 
-class Atualizar_Pedido(View):
+class Atualizar_Pedido(DispachLoginRequired, View):
     
     def post(self, *args, **kwargs):
         pedido_id = self.request.POST.get('pedidoid')
