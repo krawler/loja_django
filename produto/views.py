@@ -231,6 +231,10 @@ class Tabela(ListView):
     template_name = 'produto/tabela.html'
     context_object_name = 'produtos'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['area_sem_produtos'] = True
+        return context
 
 class Variacoes_json(ListView):
     
