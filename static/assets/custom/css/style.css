@@ -213,3 +213,7 @@ tbody > tr.selected > * {
 .hide{
     display:none;
 }
+
+.input-number{
+    width:120px;   
+}
