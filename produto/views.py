@@ -236,6 +236,27 @@ class Tabela(ListView):
         context['area_sem_produtos'] = True
         return context
 
+class EntradaProduto(View):
+    
+    def get(self, *args, **kwargs):
+        
+        context = {
+            'area_sem_produtos' : True,  
+            'variacoes' : Variacao.objects.select_related('produto')
+        }
+
+        return render(self.request, 'produto/entrada.html', context)
+    
+    def post(self, *args, **kwargs):
+        
+        quantidade = self.request.POST.get('quantidade')
+        preco_final = self.request.POST.get('quantidade')
+        id_variacao = self.request.POST.get('id_variacao')
+        user = self.request.user
+        ProdutoService().salvar_entrada_produto(id_variacao, preco_final, quantidade, user)
+
+        return redirect('produto:tabela')
+
 class Variacoes_json(ListView):
     
     def get(self, *args, **kwargs):
@@ -246,7 +267,6 @@ class Variacoes_json(ListView):
         return JsonResponse(json_data, safe=False)
 
 class Busca(ListaProdutos):
-
     
     def get_queryset(self, *args, **kwargs):
         termo = self.request.GET.get('termo') or self.request.session.get('termo')
