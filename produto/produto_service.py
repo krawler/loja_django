@@ -3,7 +3,9 @@ from pedido.models import ItemPedido
 from django.contrib.auth.models import User
 from django.db.models import Q, Count, QuerySet
 from decimal import Decimal
-from produto.models import Produto, SessaoCarrinho, Variacao, SaidaProduto
+from datetime import datetime
+from django.utils import timezone
+from produto.models import Produto, SessaoCarrinho, Variacao, SaidaProduto, EntradaProduto
 
 import json
 
@@ -58,3 +60,16 @@ class ProdutoService():
                                     pedido=pedido
         )
         saida_produto.save()
+
+    def salvar_entrada_produto(self, variacao, preco_final, quantidade, user):
+        print(variacao)
+        model_variacao = Variacao.objects.filter(id=variacao).first()
+        data = datetime.today()
+        hora = timezone.now()
+        entrada_produto = EntradaProduto(variacao=model_variacao,
+                                    preco_final=preco_final,
+                                    quantidade=quantidade,
+                                    user=user,
+                                    data=data,
+                                    hora=hora)
+        entrada_produto.save()
