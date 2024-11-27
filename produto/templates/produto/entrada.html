@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% load crispy_forms_tags %}
+
+{% load omfilters %}
+
+{% block conteudo %}
+
+<script>
+    $(document).ready(function(){
+        
+        $.noConflict();
+
+        const table = $('#table_id').DataTable({
+            colReorder: true,
+            keys: true,
+        });
+
+        $(".dt-layout-cell").first().hide()
+        $("#dt-search-0").css('width','90%');
+        $(".card-body").css('padding','0.75rem');
+
+        table.on('click', 'td', function (e) {
+            row = $(this).parent('tr');
+            nomeproduto_selecionado = row.children('td.nome_produto').html();
+            nomevariacao_selecionado = row.children('td.nome_variacao').html();
+            $("#id_variacao").val(row.attr('variacao_id'));
+            $('#preco_atual').val(row.children('td.preco_final').html());
+            $('#nome_produto_variacao').html(nomeproduto_selecionado + ' - ' + nomevariacao_selecionado);
+        });  
+
+    } );  
+</script>
+
+<div class="container d-flex vh-100"> 
+
+    <div class="card borderless">
+        <h3>Cadastro de entrada de mercadoria</h3>
+        <p class="mt-4">Em caso de erro ao cadastrar a entrada utilize a saida de mercadorias:</p>
+        <div class="card-body">
+           
+            <table id="table_id" class="display">
+                <thead>
+                    <tr>
+                        <th>nome do produto</th>
+                        <th>nome da variação</th>
+                        <th>Preço</th>
+                        <th>Preço promocional</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for variacao in variacoes %}
+                    <tr variacao_id="{{variacao.id}}">
+                        <td class="nome_produto">{{variacao.produto.nome}}</td>             
+                        <td class="nome_variacao">{{variacao.nome}}</td>                       
+                        <td class="preco_final">{{variacao.preco|formata_preco}}</td>
+                        <td>{{variacao.preco_promocional|formata_preco}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table> 
+
+        </div>
+        <div class="card-body">
+            
+            <form method="POST" action="{% url 'produto:entrada' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="produto">Produto</label>
+                    <h6 id="nome_produto_variacao"></h6>
+                </div>
+                <div class="form-group">
+                    <label for="quantidade">Quantidade</label>
+                    <input type="text" name="quantidade" id="quantidade" 
+                            placeholder="" class="form-control input-number">
+                </div>
+                <div class="form-group">
+                    <label for="InputUsuario">Preço Atual</label>
+                    <input type="text" name="preco_atual" 
+                            class="form-control input-number" id="preco_atual">
+                </div>
+                <input type="hidden" name="id_variacao" id="id_variacao"/>
+                <button type="submit" id="btn_login_perfil" 
+                        class="btn btn-primary btn-block btn-lg btn_login">
+                    Cadastrar
+                </button>  
+            </form> 
+        </div>
+         
+
+    </div>
+
+</div>
+{% endblock %}
