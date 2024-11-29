@@ -14,6 +14,19 @@ from pedido.models import ItemPedido
 import json
 import requests
 
+class DispachLoginRequired(View):
+    
+    def dispatch(self, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            return redirect("perfil:login")
+    
+        return super().dispatch(*args, **kwargs)
+    
+    def get_query_set(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        qs = qs.filter(usuario=self.request.user)
+        return qs
+
 class DispachProdutosMaisVendidos(View):
 
     def dispatch(self, *args, **kwargs):
@@ -236,7 +249,7 @@ class Tabela(ListView):
         context['area_sem_produtos'] = True
         return context
 
-class EntradaProduto(View):
+class EntradaProduto(DispachLoginRequired, View):
     
     def get(self, *args, **kwargs):
         
