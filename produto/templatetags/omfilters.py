@@ -11,7 +11,9 @@ def formata_preco(val):
 
 @register.filter
 def formata_br_date(val):
-    return val.strftime("%d/%m/%Y")
+    if val != '':
+        return val.strftime("%d/%m/%Y")
+    return ''    
 
 @register.filter
 def formata_br_hora(val):
