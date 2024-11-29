@@ -52,6 +52,7 @@ class DetalheProduto(DispachProdutosMaisVendidos, DetailView):
     slug_url_kwarg = 'slug'
 
 class AdicionarCarrinho(View):
+    
     def get(self, *args, **kwargs):
         http_referer = self.request.META.get('HTTP_REFERER', reverse('produto:lista'))
         variacao_id = self.request.GET.get('vid')
@@ -166,7 +167,6 @@ class RemoverCarrinho(View):
         return redirect(http_referer)
 
 class Carrinho(DispachProdutosMaisVendidos, View):
-    #TODO: salvar os itens da sessao quando carrega o carrinho
     
     def get(self, *args, **kwargs):
         context = {
@@ -174,6 +174,14 @@ class Carrinho(DispachProdutosMaisVendidos, View):
             'produtos_mais_vendidos': self.produtos_mais_vendidos
         }
         return render(self.request, 'produto/carrinho.html', context)
+    
+    def post(self, *args, **kwargs):
+        variacao_id = self.request.POST.get('variacaoid')
+        quantidade = self.request.POST.get('quantidade')
+        carrinho = self.request.session.get('carrinho')
+        
+        json_data = carrinho
+        return JsonResponse(json_data, safe=False)
 
 class ResumoDaCompra(View):
     
