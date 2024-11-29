@@ -26,11 +26,7 @@ class BasePerfil(View):
         if self.request.user.is_authenticated:
             self.perfil = PerfilUsuario.objects.filter(usuario=self.request.user).first()
             self.usuario = User.objects.filter(username=self.request.user).first()
-            #TODO: refatorar
-            if self.perfil.data_nascimento:
-                data_nasc = datetime.strptime(str(self.perfil.data_nascimento), '%Y-%m-%d').date()
-                data_nasc_br = data_nasc.strftime('%d/%m/%Y')
-                self.perfil.data_nascimento = data_nasc_br
+        
             self.context = {
                 'userform': 
                             forms.UserForm(
@@ -71,12 +67,17 @@ class Criar(BasePerfil):
             messages.error(self.request, msg)             
             return self.renderizar
 
-        username = self.userform.cleaned_data.get('username')
         password = self.userform.cleaned_data.get('password')
         email = self.userform.data.get('email')
-        first_name = self.userform.cleaned_data.get('first_name')
-        last_name = self.userform.cleaned_data.get('last_name')
-        
+        nome_completo = self.perfilform.cleaned_data.get('nome_completo')
+        nomes = nome_completo.split(' ')
+        first_name = nomes[0]
+        tamanho_lista = len(nomes)
+        last_name = nomes[tamanho_lista - 1]
+
+        username = str(email).split('@')[0]
+        print(first_name +'-'+ last_name)
+
         if self.request.user.is_authenticated:
             usuario = get_object_or_404(User, username=self.request.user.username)
             
