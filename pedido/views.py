@@ -20,7 +20,7 @@ class DispachLoginRequired(View):
     
     def dispatch(self, *args, **kwargs):
         if not self.request.user.is_authenticated:
-            return redirect("perfil:criar")
+            return redirect("perfil:login")
     
         return super().dispatch(*args, **kwargs)
     
