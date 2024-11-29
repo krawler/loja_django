@@ -6,6 +6,8 @@
 
 {% block conteudo %}
 
+<meta name="csrf-token" content="{{ csrf_token }}">
+
 <div class="row mt-3">
     <div class="col">
         <h3>Carrinho de compras</h3>
@@ -23,7 +25,7 @@
 
                 {% if carrinho.values %}                 
                     {% for item in carrinho.values %}
-                        <tr>
+                        <tr data-variacaoid="{{item.variacao_id}}" data-quant="{{item.quantidade}}">
                             <td class="d-none d-lg-block">
                                 {% if item.imagem %}
                                     <img class="cart-img" src={% get_media_prefix %}{{item.imagem|remove_aspas}}>
@@ -34,7 +36,7 @@
                                 {{ item.produto_nome }} - {{ item.variacao_nome }}
                                 </a>
                             <td>                       
-                            <td class="text-center">{{ item.quantidade }}</td>                        
+                            <td class="text-center"><input type="number" class="quantidade" style="width: 20%;" value="{{item.quantidade }}" /></td>                        
                             <td class="text-right">
                                 {% if item.preco_quantitativo_promocional %}
                                     R$  {{ item.preco_quantitativo_promocional }}
@@ -64,9 +66,9 @@
 {% if carrinho.values %}
     <div class="row mt-3">
         <div class="col-lg">
-            <p class='lead'>Total no carrinho</p>
+            <p class="lead">Total no carrinho</p>
 
-            <div class='table-responsive'>
+            <div class="table-responsive">
                 <table class="table">
                     <tr>
                         <td class="text-right">
@@ -81,13 +83,13 @@
             </div>
         </div>
         <div class="col-lg mt-auto bottom_40pixel">
-            <a class="btn btn-lg btn-block btn-primary" href="{% url 'produto:lista' %}">
+            <a class="btn btn-lg btn-block btn-primary" id="continuar_comprando" href="{% url 'produto:lista' %}">
                 Continuar comprando
             </a>    
-        </div>    
+        </div>  
         <div class="col-lg mt-auto bottom_40pixel">
             {% if request.user.is_authenticated %}
-            <a class="btn btn-lg btn-block btn-primary" href="{% url 'produto:resumodacompra' %}">
+            <a class="btn btn-lg btn-block btn-primary" id="finaliza_compra" href="{% url 'produto:resumodacompra' %}">
                 Finalizar compra
             </a>
             {% else %}
@@ -98,5 +100,46 @@
         </div>
     </div>
 {% endif %}
+
+<script>
+
+    function atualizaQuantidade(variacao_id, quantidade){
+
+        $.ajaxSetup({
+            headers:
+            { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+        });
+
+        
+    }
+
+    $("#continuar_comprando").on('click', function(e){
+        
+        e.preventDefault();
+
+        $('tr[data-quant]').each(function() {
+            var $row = $(this);
+            var quantidadeInput = $row.find('.quantidade').val();
+            var quantidadeOriginal = $row.data('quant');
+            var variacao_id = $row.data('variacaoid');
+
+            if (quantidadeInput != quantidadeOriginal) {
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    url: "{% url 'produto:carrinho' %}",
+                    data: {
+                        "variacaoid" : variacao_id,
+                        "quantidade": quantidade,
+                        "csrfmiddlewaretoken": $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(jsonData) { 
+                        console.log(jsonData);
+                    }
+                });
+            }
+        });
+    });
+</script>
 
 {% endblock %}
