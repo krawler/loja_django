@@ -11,6 +11,7 @@ from produto.models import Produto, Variacao
 from produto.produto_service import ProdutoService
 from perfil.models import PerfilUsuario
 from pedido.models import ItemPedido
+from .serializers import VariacaoSerializer
 import json
 import requests
 
@@ -247,6 +248,7 @@ class Tabela(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['area_sem_produtos'] = True
+
         return context
 
 class EntradaProduto(DispachLoginRequired, View):
@@ -273,10 +275,17 @@ class EntradaProduto(DispachLoginRequired, View):
 class Variacoes_json(ListView):
     
     def get(self, *args, **kwargs):
+        
         produto_id = self.request.GET.get('produtoid')
         produto = Produto.objects.filter(id=produto_id).first()
-        qs_data = Variacao.objects.filter(produto=produto)
-        json_data = serializers.serialize('json', qs_data)
+        qs_variacoes = Variacao.objects.filter(produto=produto)
+
+        for variacao in qs_variacoes:
+            saldo_estoque = ProdutoService().getEstoqueAtual(variacao.id)
+            variacao.saldo_estoque = saldo_estoque
+            serializer = VariacaoSerializer(qs_variacoes, many=True)
+            json_data = json.dumps(serializer.data)
+        
         return JsonResponse(json_data, safe=False)
 
 class Busca(ListaProdutos):
