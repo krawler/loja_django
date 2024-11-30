@@ -191,7 +191,7 @@
                                 '<tr>' +
                                     '<th style="width:35%">Nome do produto</th>'+
                                     '<th>Nome da Variação</th>'+
-                                    '<th style="text-align:center">Estoque</th>'+
+                                    '<th style="text-align:center">Estoque Médio</th>'+
                                     '<th style="text-align:center">Quantidade</th>'+
                                     '<th style="text-align:center">Preço</th>'+
                                     '<th style="text-align:center">Preço promocional</th>'
@@ -202,10 +202,10 @@
             tableRows  += '<tr>'+                       
                 '<td>'+row.fields.nome_produto+'</td>'+    
                 '<td>'+row.fields.nome_variacao+'</td>'+                         
-                '<td style="text-align:center; width:10%">' + row.fields.estoque + '</td>'+
-                '<td style="text-align:center; width:10%">' + row.fields.quantidade + '</td>'+
-                '<td style="text-align:right; width:10%">' + formata_preco(row.fields.preco) + '</td>'+
-                '<td style="text-align:right; width:15%">' + formata_preco(row.fields.preco_promocional)+'</td>' +
+                '<td style="text-align:center; width:10%">' + row.estoque + '</td>'+
+                '<td style="text-align:center; width:10%">' + row.quantidade + '</td>'+
+                '<td style="text-align:right; width:10%">' + formata_preco(row.preco) + '</td>'+
+                '<td style="text-align:right; width:15%">' + formata_preco(row.preco_promocional)+'</td>' +
                 '</tr>'; 
         });             
         return ( title +
