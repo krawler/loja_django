@@ -1,7 +1,7 @@
 from django.views import View
 from pedido.models import ItemPedido
 from django.contrib.auth.models import User
-from django.db.models import Q, Count, QuerySet
+from django.db.models import Q, Count, QuerySet, Sum
 from decimal import Decimal
 from datetime import datetime
 from django.utils import timezone
@@ -62,7 +62,6 @@ class ProdutoService():
         saida_produto.save()
 
     def salvar_entrada_produto(self, variacao, preco_final, quantidade, user):
-        print(variacao)
         model_variacao = Variacao.objects.filter(id=variacao).first()
         data = datetime.today()
         hora = timezone.now()
@@ -73,3 +72,16 @@ class ProdutoService():
                                     data=data,
                                     hora=hora)
         entrada_produto.save()
+
+    def getEstoqueAtual(self, variacao_id):
+
+        entrada_total = EntradaProduto.objects.filter(variacao_id=variacao_id).aggregate(total_entrada=Sum('quantidade'))['total_entrada']
+
+        saida_total = SaidaProduto.objects.filter(variacao_id=variacao_id).aggregate(total_saida=Sum('quantidade'))['total_saida']
+
+        entrada_total = 0 if entrada_total is None else entrada_total        
+        saida_total = 0 if saida_total is None else saida_total    
+
+        saldo = entrada_total - saida_total
+        
+        return saldo
