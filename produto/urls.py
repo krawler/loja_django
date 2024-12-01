@@ -13,5 +13,6 @@ urlpatterns = [
     path('tabela/', views.Tabela.as_view(), name="tabela"),
     path('variacoes/', views.Variacoes_json.as_view(), name="variacoes"),
     path('busca/', views.Busca.as_view(), name="busca"),
-    path('entrada/', views.EntradaProduto.as_view(), name="entrada")
+    path('entrada/', views.EntradaProduto.as_view(), name="entrada"),
+    path('categoria/', views.CategoriaView.as_view(), name="categoria")
 ]
