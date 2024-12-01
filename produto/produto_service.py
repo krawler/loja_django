@@ -5,7 +5,7 @@ from django.db.models import Q, Count, QuerySet, Sum
 from decimal import Decimal
 from datetime import datetime
 from django.utils import timezone
-from produto.models import Produto, SessaoCarrinho, Variacao, SaidaProduto, EntradaProduto
+from produto.models import Produto, SessaoCarrinho, Variacao, SaidaProduto, EntradaProduto, Categoria
 
 import json
 
@@ -85,3 +85,12 @@ class ProdutoService():
         saldo = entrada_total - saida_total
         
         return saldo
+
+    def salvar_categoria(self, nome, id):
+        datahora_criacao = datetime.now()
+        if id != None and id != '':
+            categoria = Categoria.objects.filter(id=id).first()
+            categoria.nome = nome
+        else:    
+            categoria = Categoria(nome=nome, datahora_criacao=datahora_criacao)
+        categoria.save()
