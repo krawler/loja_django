@@ -179,7 +179,10 @@ class Carrinho(DispachProdutosMaisVendidos, View):
         variacao_id = self.request.POST.get('variacaoid')
         quantidade = self.request.POST.get('quantidade')
         carrinho = self.request.session.get('carrinho')
-        
+        item_carrinho = carrinho[variacao_id]
+        item_carrinho['quantidade'] = quantidade
+        carrinho[variacao_id] = item_carrinho
+        self.request.session['carrinho'] = carrinho
         json_data = carrinho
         return JsonResponse(json_data, safe=False)
 
