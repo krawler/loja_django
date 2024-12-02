@@ -39,9 +39,9 @@
                             <td class="text-center"><input type="number" class="quantidade" style="width: 20%;" value="{{item.quantidade }}" /></td>                        
                             <td class="text-right">
                                 {% if item.preco_quantitativo_promocional %}
-                                    R$  {{ item.preco_quantitativo_promocional }}
+                                    {{ item.preco_quantitativo_promocional | formata_preco }}
                                 {% else %}
-                                    R$  {{ item.preco_quantitativo }}
+                                    R$  {{ item.preco_quantitativo | formata_preco }}
                                 {% endif %}    
                                 <a class="ml-3" href="{% url 'produto:removerdocarrinho' %}?vid={{item.variacao_id}}">
                                     <i class="fas fa-times-circle text-danger" aria-hidden="true"></i>
@@ -83,9 +83,12 @@
             </div>
         </div>
         <div class="col-lg mt-auto bottom_40pixel">
-            <a class="btn btn-lg btn-block btn-primary" id="continuar_comprando" href="{% url 'produto:lista' %}">
+            <button class="btn btn-lg btn-block btn-primary" 
+                    id="continuar_comprando" 
+                    data-url="{% url 'produto:carrinho' %}"
+                    url-destino="{% url 'produto:lista' %}">
                 Continuar comprando
-            </a>    
+            </button>    
         </div>  
         <div class="col-lg mt-auto bottom_40pixel">
             {% if request.user.is_authenticated %}
@@ -99,47 +102,44 @@
             {% endif %}
         </div>
     </div>
+
+    <div class="modal" id="dialogModal" tabindex="-1" aria-labelledby="dialogModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Confirmação</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Tem certeza que deseja alterar a quantidade?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="closeDialogModal" >Fechar</button>
+                    <button type="button" class="btn btn-primary" id="changeCartQuantity" >Alterar</button>
+                </div>
+            </div> 
+        </div>
+    </div>
+
+    <div class="modal" id="dialogModal2" tabindex="-1" aria-labelledby="dialogModal2" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Confirmação</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">X</button>
+                </div>
+                <div class="modal-body">
+                    Quantidade alterada, o que deseja?
+                </div>
+                <div class="modal-footer">
+                    <a href="#"  class="btn btn-secondary" id="closeDialogModal2" >Continuar na página</a>
+                    <a href="{% url 'produto:lista' %}" class="btn btn-primary" id="goToStore" >Navegar na loja</a>
+                </div>
+            </div> 
+        </div>
+    </div>
 {% endif %}
 
-<script>
-
-    function atualizaQuantidade(variacao_id, quantidade){
-
-        $.ajaxSetup({
-            headers:
-            { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
-        });
-
-        
-    }
-
-    $("#continuar_comprando").on('click', function(e){
-        
-        e.preventDefault();
-
-        $('tr[data-quant]').each(function() {
-            var $row = $(this);
-            var quantidadeInput = $row.find('.quantidade').val();
-            var quantidadeOriginal = $row.data('quant');
-            var variacao_id = $row.data('variacaoid');
-
-            if (quantidadeInput != quantidadeOriginal) {
-                $.ajax({
-                    type: "POST",
-                    dataType: "json",
-                    url: "{% url 'produto:carrinho' %}",
-                    data: {
-                        "variacaoid" : variacao_id,
-                        "quantidade": quantidade,
-                        "csrfmiddlewaretoken": $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(jsonData) { 
-                        console.log(jsonData);
-                    }
-                });
-            }
-        });
-    });
-</script>
+<script src="{% static 'assets/custom/js/carrinho.js' %}"></script>
 
 {% endblock %}
