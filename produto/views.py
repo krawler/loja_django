@@ -52,6 +52,13 @@ class DetalheProduto(DispachProdutosMaisVendidos, DetailView):
     context_object_name = 'produto'
     slug_url_kwarg = 'slug'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        produto = context['produto']
+        lista_estoque_variacoes = ProdutoService().get_saldo_estoque_variacoes(produto)
+        context['saldo_estoque_variacoes'] = json.dumps(lista_estoque_variacoes)
+        return context
+
 class AdicionarCarrinho(View):
     def get(self, *args, **kwargs):
         http_referer = self.request.META.get('HTTP_REFERER', reverse('produto:lista'))
