@@ -6,7 +6,7 @@ from django.core import serializers
 from decimal import Decimal
 from datetime import datetime
 from django.utils import timezone
-from produto.models import Produto, SessaoCarrinho, Variacao, SaidaProduto, EntradaProduto
+from produto.models import Produto, SessaoCarrinho, Variacao, SaidaProduto, EntradaProduto, AcessoProduto
 
 import json
 
@@ -94,3 +94,8 @@ class ProdutoService():
             saldos[variacao.id] = self.getEstoqueAtual(variacao.id)
         
         return saldos    
+    
+    def salvar_acesso_produto(self, user, slug):
+        produto = Produto.objects.filter(slug=slug).first()
+        acesso = AcessoProduto(produto=produto, user=user)
+        acesso.save()
