@@ -6,7 +6,7 @@ from django.core import serializers
 from decimal import Decimal
 from datetime import datetime
 from django.utils import timezone
-from produto.models import Produto, SessaoCarrinho, Variacao, SaidaProduto, EntradaProduto
+from produto.models import Produto, SessaoCarrinho, Variacao, SaidaProduto, EntradaProduto, Categoria
 
 import json
 
@@ -94,3 +94,12 @@ class ProdutoService():
             saldos[variacao.id] = self.getEstoqueAtual(variacao.id)
         
         return saldos    
+
+    def salvar_categoria(self, nome, id):
+        datahora_criacao = datetime.now()
+        if id != None and id != '':
+            categoria = Categoria.objects.filter(id=id).first()
+            categoria.nome = nome
+        else:    
+            categoria = Categoria(nome=nome, datahora_criacao=datahora_criacao)
+        categoria.save()

@@ -113,3 +113,8 @@ class SaidaProduto(models.Model):
     hora = models.TimeField(default=timezone.now().time())
     desativado = models.BooleanField(default=False)
     pedido = models.ForeignKey('pedido.Pedido', on_delete=models.CASCADE)
+
+class Categoria(models.Model):
+    nome = models.TextField(max_length=50, null=False)
+    desativado = models.BooleanField(default=False)
+    datahora_criacao = models.DateTimeField()

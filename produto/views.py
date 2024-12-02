@@ -7,7 +7,7 @@ from django.views.generic.detail import DetailView
 from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 from django.db.models import Q, Count, QuerySet
-from produto.models import Produto, Variacao 
+from produto.models import Produto, Variacao, Categoria 
 from produto.produto_service import ProdutoService
 from perfil.models import PerfilUsuario
 from pedido.models import ItemPedido
@@ -311,3 +311,22 @@ class Busca(ListaProdutos):
         
         self.request.session.save()
         return qs
+
+class CategoriaView(DispachLoginRequired, View):
+    
+    def get(self, *args, **kwargs):
+        
+        context = {
+            'area_sem_produtos' : True,  
+            'categorias' : Categoria.objects.all()
+        }
+
+        return render(self.request, 'produto/categoria.html', context)
+    
+    def post(self, *args, **kwargs):
+        
+        nome = self.request.POST.get('nome')
+        id_categoria = self.request.POST.get('id_categoria')
+        ProdutoService().salvar_categoria(nome, id_categoria)
+
+        return redirect('produto:categoria')

@@ -190,7 +190,7 @@ tbody > tr.selected > * {
 }
 
 #id_bairro, #id_cidade, #id_estado, #id_password, #id_password2, #id_username, 
-#id_first_name, #id_last_name, #id_telefone{
+#id_first_name, #nome, #id_telefone{
     max-width: 350px;
 }
 
