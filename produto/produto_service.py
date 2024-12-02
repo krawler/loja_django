@@ -2,6 +2,7 @@ from django.views import View
 from pedido.models import ItemPedido
 from django.contrib.auth.models import User
 from django.db.models import Q, Count, QuerySet, Sum
+from django.core import serializers
 from decimal import Decimal
 from datetime import datetime
 from django.utils import timezone
@@ -85,3 +86,11 @@ class ProdutoService():
         saldo = entrada_total - saida_total
         
         return saldo
+
+    def get_saldo_estoque_variacoes(self, produto):
+        saldos = {}
+        variacoes = Variacao.objects.filter(produto=produto)
+        for variacao in variacoes:
+            saldos[variacao.id] = self.getEstoqueAtual(variacao.id)
+        
+        return saldos    
