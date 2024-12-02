@@ -113,3 +113,10 @@ class SaidaProduto(models.Model):
     hora = models.TimeField(default=timezone.now().time())
     desativado = models.BooleanField(default=False)
     pedido = models.ForeignKey('pedido.Pedido', on_delete=models.CASCADE)
+
+class AcessoProduto(models.Model):
+    produto = models.ForeignKey(Produto, on_delete=models.CASCADE, null=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
+    data = models.DateField(default=datetime.now().date())
+    hora = models.TimeField(default=timezone.now().time())
+    desativado = models.BooleanField(default=False)
