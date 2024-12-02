@@ -20,6 +20,14 @@
         $("#dt-search-0").css('width','90%');
         $(".card-body").css('padding','0.75rem');
 
+        $('.buttons-colvis').children('span').html('Colunas');
+        $('.dt-search').children('label').html('Procurar')
+        var showing = $("#table_id_info").html()
+        showing = showing.replace('Showing','Exibindo').replace('entries', 'registros')
+                                             .replace('to','a')
+                                             .replace('of','de');
+        $("#table_id_info").html(showing);
+
         table.on('click', 'td', function (e) {
             row = $(this).parent('tr');
             nomeproduto_selecionado = row.children('td.nome_produto').html();
