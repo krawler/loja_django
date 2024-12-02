@@ -25,22 +25,25 @@
                           {{produto.preco_marketing_promocional|formata_preco}}
                     </span>
                     <span id="variation-preco"
-                          class="lead product-old-price text-muted">
-                          {{produto.preco_marketing|formata_preco}}
+                            class="lead product-old-price text-muted">
+                            {{produto.preco_marketing|formata_preco}}
                     </span>
                 {% else %}
                     <span id="variation-preco-normal" 
                     class="lead product-price">{{produto.preco_marketing|formata_preco}}</span>
                 {% endif %}          
             </p>
-
+            <p class="lead">
+                <span id="saldo_estoque"></span> em estoque  
+            </p>
             <form action="{% url 'produto:adicionaraocarrinho' %}" id="form-add-to-cart">
                 {% if produto.variacao_set %}
+                    <input type="hidden" id="estoques_variacoes" value="{{saldo_estoque_variacoes}}" />
                     <div class="form-group">
                         <input type="number" id="quantidade" name="quantidade" value="1" 
                             class="form-control form-control-lg input_qtd">
                         <select id="select-variacoes" name="vid" 
-                        class="form-control form-control-lg input_variacao">
+                            class="form-control form-control-lg input_variacao">
                             {% for variacao in produto.variacao_set.all %}
                                 {% if variacao.preco_promocional %}
                                     <option data-preco="{{variacao.preco|formata_preco}}" 
@@ -88,5 +91,18 @@
         </div>
     </div>
 </div>
+
+<script>
+    $(document).ready(function(){
+
+        estoques = JSON.parse($('#estoques_variacoes').val())
+        $("#saldo_estoque").html(estoques[$("#select-variacoes").val()]);
+        $("#select-variacoes").change(function(){
+            id_variacao = $(this).val();
+            $("#saldo_estoque").html(estoques[id_variacao]);
+        });
+
+    });
+</script>
 
 {% endblock %}
