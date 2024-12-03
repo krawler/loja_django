@@ -62,7 +62,6 @@ class ProdutoService():
         saida_produto.save()
 
     def salvar_entrada_produto(self, variacao, preco_final, quantidade, user):
-        print(variacao)
         model_variacao = Variacao.objects.filter(id=variacao).first()
         data = datetime.today()
         hora = timezone.now()
