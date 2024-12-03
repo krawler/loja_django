@@ -53,6 +53,10 @@ $(document).ready(function(){
         $("#dialogModal2").hide();     
     });
 
+    $("#btnFecharDialog").on('click', function(){
+        $("#dialogModal").hide();     
+    });
+
     $("#changeCartQuantity").click(function(){
         
         $("#dialogModal").hide(); 
