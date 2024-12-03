@@ -120,3 +120,15 @@ class AcessoProduto(models.Model):
     data = models.DateField(default=datetime.now().date())
     hora = models.TimeField(default=timezone.now().time())
     desativado = models.BooleanField(default=False)
+
+class ProdutoMaisAcessado(models.Model):
+    nome = models.CharField(max_length=200)
+    descricao = models.TextField(max_length=255)
+    imagem = models.ImageField(upload_to='produto_imagens/%Y/%m/', blank=True, null=True)
+    slug = models.SlugField(unique=True, blank=True, null=True)
+    preco = models.FloatField()
+    preco_promocional = models.FloatField(default=0)
+    total_acessos = models.IntegerField()
+
+    class Meta:
+        managed: False
