@@ -6,6 +6,7 @@ from PIL import Image
 from django.utils import timezone
 from django.utils.text import slugify 
 import os
+import django
 
 class Produto(models.Model):
     nome = models.CharField(max_length=200)
@@ -101,7 +102,7 @@ class EntradaProduto(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
     preco_final = models.FloatField()
     data = models.DateField(default=datetime.now().date())
-    hora = models.TimeField(default=timezone.now().time())
+    hora = models.TimeField(django.utils.timezone.now)
     desativado = models.BooleanField(default=False)
 
 class SaidaProduto(models.Model):
@@ -110,15 +111,15 @@ class SaidaProduto(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
     preco_final = models.FloatField()
     data = models.DateField(default=datetime.now().date())
-    hora = models.TimeField(default=timezone.now().time())
+    hora = models.TimeField(default=django.utils.timezone.now)
     desativado = models.BooleanField(default=False)
     pedido = models.ForeignKey('pedido.Pedido', on_delete=models.CASCADE)
 
 class AcessoProduto(models.Model):
     produto = models.ForeignKey(Produto, on_delete=models.CASCADE, null=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
-    data = models.DateField(default=datetime.now().date())
-    hora = models.TimeField(default=timezone.now().time())
+    data = models.DateField(default=django.utils.timezone.now)
+    hora = models.TimeField(default=django.utils.timezone.now)
     desativado = models.BooleanField(default=False)
 
 class ProdutoMaisAcessado(models.Model):
