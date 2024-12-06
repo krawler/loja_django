@@ -8,15 +8,16 @@
         <h3>{{pedido}}</h3>
         
         <div class="row mt-4">
-            <div class="col-lg-2 font-weight-bold ">Número do pedido:</div>
-            <div class="col-lg-4">{{pedido.id}}</div>
+
+            <div class="col-lg-2 font-weight-bold">Status:</div>
+            <div class="col-lg-4">{{pedido.get_status_display}}</div>
+
             <div class="col-lg-2 font-weight-bold">Total:</div>
             <div class="col-lg-4">{{pedido.total|formata_preco}}</div>
 
             <div class="col-lg-2 font-weight-bold">Qtd. Itens:</div>
-            <div class="col-lg-4">{{pedido.qtd_total}}</div>
-            <div class="col-lg-2 font-weight-bold">Status:</div>
-            <div class="col-lg-4">{{pedido.get_status_display}}</div>
+            <div class="col-lg-4">{{pedido.qtd_total|converte_int}}</div>
+            
         </div>  
         <div class="row mt-4">
             <div class="col">
