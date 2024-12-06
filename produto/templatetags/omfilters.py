@@ -4,6 +4,12 @@ from datetime import datetime
 register = Library()
 
 @register.filter
+def converte_int(val):
+    if val != '':
+        return int(val)
+    return ''       
+
+@register.filter
 def formata_preco(val):
     if isinstance(val, str):
         val = float(val)
