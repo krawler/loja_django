@@ -29,7 +29,8 @@
         <tr data-endereco="{{pedido.perfil_data.endereco}},{{pedido.perfil_data.numero}}, {{pedido.perfil_data.bairro}}, {{pedido.perfil_data.cep}}"
             data-cidade="{{pedido.perfil_data.cidade}},{{pedido.perfil_data.estado}}"
             data-ultimacompra="{{pedido.data_ultima_compra}}"
-            data-token="'{{csrf_token}}'">
+            data-token="'{{csrf_token}}'"
+            data-href="{% url 'pedido:admin_detalhe' pedido.id %}">
             <td class="dt-control" id="{{pedido.id}}"></td> 
             <td class="text-center">{{pedido.id}}</td>
             <td class="text-center">{{pedido.status|get_status_extenso}}</td>
@@ -108,14 +109,14 @@
             else {
                 row.child(format(row.data(), id_pedido, $(tr).attr('data-endereco'), 
                                 $(tr).attr('data-cidade'), $(tr).attr('data-ultimacompra'),
-                                $(tr).attr('data-token'))).show();
+                                $(tr).attr('data-token'), $(tr).attr('data-href'))).show();
                 showTabelaItens(id_pedido);
             }
         }); 
         
     });
 
-    function format(d, id_pedido,dados_endereco,dados_cidade,data_ultima_compra,token) {
+    function format(d, id_pedido,dados_endereco,dados_cidade,data_ultima_compra,token, href) {
         return (
             '<div class="row">' +
                 '<div class="col" >' +
@@ -150,8 +151,8 @@
                 '<button data-status="' + d[2] + '" data-token="' + token + '" class="btn btn-secondary btn-block btn-lg btnChangeStatus"' +
                                 'onclick="showDialogModalStatus('+ id_pedido +',' + token + ')">' +
                 'Mudar para ' + getNextStep(d[2]) + '</button>'+ 
-                '<button class="btn btn-primary btn-block btn-lg">' +
-                ' Ver detalhes do pedido </button>'+ 
+                '<a class="btn btn-primary btn-block btn-lg" href="'+ href +'">' +
+                ' Ver detalhes do pedido </a>'+ 
                 '<button class="btn btn-danger btn-block btn-lg btn-delete"' +
                 ' onclick="showDialogModalDeactivate('+ id_pedido +')">' +    
                 ' Desativar pedido </button>'+ 
