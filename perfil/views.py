@@ -281,7 +281,7 @@ class Reset_password(View):
                         return redirect('perfil:login')  
             else:
                 # Token inválido ou usuário não encontrado
-                return render(request, 'password_reset_confirm.html', {'error': 'Token inválido ou expirou.'})
+                return render(self.request, 'perfil/reset_password.html', {'error': 'Token inválido ou expirou.'})
         except Exception as e:
             # Lidar com exceções
-            return render(request, 'password_reset_confirm.html', {'error': 'Ocorreu um erro.'})
+            return render(self.request, 'perfil/reset_password.html', {'error': 'Ocorreu um erro.'})
