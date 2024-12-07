@@ -248,3 +248,15 @@ class ItensPedido_json(ListView):
         produtos = pedido_service.Pedido_Service().getItemsProdutos(pedido_id=pedido_id)
         json_data = serializers.serialize('json', produtos)
         return JsonResponse(json_data, safe=False)
+
+class Admin_detalhe_pedido(DispachLoginRequired, View):
+    
+    def get(self, *args, **kwargs):
+        
+        pk_url_kwarg = 'pk'
+        pedido_id = kwargs['pk']
+        pedido = Pedido.objects.filter(id=pedido_id).first()
+        context = {
+            'pedido' : pedido
+        }
+        return render(self.request, 'pedido/admin/detalhe.html', context)
