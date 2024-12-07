@@ -7,6 +7,13 @@
 {% block conteudo %}
 
 <script>
+
+    function formata_preco(numero){
+        if(numero != undefined)
+            return numero.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        return '';
+    }
+
     $(document).ready(function(){
         
         $.noConflict();
@@ -30,12 +37,27 @@
 
         table.on('click', 'td', function (e) {
             row = $(this).parent('tr');
+            preco_selecionado = row.children('td.preco_final').data('preco')
             nomeproduto_selecionado = row.children('td.nome_produto').html();
             nomevariacao_selecionado = row.children('td.nome_variacao').html();
             $("#id_variacao").val(row.attr('variacao_id'));
-            $('#preco_atual').val(row.children('td.preco_final').html());
-            $('#nome_produto_variacao').html(nomeproduto_selecionado + ' - ' + nomevariacao_selecionado);
-        });  
+            $('#preco_atual').val(row.children('td.preco_final').html().trimLeft());
+            $("#nome_produto_variacao").html(nomeproduto_selecionado + ' - ' + nomevariacao_selecionado);
+            $("#preco_selecionado").val(preco_selecionado);
+        }); 
+
+        $("#quantidade").blur(function(){
+            preco = parseInt($("#preco_selecionado").val());
+            quantidade = parseInt($(this).val());
+            if(isNaN(quantidade))
+                quantidade = 1 
+            if(isNaN(preco)){
+                total = 0;
+            }else{
+                total = preco * quantidade;
+            }            
+            $("#total_entrada").val(formata_preco(total));
+        }); 
 
     } );  
 </script>
@@ -54,6 +76,7 @@
                         <th>nome da variação</th>
                         <th>Preço</th>
                         <th>Preço promocional</th>
+                        <th>Saldo estoque</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -61,8 +84,11 @@
                     <tr variacao_id="{{variacao.id}}">
                         <td class="nome_produto">{{variacao.produto.nome}}</td>             
                         <td class="nome_variacao">{{variacao.nome}}</td>                       
-                        <td class="preco_final">{{variacao.preco|formata_preco}}</td>
+                        <td class="preco_final" data-preco="{{variacao.preco}}">
+                            {{variacao.preco|formata_preco}}
+                        </td>
                         <td>{{variacao.preco_promocional|formata_preco}}</td>
+                        <td>{{variacao.saldo_estoque}}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -83,11 +109,17 @@
                             placeholder="" class="form-control input-number">
                 </div>
                 <div class="form-group">
-                    <label for="InputUsuario">Preço Atual</label>
+                    <label for="preco_atual">Preço Atual</label>
                     <input type="text" name="preco_atual" 
                             class="form-control input-number" id="preco_atual">
                 </div>
+                <div class="form-group">
+                    <label for="total_entrada">Valor total</label>
+                    <input type="text" name="total_entrada" 
+                            class="form-control input-number" id="total_entrada">
+                </div>
                 <input type="hidden" name="id_variacao" id="id_variacao"/>
+                <input type="hidden" name="preco_selecionado" id="preco_selecionado"/>
                 <button type="submit" id="btn_login_perfil" 
                         class="btn btn-primary btn-block btn-lg btn_login">
                     Cadastrar
