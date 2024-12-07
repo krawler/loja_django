@@ -16,20 +16,17 @@
             <th></th>
             <th>nome</th>
             <th>descricao</th>
-            <th>slug</th>
-            <th>Preço</th>
-            <th>Preço promocional</th>
+            <th>Categoria</th>
         </tr>
     </thead>
     <tbody>
         {% for produto in produtos %}
-        <tr data-image="{% get_media_prefix %}{{produto.imagem|remove_aspas}}">
+        <tr data-image="{% get_media_prefix %}{{produto.imagem|remove_aspas}}"
+            data-slug="{{produto.slug}}">
             <td class="dt-control" id="{{produto.id}}"></td> 
             <td>{{produto.nome}}</td>
             <td>{{produto.descricao}}</td>
-            <td>{{produto.slug}}</td>
-            <td style="width: 10%">{{produto.preco_marketing|formata_preco}}</td>
-            <td>{{produto.preco_marketing_promocional|formata_preco}}</td>
+            <td style="width:20%">{{produto.categoria.nome}}</td>
         </tr>
         {% endfor %}
     </tbody>
@@ -76,13 +73,18 @@
                 $(".linha_detalhe").remove();
             }
             else {
-                row.child(format(row.data(), id_produto, $(this).parent().attr("data-image"))).show();
+                row.child(format(row.data(), 
+                                id_produto, 
+                                $(this).parent().attr("data-image"),
+                                $(this).parent().attr("data-slug")
+                                )
+                        ).show();
                 showTabelaVariacoes(id_produto);
             }
         });        
     });
 
-    function format(d, id_produto, imagem) {
+    function format(d, id_produto, imagem, slug) {
         return (
             '<div class="col" style="float:left; width:70%">' +
             '<dl>' +
@@ -92,7 +94,7 @@
             '</dd>' +
             '<dt>Slug:</dt>' +
             '<dd>' +
-            d[3] +
+            slug +
             '</dd>' +
             '<dt>Descrição:</dt>' +
             '<dd>'+ d[2] +'</dd>' +
