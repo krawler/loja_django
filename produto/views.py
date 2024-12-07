@@ -273,9 +273,14 @@ class EntradaProduto(DispachLoginRequired, View):
     
     def get(self, *args, **kwargs):
         
+        variacoes = Variacao.objects.select_related('produto')
+    
+        for variacao in variacoes:
+            variacao.saldo_estoque = ProdutoService().getEstoqueAtual(variacao.id)
+
         context = {
             'area_sem_produtos' : True,  
-            'variacoes' : Variacao.objects.select_related('produto')
+            'variacoes' : variacoes
         }
 
         return render(self.request, 'produto/entrada.html', context)
