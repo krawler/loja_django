@@ -3,14 +3,21 @@ from django.views.generic import ListView
 from django.views import View
 from datetime import datetime
 from . import forms
-from .models import PerfilUsuario
+from .models import PerfilUsuario, PasswordResetCode
 from produto.models import Produto
 from produto.produto_service import ProdutoService
+from django.core.mail import send_mail
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.forms import PasswordResetForm
+from django.template.loader import render_to_string
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 import copy
 import json
+import random
+import string
 
 class BasePerfil(View):
     
@@ -207,6 +214,7 @@ class Login(View):
 
 
 class Logout(View):
+
     def get(self, *args, **kwargs):
         
         carrinho = self.request.session.get('carrinho')
@@ -214,3 +222,66 @@ class Logout(View):
         logout(self.request)
         self.request.session.save()
         return redirect('produto:lista')
+
+class Password_Reset(View):
+
+    def get(self, *args, **kwargs):
+        form = form = PasswordResetForm()        
+        return render(self.request, 'perfil/password_reset.html', {'form': form, 'mensagem': ''})
+    
+    def post(self, *args, **kwargs):
+        form = PasswordResetForm(self.request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            try:
+                user = User.objects.get(email=email)
+                code = ''.join(random.choices(string.digits, k=8))
+                password_reset = PasswordResetCode.objects.create(usuario=user, codigo=code)
+                subject = 'Recuperação de Senha'
+                message = render_to_string('perfil/password_reset.html', {'code': code})
+                # send_mail(subject, message, 'seu_email@example.com', [email])
+                return redirect('perfil:password_reset')
+            except User.DoesNotExist:
+                self.msg_retorno = "Usuário não encontrado, verifique seu email"
+                pass            
+
+        return render(self.request, 'perfil/code_validation.html', {'form': form, 'mensagem': self.msg_retorno})
+
+
+class Code_Verification(View):
+
+    def get(self, *args, **kwargs):
+        email = self.request.GET.get('email')
+        user = User.objects.exclude(is_active=False).get(email=email)
+        uidb64 = urlsafe_base64_encode(force_bytes(user.id))
+        return render(self.request, 'perfil/code_validation.html')  
+
+    def post(self, *args, **kwargs):
+        codigo = self.request.POST.get('codigo')
+        user = User.objects.exclude(is_active=False).get(email=email)
+        return render(self.request, 'perfil/code_validation.html')  
+
+class Reset_password(View):
+    
+    def get(self, *args, **kwargs):
+        return render(self.request, 'perfil/reset_password.html', {'form': form, 'mensagem': ''})   
+
+    def post(self, *args, **kwargs):
+        try:
+            # Decodifica o UID e obtém o usuário
+            uid = force_text(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=uid)
+
+            if user is not None and default_token_generator.check_token(user, token):
+                    form = SetPasswordForm(user, request.POST)
+                    if form.is_valid():
+                        user.set_password(form.cleaned_data['new_password1'])
+                        user.save()
+                        PasswordResetCode.objects.filter(user=user).delete()
+                        return redirect('perfil:login')  
+            else:
+                # Token inválido ou usuário não encontrado
+                return render(request, 'password_reset_confirm.html', {'error': 'Token inválido ou expirou.'})
+        except Exception as e:
+            # Lidar com exceções
+            return render(request, 'password_reset_confirm.html', {'error': 'Ocorreu um erro.'})
