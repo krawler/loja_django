@@ -4,84 +4,22 @@
 
 {% block conteudo %}
 
-<script>
-    $(document).ready(function(){
-        
-        let cep = $("#id_cep").val().replace("-", "")
-        let url_call = "https://viacep.com.br/ws/" + cep + "/json/"; 
-        
-        $("#id_cep").blur(() => {
-            $.ajax({
-                        url: url_call,
-                        type: 'GET',
-                        async: true,
-                        success: function(response){
-                            $("#id_bairro").val(response.bairro);
-                            $("#id_cidade").val(response.localidade);
-                            $("#id_endereco").val(response.logradouro);
-                            $("#uf").val(response.uf);
-                        }
-                    },                
-            );
-        });
+{% load static %}
 
-        $("#enviar_form_perfil").click((e) => {
-            $.ajax({
-                        url: url_call,
-                        type: 'GET',
-                        async: false,
-                        success: function(response){
-                            if(response.uf != $("#id_estado").val()){
-                                e.preventDefault(); 
-                                $("#id_cep").css("border-color", "red");
-                                $("#id_estado").css("border-color", "red"); 
-                                $("#id_estado").after('<span class="password-strength-indicator"' 
-                                                    + 'style="display: none;">&nbsp;</span>')
-                                                .after('<small id="hint_id_password"'
-                                                    + ' class="form-text text-red-validation">O estado deve ser' 
-                                                    + ' o mesmo estado do cep</small>');                            } 
-                        }
-                    },                
-            );
-        });
-    });
-</script>
+<script src="{% static 'assets/custom/js/form_userperfil.js' %} "></script>
 
-<div class="row">
-    {% if not request.user.is_authenticated %}
-        <div class="col-lg mt-3">
-            <h4>Login</h4>
-            <p>Se já fez o cadastro, basta entrar com seu usuário e senha abaixo:</p>
-            <form method="POST" action="{% url 'perfil:login' %}">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="InputUsuario">Usuário</label>
-                    <input type="text" name="username" id="username" placeholder="Digite seu usuário"
-                           class="form-control" aria-describedby="usuarioHelp">
-                </div>
-                <div class="form-group">
-                    <label for="InputUsuario">Senha</label>
-                    <input type="password" name="password" placeholder="Digite sua senha"
-                           class="form-control" id="exampleInputPassword">
-                </div>
-                <button type="submit" id="btn_login_perfil" class="btn btn-primary btn-block btn-lg">
-                    Login
-                </button>
-            </form>   
-
-        </div>
-    {% endif %}
+<div class="row ml-5">
     
     <div class="col-lg mt-3">
         {% block titulocadastro %}
             <h4>Cadastro</h4>
-            <p>Caso ainda não tenha cadastro, utilize o formulário</p>
+            <p>Utilize o formulário abaixo para realizar seu cadastro</p>
         {% endblock %}
 
         <form method="POST" action="">            
             {% csrf_token %}          
-            {{userform|crispy}}
             {{perfilform|crispy}}
+            {{userform|crispy}}
             <input type="hidden" name="uf" id="uf" value="{{perfilform.data.estado}}">
             <div class="row">
                 <div class="col">

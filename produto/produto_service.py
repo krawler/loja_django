@@ -1,9 +1,12 @@
 from django.views import View
 from pedido.models import ItemPedido
 from django.contrib.auth.models import User
-from django.db.models import Q, Count, QuerySet
+from django.db.models import Q, Count, QuerySet, Sum
+from django.core import serializers
 from decimal import Decimal
-from produto.models import Produto, SessaoCarrinho, Variacao
+from datetime import datetime
+from django.utils import timezone
+from produto.models import Produto, SessaoCarrinho, Variacao, SaidaProduto, EntradaProduto, Categoria
 
 import json
 
@@ -47,3 +50,56 @@ class ProdutoService():
 
     def getCarrinhoSessao(self, user):
         return SessaoCarrinho.objects.filter(user=user).all()
+
+    def salvar_saida_produto(self, variacao, preco_final, quantidade, user, data, hora, pedido):
+        saida_produto = SaidaProduto(variacao=variacao,
+                                    preco_final=preco_final,
+                                    quantidade=quantidade,
+                                    user=user,
+                                    data=data,
+                                    hora=hora,
+                                    pedido=pedido
+        )
+        saida_produto.save()
+
+    def salvar_entrada_produto(self, variacao, preco_final, quantidade, user):
+        model_variacao = Variacao.objects.filter(id=variacao).first()
+        data = datetime.today()
+        hora = timezone.now()
+        entrada_produto = EntradaProduto(variacao=model_variacao,
+                                    preco_final=preco_final,
+                                    quantidade=quantidade,
+                                    user=user,
+                                    data=data,
+                                    hora=hora)
+        entrada_produto.save()
+
+    def getEstoqueAtual(self, variacao_id):
+
+        entrada_total = EntradaProduto.objects.filter(variacao_id=variacao_id).aggregate(total_entrada=Sum('quantidade'))['total_entrada']
+
+        saida_total = SaidaProduto.objects.filter(variacao_id=variacao_id).aggregate(total_saida=Sum('quantidade'))['total_saida']
+
+        entrada_total = 0 if entrada_total is None else entrada_total        
+        saida_total = 0 if saida_total is None else saida_total    
+
+        saldo = entrada_total - saida_total
+        
+        return saldo
+
+    def get_saldo_estoque_variacoes(self, produto):
+        saldos = {}
+        variacoes = Variacao.objects.filter(produto=produto)
+        for variacao in variacoes:
+            saldos[variacao.id] = self.getEstoqueAtual(variacao.id)
+        
+        return saldos    
+
+    def salvar_categoria(self, nome, id):
+        datahora_criacao = datetime.now()
+        if id != None and id != '':
+            categoria = Categoria.objects.filter(id=id).first()
+            categoria.nome = nome
+        else:    
+            categoria = Categoria(nome=nome, datahora_criacao=datahora_criacao)
+        categoria.save()

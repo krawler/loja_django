@@ -7,12 +7,26 @@ from django.views.generic.detail import DetailView
 from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 from django.db.models import Q, Count, QuerySet
-from produto.models import Produto, Variacao 
+from produto.models import Produto, Variacao, Categoria 
 from produto.produto_service import ProdutoService
 from perfil.models import PerfilUsuario
 from pedido.models import ItemPedido
+from .serializers import VariacaoSerializer
 import json
 import requests
+
+class DispachLoginRequired(View):
+    
+    def dispatch(self, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            return redirect("perfil:login")
+    
+        return super().dispatch(*args, **kwargs)
+    
+    def get_query_set(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        qs = qs.filter(usuario=self.request.user)
+        return qs
 
 class DispachProdutosMaisVendidos(View):
 
@@ -38,7 +52,15 @@ class DetalheProduto(DispachProdutosMaisVendidos, DetailView):
     context_object_name = 'produto'
     slug_url_kwarg = 'slug'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        produto = context['produto']
+        lista_estoque_variacoes = ProdutoService().get_saldo_estoque_variacoes(produto)
+        context['saldo_estoque_variacoes'] = json.dumps(lista_estoque_variacoes)
+        return context
+
 class AdicionarCarrinho(View):
+    
     def get(self, *args, **kwargs):
         http_referer = self.request.META.get('HTTP_REFERER', reverse('produto:lista'))
         variacao_id = self.request.GET.get('vid')
@@ -103,8 +125,8 @@ class AdicionarCarrinho(View):
                 'preco_unitario_promocional' : preco_unitario_promocional,
                 'quantidade' : quantidade,
                 'slug' : slug,
-                'preco_quantitativo_promocional': preco_unitario_promocional * float(quantidade),
-                'preco_quantitativo' : preco_unitario * float(quantidade),
+                'preco_quantitativo_promocional': preco_unitario_promocional * int(quantidade),
+                'preco_quantitativo' : preco_unitario * int(quantidade),
                 'imagem' : imagem
             }
 
@@ -153,16 +175,24 @@ class RemoverCarrinho(View):
         return redirect(http_referer)
 
 class Carrinho(DispachProdutosMaisVendidos, View):
-    #TODO: salvar os itens da sessao quando carrega o carrinho
-
     
     def get(self, *args, **kwargs):
-
         context = {
             'carrinho': self.request.session.get('carrinho'),
             'produtos_mais_vendidos': self.produtos_mais_vendidos
         }
         return render(self.request, 'produto/carrinho.html', context)
+    
+    def post(self, *args, **kwargs):
+        variacao_id = self.request.POST.get('variacaoid')
+        quantidade = self.request.POST.get('quantidade')
+        carrinho = self.request.session.get('carrinho')
+        item_carrinho = carrinho[variacao_id]
+        item_carrinho['quantidade'] = quantidade
+        carrinho[variacao_id] = item_carrinho
+        self.request.session['carrinho'] = carrinho
+        json_data = carrinho
+        return JsonResponse(json_data, safe=False)
 
 class ResumoDaCompra(View):
     
@@ -233,18 +263,55 @@ class Tabela(ListView):
     template_name = 'produto/tabela.html'
     context_object_name = 'produtos'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['area_sem_produtos'] = True
+
+        return context
+
+class EntradaProduto(DispachLoginRequired, View):
+    
+    def get(self, *args, **kwargs):
+        
+        variacoes = Variacao.objects.select_related('produto')
+    
+        for variacao in variacoes:
+            variacao.saldo_estoque = ProdutoService().getEstoqueAtual(variacao.id)
+
+        context = {
+            'area_sem_produtos' : True,  
+            'variacoes' : variacoes
+        }
+
+        return render(self.request, 'produto/entrada.html', context)
+    
+    def post(self, *args, **kwargs):
+        
+        quantidade = self.request.POST.get('quantidade')
+        preco_final = self.request.POST.get('quantidade')
+        id_variacao = self.request.POST.get('id_variacao')
+        user = self.request.user
+        ProdutoService().salvar_entrada_produto(id_variacao, preco_final, quantidade, user)
+
+        return redirect('produto:tabela')
 
 class Variacoes_json(ListView):
     
     def get(self, *args, **kwargs):
+        
         produto_id = self.request.GET.get('produtoid')
         produto = Produto.objects.filter(id=produto_id).first()
-        qs_data = Variacao.objects.filter(produto=produto)
-        json_data = serializers.serialize('json', qs_data)
+        qs_variacoes = Variacao.objects.filter(produto=produto)
+
+        for variacao in qs_variacoes:
+            saldo_estoque = ProdutoService().getEstoqueAtual(variacao.id)
+            variacao.saldo_estoque = saldo_estoque
+            serializer = VariacaoSerializer(qs_variacoes, many=True)
+            json_data = json.dumps(serializer.data)
+        
         return JsonResponse(json_data, safe=False)
 
 class Busca(ListaProdutos):
-
     
     def get_queryset(self, *args, **kwargs):
         termo = self.request.GET.get('termo') or self.request.session.get('termo')
@@ -260,3 +327,22 @@ class Busca(ListaProdutos):
         
         self.request.session.save()
         return qs
+
+class CategoriaView(DispachLoginRequired, View):
+    
+    def get(self, *args, **kwargs):
+        
+        context = {
+            'area_sem_produtos' : True,  
+            'categorias' : Categoria.objects.all()
+        }
+
+        return render(self.request, 'produto/categoria.html', context)
+    
+    def post(self, *args, **kwargs):
+        
+        nome = self.request.POST.get('nome')
+        id_categoria = self.request.POST.get('id_categoria')
+        ProdutoService().salvar_categoria(nome, id_categoria)
+
+        return redirect('produto:categoria')

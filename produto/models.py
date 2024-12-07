@@ -1,7 +1,9 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
+from datetime import datetime
 from PIL import Image
+from django.utils import timezone
 from django.utils.text import slugify 
 import os
 
@@ -54,7 +56,16 @@ class Produto(models.Model):
     def __str__(self):
         return self.nome   
 
+class ProdutoSimples(models.Model):
+    nome_produto = models.CharField(max_length=100)
+    nome_variacao = models.CharField(max_length=100)
+    preco = models.FloatField(default=0)
+    preco_promocional = models.FloatField(default=0)  
+    quantidade = models.FloatField(default=0)
+    estoque = models.IntegerField()
 
+    class Meta:
+        managed = False 
 
 class Variacao(models.Model):
     
@@ -83,3 +94,27 @@ class SessaoCarrinho(models.Model):
     class Meta:
         verbose_name = "Carrinho da sessão salva"
         db_table = "sessao_carrinho"   
+
+class EntradaProduto(models.Model):
+    variacao = models.ForeignKey(Variacao, on_delete=models.CASCADE, null=False)
+    quantidade = models.PositiveIntegerField(null=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
+    preco_final = models.FloatField()
+    data = models.DateField(default=datetime.now().date())
+    hora = models.TimeField(default=timezone.now().time())
+    desativado = models.BooleanField(default=False)
+
+class SaidaProduto(models.Model):
+    variacao = models.ForeignKey(Variacao, on_delete=models.CASCADE, null=False)
+    quantidade = models.PositiveIntegerField(null=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
+    preco_final = models.FloatField()
+    data = models.DateField(default=datetime.now().date())
+    hora = models.TimeField(default=timezone.now().time())
+    desativado = models.BooleanField(default=False)
+    pedido = models.ForeignKey('pedido.Pedido', on_delete=models.CASCADE)
+
+class Categoria(models.Model):
+    nome = models.TextField(max_length=50, null=False)
+    desativado = models.BooleanField(default=False)
+    datahora_criacao = models.DateTimeField()

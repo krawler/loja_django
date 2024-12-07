@@ -1,12 +1,15 @@
 from django.shortcuts import render, redirect
+from django.core import serializers
 from django.views import View
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 from django.core.paginator import Paginator
-from produto.models import Variacao, Produto
+from produto.models import Variacao, Produto, ProdutoSimples, SaidaProduto
 from produto.produto_service import ProdutoService
+from . import pedido_service 
+from django.db import connection
 from .models import Pedido, ItemPedido
 from .email.py_email import PyEmail 
 from datetime import datetime, date
@@ -17,7 +20,7 @@ class DispachLoginRequired(View):
     
     def dispatch(self, *args, **kwargs):
         if not self.request.user.is_authenticated:
-            return redirect("perfil:criar")
+            return redirect("perfil:login")
     
         return super().dispatch(*args, **kwargs)
     
@@ -132,7 +135,16 @@ class SalvarPedido(View):
                 imagem=v['imagem']
             ) for v in carrinho.values()
         ])
-                                             
+
+        for v in carrinho.values():
+            ProdutoService().salvar_saida_produto(variacao=Variacao.objects.filter(id=v['variacao_id']).first(),
+                                                    preco_final=v['preco_quantitativo_promocional'],
+                                                    quantidade=v['quantidade'],
+                                                    user=self.request.user,
+                                                    data=datetime.today(),
+                                                    hora=datetime.now(),
+                                                    pedido=pedido)
+        
         del self.request.session['carrinho']
         ProdutoService().limpa_session_carrinho_user(self.request.user)
         self.request.session['pedido_id'] = pedido.id 
@@ -162,7 +174,7 @@ class MeusPedidos(DispachLoginRequired, ListView):
     
     def get(self, *args, **kwargs):
         usuario = self.request.user
-        pedidos = Pedido.objects.filter(usuario=usuario)
+        pedidos = Pedido.objects.filter(usuario=usuario).order_by('id').reverse()
         produtos_mais_vendidos = ProdutoService().get_produtos_mais_vendidos()
         page = self.request.GET.get('page', 1)
         paginator = Paginator(pedidos, per_page=10)
@@ -186,3 +198,65 @@ class Detalhe(DispachLoginRequired, DetailView):
         context = super().get_context_data(**kwargs)
         context['produtos_mais_vendidos'] = self.produtos_mais_vendidos     
         return context
+
+class Tabela(DispachLoginRequired, ListView):
+    model = Pedido
+    template_name = 'pedido/tabela.html'
+    context_object_name = 'pedidos'
+    ordering = ['-id']
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['area_sem_produtos'] = True
+        pedidos = context['pedidos']
+        pedidos = Pedido.objects.filter(desativado=False).order_by('id').reverse()
+        for pedido in pedidos:            
+            #data_datetime = datetime.datetime.strptime(pedido.data_emissao, "%d/%m/%Y")
+            #pedido.data_emissao = data_datetime
+            perfil = pedido.usuario.perfilusuario
+            pedido.perfil_data = perfil
+            data_ultima_compra = pedido_service.Pedido_Service().get_data_ultimo_pedido(user=pedido.usuario)
+            pedido.data_ultima_compra = data_ultima_compra
+        context['pedidos'] = pedidos
+        return context
+
+class Atualizar_Pedido(DispachLoginRequired, View):
+    
+    def post(self, *args, **kwargs):
+        pedido_id = self.request.POST.get('pedidoid')
+        de = self.request.POST.get('get')
+        para = self.request.POST.get('para')
+        para = pedido_service.Pedido_Service().get_sigla_status(para)
+        pedido = Pedido.objects.get(id=pedido_id)
+        pedido.status = para
+        pedido.save()
+        return JsonResponse(para, safe=False)
+
+class Desativar_Pedido(View):
+    
+    def post(self, *args, **kwargs):
+        pedido_id = self.request.POST.get('pedidoid')
+        pedido = pedido_service.Pedido_Service().desativar_pedido(pedidoid=pedido_id)
+        json_data = pedido.desativado
+        return JsonResponse(json_data, safe=False)
+
+
+class ItensPedido_json(ListView):
+    
+    def get(self, *args, **kwargs):
+        pedido_id = self.request.GET.get('pedidoid')
+        produtos = pedido_service.Pedido_Service().getItemsProdutos(pedido_id=pedido_id)
+        json_data = serializers.serialize('json', produtos)
+        return JsonResponse(json_data, safe=False)
+
+class Admin_detalhe_pedido(DispachLoginRequired, View):
+    
+    def get(self, *args, **kwargs):
+        
+        pk_url_kwarg = 'pk'
+        pedido_id = kwargs['pk']
+        pedido = Pedido.objects.filter(id=pedido_id).first()
+        context = {
+            'pedido' : pedido
+        }
+        return render(self.request, 'pedido/admin/detalhe.html', context)

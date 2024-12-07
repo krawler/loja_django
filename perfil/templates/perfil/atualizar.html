@@ -1,10 +1,35 @@
-{% extends 'perfil/criar.html' %}
+{% extends 'base.html' %}
 
-{% block titulo %}Atualizar perfil de {{ user }} | {% endblock %}
+{% load crispy_forms_tags %}
 
-{% block titulocadastro %}
-<h4>Atualizar cadastro</h4>
-<p>
-    Utilize o formulário a seguir para atualizar seus dados.
-</p>
+{% block conteudo %}
+
+{% load static %}
+
+<script src="{% static 'assets/custom/js/form_userperfil.js' %} "></script>
+
+<div class="row">
+    
+    <div class="col-lg mt-3">
+        {% block titulocadastro %}
+            <h4>Alteração dos dados no cadastro</h4>
+            <p>Caso precise atualizar alguma informação do seu cadastro, utilize o formulário abaixo</p>
+        {% endblock %}
+
+        <form method="POST" action="{% url 'perfil:criar' %}">            
+            {% csrf_token %}   
+            {{perfilform|crispy}}       
+            {{userform|crispy}}
+            <input type="hidden" name="uf" id="uf" value="{{perfilform.data.estado}}">
+            <div class="row">
+                <div class="col">
+                    <button type="submit" id="enviar_form_perfil"
+                        class="btn btn-primary btn-lg btn-cadastro-perfil">
+                        Enviar
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}

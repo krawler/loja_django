@@ -4,6 +4,12 @@ from datetime import datetime
 register = Library()
 
 @register.filter
+def converte_int(val):
+    if val != '':
+        return int(val)
+    return ''       
+
+@register.filter
 def formata_preco(val):
     if isinstance(val, str):
         val = float(val)
@@ -11,7 +17,13 @@ def formata_preco(val):
 
 @register.filter
 def formata_br_date(val):
-    return val.strftime("%d/%m/%Y")
+    if val != '':
+        return val.strftime("%d/%m/%Y")
+    return ''    
+
+@register.filter
+def formata_br_hora(val):
+    return val.strftime("%H:%M")
 
 @register.filter
 def remove_aspas(val):
@@ -25,7 +37,7 @@ def none_to_blank(val):
 
 @register.filter
 def cart_total_qtd(carrinho):
-    return sum([float(item['quantidade']) for item in carrinho.values()])
+    return sum([int(item['quantidade']) for item in carrinho.values()])
 
 @register.filter
 def cart_total_preco(carrinho):
@@ -38,3 +50,14 @@ def cart_total_preco(carrinho):
             for item in carrinho.values()
         ]
     ) 
+
+
+@register.filter
+def get_status_extenso(val):
+    match val:
+        case 'A': return 'Aprovado'
+        case 'C': return 'Criado'
+        case 'R': return 'Reprovado'
+        case 'P': return 'Preparando'
+        case 'E': return 'Enviado'
+        case 'F': return 'Finalizado'

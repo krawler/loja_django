@@ -5,14 +5,41 @@ from . import models
 
 class PerfilForm(forms.ModelForm):
     
+    '''
+    data_nascimento = forms.DateField(
+        widget=forms.DateTimeInput(format='%d/%m/%Y'),
+        input_formats=['%d/%m/%Y'],
+        label='Data de nascimento'
+    )
+    '''
+
+    complemento = forms.CharField(
+        widget=forms.TextInput(),
+        label='Complemento',
+        required=False,
+        help_text='Esse campo não é obrigatório'
+    )
+
+    bairro = forms.CharField(
+        widget=forms.TextInput(),
+        label='Bairro',
+        required=False,
+        help_text='Esse campo não é obrigatório'
+    )
+
+    cep = forms.CharField(
+        widget=forms.TextInput(),
+        label='CEP'
+    )
+
     def __init__(self, perfil=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.perfil = perfil
-         
+    
     class Meta:
         model = models.PerfilUsuario
-        fields = ('idade', 'data_nascimento', 'cpf', 'endereco', 'numero', 'complemento', 
-                  'bairro', 'cep', 'cidade', 'estado')
+        fields = ('nome_completo','cep', 'endereco', 'numero', 'complemento', 
+                'bairro', 'cidade', 'estado', 'telefone')
 
 class UserForm(forms.ModelForm):
     
@@ -20,22 +47,29 @@ class UserForm(forms.ModelForm):
         required=False,
         widget=forms.PasswordInput(),
         label='Senha',
-        help_text='Usuario logados podem deixar esse campo em branco para manter a senha'
+        help_text='Use uma letra maiuscula e um numero'
     )
     password2 = forms.CharField(
         required=False,
         widget=forms.PasswordInput(),
-        label='Cofirmação de senha',
-        help_text='Digite a senha igual ao campo acima'
+        label='Confirmação de senha',
+        help_text='Digite a senha igual a senha informada no campo acima'
     )
-    
+
+    email = forms.CharField(
+        required=True,
+        widget=forms.TextInput(),
+        label='Email',
+        help_text='Enviaremos a confirmação de cadastro e outros emails para esse endereço'
+    )
+
     def __init__(self, usuario=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.usuario = usuario        
         
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'username', 'password', 'password2', 'email')
+        fields = ('email','password', 'password2')
     
     def clean(self, *args, **kwargs):
         data = self.data

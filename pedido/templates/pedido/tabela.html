@@ -1,0 +1,261 @@
+{% extends 'base.html' %}
+
+{% load omfilters %}
+
+{% load static %}
+
+{% block conteudo %}
+
+<meta name="csrf-token" content="{{ csrf_token }}">
+
+<h1 class="text-center">Listagem de pedidos</h1>
+
+<br />
+
+<table id="table_id" class="display">
+    <thead>
+        <tr>
+            <th></th>
+            <th class="text-center" style="width: 10%">Número</th>
+            <th>Situação</th>
+            <th>Data de emissão</th>
+            <th>Usuário</th>
+            <th>Quantidade</th>
+            <th>Valor total</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for pedido in pedidos %}
+        <tr data-endereco="{{pedido.perfil_data.endereco}},{{pedido.perfil_data.numero}}, {{pedido.perfil_data.bairro}}, {{pedido.perfil_data.cep}}"
+            data-cidade="{{pedido.perfil_data.cidade}},{{pedido.perfil_data.estado}}"
+            data-ultimacompra="{{pedido.data_ultima_compra}}"
+            data-token="'{{csrf_token}}'"
+            data-href="{% url 'pedido:admin_detalhe' pedido.id %}">
+            <td class="dt-control" id="{{pedido.id}}"></td> 
+            <td class="text-center">{{pedido.id}}</td>
+            <td class="text-center">{{pedido.status|get_status_extenso}}</td>
+            <td>{{pedido.data_emissao|formata_br_date}}   às   {{pedido.hora_emissao|formata_br_hora}}</td>
+            <td>{{pedido.usuario.email}}</td>
+            <td style="width: 10%">{{pedido.qtd_total}}</td>
+            <td>{{pedido.total|formata_preco}}</td>
+        </tr>
+        
+        {% endfor %}
+    </tbody>
+</table>
+<div id="dialog-confirm-status" class="hide" title="Alteração da situação do pedido">
+    <p>
+        <span class="ui-icon ui-icon-alert" 
+            style="float:left; margin:12px 12px 20px 0;">
+        </span>
+        <span id="msg-de-para">Isso irá alterar o status do pedido. Você tem certeza?</span>
+    </p>
+</div>  
+<div id="dialog-confirm-deactivate" class="hide" title="Desativação do pedido">
+    <p>
+        <span class="ui-icon ui-icon-alert" 
+            style="float:left; margin:12px 12px 20px 0;">
+        </span>
+        Isso irá desativar o pedido e você não poderá usá-lo no sistema da loja . Você tem certeza?
+    </p>
+</div>  
+
+
+<script>
+    $(document).ready(function(){
+        
+        $.noConflict();
+
+        const table = $('#table_id').DataTable({
+            colReorder: true,
+            keys: true,
+            pageLength:20,
+            layout: {
+                topStart: {
+                    buttons: ['print', 'excel', 'pdf', 'csv', 'colvis' ]
+                }
+            }
+        });
+
+
+        $('.buttons-colvis').children('span').html('Colunas');
+        $('.dt-search').children('label').html('Procurar')
+        var showing = $("#table_id_info").html()
+        showing = showing.replace('Showing','Exibindo').replace('entries', 'registros')
+                                             .replace('to','a')
+                                             .replace('of','de');
+        $("#table_id_info").html(showing);
+
+        $(".dt-paging-button").on('click', function(){
+            $("#table_id_info").html(showing);
+        });
+
+        table.on('requestChild.dt', function (e, row) {
+            row.child(format(row.data())).show();
+        });        
+
+        table.on('click', 'td.dt-control', function (e) {
+            
+            let tr  = e.target.closest('tr');
+            let row = table.row(tr);
+            let id_pedido = $(this).attr("id")
+
+            if (row.child.isShown()) {
+                row.child.hide();
+                $("#tabela_variacoes").remove();
+                $(".titulo_h5").remove();
+                $(".linha_detalhe").remove();
+            }
+            else {
+                row.child(format(row.data(), id_pedido, $(tr).attr('data-endereco'), 
+                                $(tr).attr('data-cidade'), $(tr).attr('data-ultimacompra'),
+                                $(tr).attr('data-token'), $(tr).attr('data-href'))).show();
+                showTabelaItens(id_pedido);
+            }
+        }); 
+        
+    });
+
+    function format(d, id_pedido,dados_endereco,dados_cidade,data_ultima_compra,token, href) {
+        return (
+            '<div class="row">' +
+                '<div class="col" >' +
+                '<dl>' +
+                '<dt>Numero:</dt>' +
+                '<dd>' +
+                d[1] +
+                '</dd>' +
+                '<dt>Data e hora:</dt>' +
+                '<dd>' +
+                d[3] +
+                '</dd>' +
+                '<dt>Situação:</dt>' +
+                '<dd id="status_'+ id_pedido +'">'+ d[2] +'</dd>' +
+                '</dl>' +
+                '</div>' +
+                '<div class="col" style=""">' +
+                    '<dl>' +
+                    '<dt>Endereço:</dt>' +
+                    '<dd>' +
+                    dados_endereco +
+                    '</dd>' +
+                    '<dt>Cidade:</dt>' +
+                    '<dd>' +
+                    dados_cidade +
+                    '</dd>' +
+                    '<dt>Última compra:</dt>' +
+                    '<dd>'+ data_ultima_compra +'</dd>' +
+                    '</dl>' +
+                '</div>' +    
+                '<div class="col" style=""">' +
+                '<button data-status="' + d[2] + '" data-token="' + token + '" class="btn btn-secondary btn-block btn-lg btnChangeStatus"' +
+                                'onclick="showDialogModalStatus('+ id_pedido +',' + token + ')">' +
+                'Mudar para ' + getNextStep(d[2]) + '</button>'+ 
+                '<a class="btn btn-primary btn-block btn-lg" href="'+ href +'">' +
+                ' Ver detalhes do pedido </a>'+ 
+                '<button class="btn btn-danger btn-block btn-lg btn-delete"' +
+                ' onclick="showDialogModalDeactivate('+ id_pedido +')">' +    
+                ' Desativar pedido </button>'+ 
+            '</div>' +    
+            '</br>'
+        );
+    }
+
+    async function showTabelaItens(id){     
+        
+        itens = await getTabelaItens(id); 
+          
+        table = getTableFromDataArray(itens, id);
+        $("#"+id).parent().after(table);   
+    }
+
+    async function getTabelaItens(id){        
+
+        return $.ajax({
+                    type: "GET",
+                    dataType: "json",
+                    url: "{% url 'pedido:itens_pedido' %}",
+                    data: "pedidoid=" + id,
+                    success: function(jsonData) { 
+                        return jsonData;
+                    }
+                });
+    }
+
+    function getTableFromDataArray(dataText, id_pedido){
+        const dataObj = JSON.parse(dataText);
+        let title = ''
+        let tableHeader =   '<tr class="linha_detalhe">'+
+                            '<td colspan=\"7\">'+
+                            '<table id=\"tabela_variacoes\" style=\"width:100%\">' +
+                            '<thead>' +
+                                '<tr>' +
+                                    '<th style="width:35%">Nome do produto</th>'+
+                                    '<th>Nome da Variação</th>'+
+                                    '<th style="text-align:center">Estoque Médio</th>'+
+                                    '<th style="text-align:center">Quantidade</th>'+
+                                    '<th style="text-align:center">Preço</th>'+
+                                    '<th style="text-align:center">Preço promocional</th>'
+                                '</tr>'+
+                            '</thead>'; 
+        let tableRows = '';
+        dataObj.forEach(row => {
+            tableRows  += '<tr>'+                       
+                '<td>'+row.fields.nome_produto+'</td>'+    
+                '<td>'+row.fields.nome_variacao+'</td>'+                         
+                '<td style="text-align:center; width:10%">' + row.fields.estoque + '</td>'+
+                '<td style="text-align:center; width:10%">' + row.fields.quantidade + '</td>'+
+                '<td style="text-align:right; width:10%">' + formata_preco(row.fields.preco) + '</td>'+
+                '<td style="text-align:right; width:15%">' + formata_preco(row.fields.preco_promocional)+'</td>' +
+                '</tr>'; 
+        });             
+        return ( title +
+                 tableHeader +
+                    '<tbody>'+
+                        tableRows +                           
+                     '</tbody>'+
+                 '</table>' +
+                 '</td>' +
+                 '</tr>' 
+               );     
+    }
+
+    function formata_preco(numero)
+    {
+        if(numero != undefined)
+            return numero.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        return '';
+    }
+
+    function apenasNumeros(string) 
+    {
+        var numsStr = string.replace(/[^0-9]/g,'');
+        return parseInt(numsStr);
+    }
+
+    function getNextStep(status){
+        
+        switch(status){
+            case 'Aprovado': return 'Preparando';
+            case 'Criado': return 'Aprovado';
+            case 'Reprovado': return 'Criado';
+            case 'Preparando': return 'Enviado';
+            case 'Enviado': return 'Finalizado';
+            case 'Finalizado': return 'Preparando';
+        }
+    }
+    function getStatusNameExtenso(sigla){
+
+        switch(sigla){
+            case 'A': return 'Aprovado';
+            case 'C': return 'Criado';
+            case 'R': return 'Reprovado';
+            case 'P': return 'Preparando';
+            case 'E': return 'Enviado';
+            case 'F': return 'Finalizado';
+        }
+    }
+    
+</script> 
+
+{% endblock conteudo %}

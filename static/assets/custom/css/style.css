@@ -189,11 +189,32 @@ tbody > tr.selected > * {
     max-width: 90px;
 }
 
-#id_bairro, #id_cidade, #id_estado, #id_password, #id_password2, #id_username, #id_first_name, #id_last_name{
+#id_bairro, #id_cidade, #id_estado, #id_password, #id_password2, #id_username, 
+#id_first_name, #nome, #id_telefone{
     max-width: 350px;
 }
 
-#id_email, #id_endereco, #id_complemento {
+#id_email, #id_endereco, #id_complemento, #id_nome_completo {
     max-width: 600px;
 }
 
+.relative-field {
+    position: relative; 
+}
+
+.button_cep {
+    position: absolute;
+    right: 78%; 
+    top: 22%;
+}
+.borderless{
+    border:none;
+}
+
+.hide{
+    display:none;
+}
+
+.input-number{
+    width:120px;   
+}

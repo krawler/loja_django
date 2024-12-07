@@ -26,11 +26,7 @@ class BasePerfil(View):
         if self.request.user.is_authenticated:
             self.perfil = PerfilUsuario.objects.filter(usuario=self.request.user).first()
             self.usuario = User.objects.filter(username=self.request.user).first()
-            #TODO: refatorar
-            if self.perfil.data_nascimento:
-                data_nasc = datetime.strptime(str(self.perfil.data_nascimento), '%Y-%m-%d').date()
-                data_nasc_br = data_nasc.strftime('%d/%m/%Y')
-                self.perfil.data_nascimento = data_nasc_br
+        
             self.context = {
                 'userform': 
                             forms.UserForm(
@@ -43,13 +39,15 @@ class BasePerfil(View):
                                 data=self.request.POST or None,
                                 instance=self.perfil, 
                                 perfil=self.perfil),
-                'produtos_mais_vendidos' : ProdutoService().get_produtos_mais_vendidos() 
+                'produtos_mais_vendidos' : ProdutoService().get_produtos_mais_vendidos(),
+                'pagina_cadastro': True 
             }
         else:
             self.context = {
                 'userform': forms.UserForm(data=self.request.POST or None),
                 'perfilform': forms.PerfilForm(data=self.request.POST or None),
-                'produtos_mais_vendidos' : ProdutoService().get_produtos_mais_vendidos() 
+                'produtos_mais_vendidos' : ProdutoService().get_produtos_mais_vendidos(),
+                'pagina_cadastro': True 
             }
             
         self.userform = self.context['userform']
@@ -66,24 +64,26 @@ class Criar(BasePerfil):
         
         if not self.userform.is_valid() or not self.perfilform.is_valid():    
             msg = 'Há erros no formulário, por favor verifique nos campos abaixo'  
-            if not estado == uf:
-                msg += ' - '
             messages.error(self.request, msg)             
-
             return self.renderizar
-                      
-        username = self.userform.cleaned_data.get('username')
+
         password = self.userform.cleaned_data.get('password')
         email = self.userform.data.get('email')
-        first_name = self.userform.cleaned_data.get('first_name')
-        last_name = self.userform.cleaned_data.get('last_name')
-        
+        nome_completo = self.perfilform.cleaned_data.get('nome_completo')
+        nomes = nome_completo.split(' ')
+        first_name = nomes[0]
+        tamanho_lista = len(nomes)
+        last_name = nomes[tamanho_lista - 1]
+
+        username = str(email).split('@')[0]
+        print(first_name +'-'+ last_name)
+
         if self.request.user.is_authenticated:
             usuario = get_object_or_404(User, username=self.request.user.username)
             
             usuario.username = username
             if password:
-               usuario.set_password(password)           
+                usuario.set_password(password)           
             usuario.email = email 
             usuario.first_name = first_name
             usuario.last_name = last_name
@@ -117,7 +117,7 @@ class Criar(BasePerfil):
         
         self.request.session['carrinho'] = self.carrinho
         self.request.session.save()       
-       
+
         return redirect('perfil:cadastro_concluido')
             
 
@@ -139,10 +139,25 @@ class Cadastro_concluido(View):
          }    
          return render(self.request, self.template_name, contexto)
 
-class Atualizar(View):
-    pass
+class Atualizar(Criar):
+
+    template_name = 'perfil/atualizar.html'
+    
+    def get(self, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            return redirect('perfil:login')
+        
+        return self.renderizar    
 
 class Login(View):
+
+    def get(self, *args, **kwargs):
+
+        contexto = {
+            'area_sem_produtos' : True
+        }
+        return render(self.request, 'perfil/login.html', contexto)
+
     def post(self, *args, **kwargs):
         username = self.request.POST.get('username')
         password = self.request.POST.get('password')
@@ -161,7 +176,7 @@ class Login(View):
                 self.request,
                 "Usuário ou senha inválidos"
             )
-            return redirect('perfil:criar')
+            return redirect('perfil:login')
         
         login(self.request, user=usuario)
         
