@@ -22,7 +22,8 @@ class Produto(models.Model):
             ('V', 'Variável'), 
             ('S', 'Simples'),
         )
-    )
+    ),
+    categoria = models.ForeignKey('produto.Categoria', on_delete=models.CASCADE)
 
     @staticmethod
     def resize(img, new_width=800):
