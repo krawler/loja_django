@@ -215,36 +215,46 @@ class ResumoDaCompra(View):
         
         url = 'https://melhorenvio.com.br/api/v2/me/shipment/calculate'
         
-        perfil = PerfilUsuario.objects.filter(usuario=self.request.user).first()    
+        carrinho = self.request.session['carrinho']
+        products = []
+        for variacao_id in carrinho:
+            variacao = Variacao.objects.get(id=variacao_id)
+            product_package =  {
+                "width": variacao.largura,
+                "height": variacao.altura,
+                "length": variacao.comprimento,
+                "weight": variacao.peso,
+                "quantity": carrinho[variacao_id]['quantidade'] 
+            }
+            products.append(product_package)
+
+        perfil = PerfilUsuario.objects.get(usuario=self.request.user)    
         data = {
             "from" : {
+                # TODO: Parametrizar
                 "postal_code": "18910066",
             },
             "to" : {
               "postal_code" : perfil.cep,  
             }, 
-            "package": {
-                "height": 4,
-                "width": 12,
-                "length": 17,
-                "weight": 0.3
-            }    
+            "products" : products
         }
         headers = { 
                     "Authorization" :  self.bearer_token,
                     "Content-Type" : "Application/json",
                     "Accept" : "Application/json"
-                  }
+                }
         try:
             response = requests.post(url, headers=headers, json=data)
             return response.json()
         except Exception as error:
             print(error)
+
     
     def get(self, *args, **kwargs):
         
         if not self.request.user.is_authenticated:
-            return redirect('perfil:criar')
+            return redirect('perfil:login')
         
         perfil = PerfilUsuario.objects.filter(usuario=self.request.user).first()
         if perfil is None:
