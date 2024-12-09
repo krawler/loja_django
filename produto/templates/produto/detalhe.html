@@ -4,6 +4,8 @@
 
 {% block conteudo %}
 
+<meta name="csrf-token" content="{{ csrf_token }}">
+
 <div class="row">
     <div class="col-lg">
         <div class="row no-gutters">
@@ -31,22 +33,28 @@
                     class="lead product-price">{{produto.preco_marketing|formata_preco}}</span>
                 {% endif %}          
             </p>
+            <p class="lead hide" id="pergunta_aviso_produto_disponivel">
+                Deseja ser avisado quando este produto estiver disponível?
+                <button class="btn btn-primary" id="sim_produto_disponivel">Sim</button>
+            </p>
             <p class="lead">
                 <span id="saldo_estoque"></span> em estoque  
             </p>
             <form action="{% url 'produto:adicionaraocarrinho' %}" id="form-add-to-cart">
                 {% if produto.variacao_set %}
+                    <input type="hidden" name="csrf_token" value="{{csrf_token}}">
                     <input type="hidden" id="estoques_variacoes" value="{{saldo_estoque_variacoes}}" />
                     <div class="form-group">
                         <input type="number" id="quantidade" name="quantidade" value="1" 
                             class="form-control form-control-lg input_qtd">
                         <select id="select-variacoes" name="vid" 
                             class="form-control form-control-lg input_variacao">
+                            
                             {% for variacao in produto.variacao_set.all %}
                                 {% if variacao.preco_promocional %}
                                     <option data-preco="{{variacao.preco|formata_preco}}" 
                                             data-preco-promocional="{{variacao.preco_promocional}}" 
-                                            value="{{variacao.id}}">
+                                            value="{{variacao.id}}" selected="selected">
                                         {% if variacao.nome %}
                                             {{variacao.nome}}
                                         {% else %}
@@ -95,11 +103,40 @@
 <script>
     $(document).ready(function(){
 
-        estoques = JSON.parse($('#estoques_variacoes').val())
-        $("#saldo_estoque").html(estoques[$("#select-variacoes").val()]);
+        estoques = JSON.parse($('#estoques_variacoes').val());
+        saldo_estoque = estoques[$("#select-variacoes").val()];
+        $("#saldo_estoque").html(saldo_estoque);
+        if(saldo_estoque === 0)
+            $("#pergunta_aviso_produto_disponivel").show();
+
         $("#select-variacoes").change(function(){
             id_variacao = $(this).val();
-            $("#saldo_estoque").html(estoques[id_variacao]);
+            if(estoques[id_variacao] === 0){
+                $("#pergunta_aviso_produto_disponivel").show();
+                $("#saldo_estoque").html(estoques[id_variacao]);
+            } 
+        });
+
+        $("#sim_produto_disponivel").click(function(){
+
+            id_variacao = {{ produto.variacao_set.first.id }};
+
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "{% url 'produto:detalhe' produto.slug %}",
+                data: {
+                    "id_variacao" : id_variacao,
+                    "csrfmiddlewaretoken": $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(jsonData) { 
+                    if(jsonData=="True")
+                        return console.log("returned: " + jsonData);
+                }
+            });
+
+            $("#pergunta_aviso_produto_disponivel").html("Você receberá um email quando esse produto estiver disponível em estoque")
+
         });
 
     });
