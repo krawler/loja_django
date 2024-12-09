@@ -31,7 +31,7 @@ class DispachLoginRequired(View):
 class DispachProdutosMaisVendidos(View):
 
     def dispatch(self, *args, **kwargs):
-        self.produtos_mais_vendidos = ProdutoService().get_produtos_mais_vendidos()
+        self.produtos_mais_vendidos = ProdutoService().get_produtos_mais_acessados_por_usuario(self.request.user)
         return super().dispatch(*args, **kwargs)
     
     def get_context_data(self, **kwargs):
@@ -52,12 +52,24 @@ class DetalheProduto(DispachProdutosMaisVendidos, DetailView):
     context_object_name = 'produto'
     slug_url_kwarg = 'slug'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        produto = context['produto']
-        lista_estoque_variacoes = ProdutoService().get_saldo_estoque_variacoes(produto)
-        context['saldo_estoque_variacoes'] = json.dumps(lista_estoque_variacoes)
-        return context
+    def get(self, *args, **kwargs):
+
+        if kwargs != None and kwargs != '':
+            user = self.request.user
+            if user.is_authenticated:
+                ProdutoService().salvar_acesso_produto(user, kwargs['slug'])
+            
+            produto = Produto.objects.filter(slug=kwargs['slug']).first()
+            
+            lista_estoque_variacoes = ProdutoService().get_saldo_estoque_variacoes(produto)
+        
+        context = { 
+            'saldo_estoque_variacoes' : json.dumps(lista_estoque_variacoes),
+            'produto' : produto,
+            'produtos_mais_vendidos' : self.produtos_mais_vendidos 
+        }
+
+        return render(self.request, self.template_name, context)
 
 class AdicionarCarrinho(View):
     

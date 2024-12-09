@@ -1,13 +1,13 @@
 from django.views import View
 from pedido.models import ItemPedido
 from django.contrib.auth.models import User
+from django.db import connection
 from django.db.models import Q, Count, QuerySet, Sum
 from django.core import serializers
 from decimal import Decimal
 from datetime import datetime
 from django.utils import timezone
 from produto.models import Produto, SessaoCarrinho, Variacao, SaidaProduto, EntradaProduto, Categoria
-
 import json
 
 class ProdutoService():
