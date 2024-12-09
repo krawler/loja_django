@@ -103,3 +103,29 @@ class ProdutoService():
         else:    
             categoria = Categoria(nome=nome, datahora_criacao=datahora_criacao)
         categoria.save()
+
+    def get_produtos_mais_acessados_por_usuario(request, user):
+        user = User.objects.filter(username=user).first()
+        if user == None:
+            return
+        with connection.cursor() as cursor:
+            str_sql = """
+                        SELECT p.nome, p.descricao, p.imagem, p.slug, p.preco_marketing, 
+                        p.preco_marketing_promocional, COUNT(ap.id) AS total_acessos
+                        FROM produto_acessoproduto ap
+                        INNER JOIN produto_produto p ON ap.produto_id = p.id
+                        WHERE ap.user_id = %s
+                        GROUP BY p.id
+                        ORDER BY total_acessos DESC
+                        LIMIT 4;
+                        """
+            cursor.execute(str_sql, [user.id])
+
+            rows = cursor.fetchall()
+            produtos = []
+            for row in rows:
+                produtos.append(ProdutoMaisAcessado(nome=row[0], descricao=row[1], imagem=row[2], 
+                                                    slug=row[3], preco=row[4], preco_promocional=row[5], 
+                                                    total_acessos=row[6]))
+
+        return produtos
