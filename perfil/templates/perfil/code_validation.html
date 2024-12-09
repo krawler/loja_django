@@ -12,10 +12,10 @@
         <p class="mt-4">Validação de token:</p>
 
         <div class="card-body">
-            <form method="POST" action="{% url 'perfil:reset_password' %}">
+            <form method="POST" action="{% url 'perfil:code_verification' %}">
                 {% csrf_token %}
-                <input type="hidden" id="uidb64" value="{{uidb64}}">
-                <input type="hidden" id="token" value="{{token}}">
+                <input type="hidden" id="uidb64" name="uidb64" value="{{uidb64}}">
+                <input type="hidden" id="token" name="token" value="{{token}}">
                 <div class="form-group">
                     <input type="text" name="codigo" id="codigo" placeholder="Digite o código de 8 dígitos"
                            class="form-control" aria-describedby="usuarioHelp">
