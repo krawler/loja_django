@@ -139,3 +139,9 @@ class ProdutoMaisAcessado(models.Model):
 
     class Meta:
         managed: False
+
+class AvisoProdutoDisponivel(models.Model):
+    variacao = models.ForeignKey(Variacao, on_delete=models.CASCADE, null=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
+    data = models.DateField(default=django.utils.timezone.now)
+    hora = models.TimeField(default=django.utils.timezone.now)
