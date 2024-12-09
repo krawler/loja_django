@@ -71,6 +71,18 @@ class DetalheProduto(DispachProdutosMaisVendidos, DetailView):
 
         return render(self.request, self.template_name, context)
 
+    def post(self, *args, **kwargs):
+
+        if kwargs != None and kwargs != '':
+            user = self.request.user
+            id_variacao = self.request.POST.get('id_variacao')
+            if user.is_authenticated:
+                ProdutoService().salvar_aviso_produto_disponivel(user, id_variacao)
+                json_data = '{true}'
+            else:
+                json_data = '{false}'    
+        return JsonResponse(json_data, safe=False)
+
 class AdicionarCarrinho(View):
     
     def get(self, *args, **kwargs):
