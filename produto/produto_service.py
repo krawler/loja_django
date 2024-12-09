@@ -7,7 +7,8 @@ from django.core import serializers
 from decimal import Decimal
 from datetime import datetime
 from django.utils import timezone
-from produto.models import Produto, SessaoCarrinho, Variacao, SaidaProduto, EntradaProduto, Categoria
+from .models import Produto, SessaoCarrinho, Variacao, SaidaProduto 
+from .models import EntradaProduto, Categoria, AcessoProduto, ProdutoMaisAcessado
 import json
 
 class ProdutoService():
@@ -103,6 +104,11 @@ class ProdutoService():
         else:    
             categoria = Categoria(nome=nome, datahora_criacao=datahora_criacao)
         categoria.save()
+    
+    def salvar_acesso_produto(self, user, slug):
+        produto = Produto.objects.filter(slug=slug).first()
+        acesso = AcessoProduto(produto=produto, user=user)
+        acesso.save()
 
     def get_produtos_mais_acessados_por_usuario(request, user):
         user = User.objects.filter(username=user).first()
