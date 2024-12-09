@@ -77,6 +77,10 @@ class Variacao(models.Model):
     preco_promocional = models.FloatField(default=0)
     estoque = models.PositiveBigIntegerField(default=1)
     id_preco_stripe = models.CharField(max_length=50, blank=True, null=True)
+    peso = models.FloatField(default=0)
+    largura  = models.FloatField(default=0)
+    comprimento  = models.FloatField(default=0)
+    altura  = models.FloatField(default=0)
 
     def __str__(self):
         return self.produto.nome + '  -  ' + self.nome
@@ -121,6 +125,9 @@ class Categoria(models.Model):
     desativado = models.BooleanField(default=False)
     datahora_criacao = models.DateTimeField()
 
+    def __str__(self):
+        return self.nome
+
 class AcessoProduto(models.Model):
     produto = models.ForeignKey(Produto, on_delete=models.CASCADE, null=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
@@ -139,3 +146,9 @@ class ProdutoMaisAcessado(models.Model):
 
     class Meta:
         managed: False
+
+class AvisoProdutoDisponivel(models.Model):
+    variacao = models.ForeignKey(Variacao, on_delete=models.CASCADE, null=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
+    data = models.DateField(default=django.utils.timezone.now)
+    hora = models.TimeField(default=django.utils.timezone.now)
