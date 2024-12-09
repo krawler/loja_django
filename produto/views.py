@@ -71,6 +71,18 @@ class DetalheProduto(DispachProdutosMaisVendidos, DetailView):
 
         return render(self.request, self.template_name, context)
 
+    def post(self, *args, **kwargs):
+
+        if kwargs != None and kwargs != '':
+            user = self.request.user
+            id_variacao = self.request.POST.get('id_variacao')
+            if user.is_authenticated:
+                ProdutoService().salvar_aviso_produto_disponivel(user, id_variacao)
+                json_data = '{true}'
+            else:
+                json_data = '{false}'    
+        return JsonResponse(json_data, safe=False)
+
 class AdicionarCarrinho(View):
     
     def get(self, *args, **kwargs):
@@ -287,7 +299,7 @@ class Tabela(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['area_sem_produtos'] = True
+        context['pagina_tabela'] = True
 
         return context
 
@@ -302,7 +314,8 @@ class EntradaProduto(DispachLoginRequired, View):
 
         context = {
             'area_sem_produtos' : True,  
-            'variacoes' : variacoes
+            'variacoes' : variacoes,
+            'pagina_tabela' : True
         }
 
         return render(self.request, 'produto/entrada.html', context)
@@ -356,7 +369,8 @@ class CategoriaView(DispachLoginRequired, View):
         
         context = {
             'area_sem_produtos' : True,  
-            'categorias' : Categoria.objects.all()
+            'categorias' : Categoria.objects.all(),
+            'pagina_tabela' : True
         }
 
         return render(self.request, 'produto/categoria.html', context)
