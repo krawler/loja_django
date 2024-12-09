@@ -76,3 +76,4 @@ class PasswordResetCode(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     codigo = models.CharField(max_length=50, unique=True)
     criado_em = models.DateTimeField(auto_now_add=True)
+    token = models.CharField(max_length=50, unique=False)
