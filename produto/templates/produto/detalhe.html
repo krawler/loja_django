@@ -20,14 +20,12 @@
             <p class="lead">{{produto.descricao}}</p>
             <p class="lead">
                 {% if produto.preco_marketing_promocional %}
-                    <span id="variation-preco-promocional" 
-                          class="lead product-price">
-                          {{produto.preco_marketing_promocional|formata_preco}}
-                    </span>
-                    <span id="variation-preco"
-                            class="lead product-old-price text-muted">
-                            {{produto.preco_marketing|formata_preco}}
-                    </span>
+                <span id="variation-preco" class="lead product-old-price text-muted">
+                {{produto.preco_marketing|formata_preco}}
+                </span>
+                <span id="variation-preco-promocional" class="lead product-price">
+                    {{produto.preco_marketing_promocional|formata_preco}}
+                </span>
                 {% else %}
                     <span id="variation-preco-normal" 
                     class="lead product-price">{{produto.preco_marketing|formata_preco}}</span>
@@ -91,6 +89,8 @@
         </div>
     </div>
 </div>
+
+{% include 'parciais/_mais_acessados.html' %}
 
 <script>
     $(document).ready(function(){

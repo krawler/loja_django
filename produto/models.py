@@ -6,6 +6,7 @@ from PIL import Image
 from django.utils import timezone
 from django.utils.text import slugify 
 import os
+import django
 
 class Produto(models.Model):
     nome = models.CharField(max_length=200)
@@ -102,7 +103,7 @@ class EntradaProduto(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
     preco_final = models.FloatField()
     data = models.DateField(default=datetime.now().date())
-    hora = models.TimeField(default=timezone.now().time())
+    hora = models.TimeField(django.utils.timezone.now)
     desativado = models.BooleanField(default=False)
 
 class SaidaProduto(models.Model):
@@ -111,7 +112,7 @@ class SaidaProduto(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
     preco_final = models.FloatField()
     data = models.DateField(default=datetime.now().date())
-    hora = models.TimeField(default=timezone.now().time())
+    hora = models.TimeField(default=django.utils.timezone.now)
     desativado = models.BooleanField(default=False)
     pedido = models.ForeignKey('pedido.Pedido', on_delete=models.CASCADE)
 
@@ -119,3 +120,22 @@ class Categoria(models.Model):
     nome = models.TextField(max_length=50, null=False)
     desativado = models.BooleanField(default=False)
     datahora_criacao = models.DateTimeField()
+
+class AcessoProduto(models.Model):
+    produto = models.ForeignKey(Produto, on_delete=models.CASCADE, null=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
+    data = models.DateField(default=django.utils.timezone.now)
+    hora = models.TimeField(default=django.utils.timezone.now)
+    desativado = models.BooleanField(default=False)
+
+class ProdutoMaisAcessado(models.Model):
+    nome = models.CharField(max_length=200)
+    descricao = models.TextField(max_length=255)
+    imagem = models.ImageField(upload_to='produto_imagens/%Y/%m/', blank=True, null=True)
+    slug = models.SlugField(unique=True, blank=True, null=True)
+    preco = models.FloatField()
+    preco_promocional = models.FloatField(default=0)
+    total_acessos = models.IntegerField()
+
+    class Meta:
+        managed: False
