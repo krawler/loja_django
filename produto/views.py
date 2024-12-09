@@ -277,7 +277,7 @@ class Tabela(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['area_sem_produtos'] = True
+        context['pagina_tabela'] = True
 
         return context
 
@@ -292,7 +292,8 @@ class EntradaProduto(DispachLoginRequired, View):
 
         context = {
             'area_sem_produtos' : True,  
-            'variacoes' : variacoes
+            'variacoes' : variacoes,
+            'pagina_tabela' : True
         }
 
         return render(self.request, 'produto/entrada.html', context)
@@ -346,7 +347,8 @@ class CategoriaView(DispachLoginRequired, View):
         
         context = {
             'area_sem_produtos' : True,  
-            'categorias' : Categoria.objects.all()
+            'categorias' : Categoria.objects.all(),
+            'pagina_tabela' : True
         }
 
         return render(self.request, 'produto/categoria.html', context)
