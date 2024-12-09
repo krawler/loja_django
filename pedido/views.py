@@ -208,7 +208,7 @@ class Tabela(DispachLoginRequired, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['area_sem_produtos'] = True
+        context['pagina_tabela'] = True
         pedidos = context['pedidos']
         pedidos = Pedido.objects.filter(desativado=False).order_by('id').reverse()
         for pedido in pedidos:            
