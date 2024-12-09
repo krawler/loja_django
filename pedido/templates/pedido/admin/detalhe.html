@@ -8,7 +8,7 @@
         <h3>{{pedido}}</h3>
         
         <div class="row mt-4">
-            <div class="col">
+            <div class="col" style="width:50%">
                 <div class="row-lg-2 font-weight-bold">Status:</div>
                 <div class="row-lg-4">{{pedido.get_status_display}}</div>
 
@@ -20,16 +20,19 @@
 
                 <div class="row-lg-2 font-weight-bold">Código Rastreio:</div>
                 <div class="row-lg-4">{{pedido.codigo_rastreio_correio}}</div>
+
+                <div class="row-lg-2 font-weight-bold">Código Rastreio:</div>
+                <div class="row-lg-4">{{perfil.nome_completo}}</div>
             </div>
-            <div class="col">
+            <div class="col" style="width:25%">
                 <button data-status="{{pedido.status}}" 
                         class="btn btn-secondary btn-block btn-lg btnChangeStatus"
                         onclick="showDialogModalStatus()">
-                                Mudar para 
+                        Mudar de {{pedido.get_status_display}}   para 
                 </button> 
                 
             </div>
-            <div class="col">
+            <div class="col" style="width:25%">
                 <button class="btn btn-danger btn-block btn-lg btn-delete"
                         onclick="showDialogModalDeactivate()">    
                     Desativar pedido 

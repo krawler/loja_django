@@ -11,6 +11,7 @@ from produto.produto_service import ProdutoService
 from . import pedido_service 
 from django.db import connection
 from .models import Pedido, ItemPedido
+from perfil.models import PerfilUsuario
 from .email.py_email import PyEmail 
 from datetime import datetime, date
 from pprint import pprint
@@ -256,7 +257,9 @@ class Admin_detalhe_pedido(DispachLoginRequired, View):
         pk_url_kwarg = 'pk'
         pedido_id = kwargs['pk']
         pedido = Pedido.objects.filter(id=pedido_id).first()
+        perfil = PerfilUsuario.objects.filter(usuario=pedido.usuario).first()
         context = {
-            'pedido' : pedido
+            'pedido' : pedido,
+            'perfil' : perfil
         }
         return render(self.request, 'pedido/admin/detalhe.html', context)
