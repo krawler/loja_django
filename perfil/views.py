@@ -11,8 +11,9 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth.tokens import default_token_generator
 from django.template.loader import render_to_string
-from django.utils.encoding import force_bytes
+from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 import copy
 import json
@@ -236,52 +237,81 @@ class Password_Reset(View):
             try:
                 user = User.objects.get(email=email)
                 code = ''.join(random.choices(string.digits, k=8))
-                password_reset = PasswordResetCode.objects.create(usuario=user, codigo=code)
+                token = default_token_generator.make_token(user)
+                password_reset = PasswordResetCode.objects.create(usuario=user, codigo=code, token=token)
                 subject = 'Recuperação de Senha'
                 message = render_to_string('perfil/password_reset.html', {'code': code})
+                
                 # send_mail(subject, message, 'seu_email@example.com', [email])
-                return redirect('perfil:password_reset')
+                if user is not None:    
+                    uidb64 = urlsafe_base64_encode(force_bytes(user.id))
+                    self.request.session['uidb64'] = uidb64
+                    self.request.session.save()
+
+                return redirect('perfil:code_verification')
+
             except User.DoesNotExist:
                 self.msg_retorno = "Usuário não encontrado, verifique seu email"
-                pass            
-
-        return render(self.request, 'perfil/code_validation.html', {'form': form, 'mensagem': self.msg_retorno})
-
+                return render(self.request, 'perfil/password_reset.html', {'form': form})            
+        else:
+            return render(self.request, 'perfil/password_reset.html', {'form': form, 'mensagem': self.msg_retorno})
 
 class Code_Verification(View):
 
-    def get(self, *args, **kwargs):
-        email = self.request.GET.get('email')
-        user = User.objects.exclude(is_active=False).get(email=email)
-        uidb64 = urlsafe_base64_encode(force_bytes(user.id))
+    def get(self, *args, **kwargs):        
         return render(self.request, 'perfil/code_validation.html')  
 
     def post(self, *args, **kwargs):
-        codigo = self.request.POST.get('codigo')
-        user = User.objects.exclude(is_active=False).get(email=email)
-        return render(self.request, 'perfil/code_validation.html')  
+        token = self.request.POST.get('codigo')
+        uidb64 = self.request.session.get('uidb64')
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+        if user is not None:
+            if default_token_generator.check_token(user, token):
+                return redirect('perfil:reset_password') 
+            else:
+                messages.error(
+                    self.request,
+                    'Token inválido ou o tempo de expiração está vencido'
+                )
+                return render(self.request, 'perfil/code_validation.html', context)  
+        else:           
+            
+            context['mensagem_retorno'] = 'Usuário não encontrado, favor repita o processo ou entre em contato com a gente'
+            messages.error(
+                self.request,
+                context['mensagem_retorno']
+            )
+            return render(self.request, 'perfil/code_validation.html', context)  
 
 class Reset_password(View):
     
     def get(self, *args, **kwargs):
-        return render(self.request, 'perfil/reset_password.html', {'form': form, 'mensagem': ''})   
+        return render(self.request, 'perfil/reset_password.html')   
 
     def post(self, *args, **kwargs):
         try:
-            # Decodifica o UID e obtém o usuário
-            uid = force_text(urlsafe_base64_decode(uidb64))
+            uidb64 = self.request.POST.get('uidb64')
+            uid = force_str(urlsafe_base64_decode(uidb64))
             user = User.objects.get(pk=uid)
+            codigo = self.request.POST.get('codigo')
+            try:
+                password_reset_code = PasswordResetCode.objects.get(codigo=codigo)
+                token = password_reset_code.token
 
-            if user is not None and default_token_generator.check_token(user, token):
-                    form = SetPasswordForm(user, request.POST)
-                    if form.is_valid():
-                        user.set_password(form.cleaned_data['new_password1'])
-                        user.save()
-                        PasswordResetCode.objects.filter(user=user).delete()
-                        return redirect('perfil:login')  
-            else:
-                # Token inválido ou usuário não encontrado
-                return render(self.request, 'perfil/reset_password.html', {'error': 'Token inválido ou expirou.'})
+                if user is not None and default_token_generator.check_token(user, token):
+                        form = SetPasswordForm(user, request.POST)
+                        if form.is_valid():
+                            user.set_password(form.cleaned_data['new_password1'])
+                            user.save()
+                            PasswordResetCode.objects.filter(user=user).delete()
+                            return redirect('perfil:login')  
+                else:
+                    return render(self.request, 'perfil/reset_password.html', {'error': 'Token inválido ou expirou.'})
+            except PasswordResetCode.DoesNotExist:
+                messages.error(
+                    self.request,
+                    'Token não encontrado com o código informado, por favor tente novamente ou entre em contato com nosso suporte'
+                )
         except Exception as e:
-            # Lidar com exceções
-            return render(self.request, 'perfil/reset_password.html', {'error': 'Ocorreu um erro.'})
+            return render(self.request, 'perfil/reset_password.html', {'error': f'Ocorreu um erro.'})
