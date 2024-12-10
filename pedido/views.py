@@ -61,15 +61,51 @@ class Pagar(DispachLoginRequired, View):
         return redirect(checkout_session.url, code=303)
  
     def get(self, *args, **kwargs):
-        
-        if not self.request.session.get('carrinho'):
-            return redirect('produto:resumodacompra')
-        
+
         carrinho = self.request.session.get('carrinho')
+        if carrinho is None:
+            return redirect('pedido:compraconcluida') 
+        
         carrinho_variacao_ids = [v for v in carrinho]
         bd_variacoes = list(
-            Variacao.objects.filter(id__in=carrinho_variacao_ids)
+            Variacao.objects.select_related('produto').filter(id__in=carrinho_variacao_ids)
         )
+        
+        for variacao in bd_variacoes:
+            vid = variacao.id
+            svid = str(vid)
+            estoque = ProdutoService().getEstoqueAtual(vid)
+            qtd_carrinho = int(carrinho[svid]['quantidade'])
+            preco_unt = carrinho[svid]['preco_quantitativo']
+            preco_unt_promo = carrinho[svid]['preco_quantitativo_promocional']
+            variacao = Variacao.objects.get(id=vid)
+
+            if estoque < 1:
+                del self.request.session['carrinho'][svid]
+                messages.error(
+                    self.request,
+                    f'O produto {variacao.produto.nome}, {variacao.nome}'
+                    ' foi removido do seu carrinho por que o saldo desse produto em nosso estoque foi zerado,'
+                    ' você pode solicitar para ser avisado quando esse produto voltar na página do produto'
+                    ' ou verificar outras variações'
+                )
+                self.request.session.save()
+                return redirect('produto:carrinho')
+
+            if estoque < qtd_carrinho:
+                carrinho[svid]['quantidade'] = estoque        
+                carrinho[svid]['preco_quantitativo'] = estoque * preco_unt
+                carrinho[svid]['preco_quantidade_promocional'] = estoque * preco_unt_promo    
+                
+                messages.error(
+                    self.request,
+                    'Estoque insuficiente para alguns produtos do seu carrinho. '
+                    'Reduzimos a quantidade desses produtos. Por favor, verifique '
+                    'em quais produtos foram afetados a seguir'
+                )
+                self.request.session.save()
+                return redirect('produto:carrinho')
+        
         return self.create_checkout_session(bd_variacoes)
 
 class SalvarPedido(View):    
@@ -87,7 +123,7 @@ class SalvarPedido(View):
         for variacao in bd_variacoes:
             vid = variacao.id
             svid = str(vid)
-            estoque = variacao.estoque
+            estoque = ProdutoService().getEstoqueAtual(vid)
             qtd_carrinho = int(carrinho[svid]['quantidade'])
             preco_unt = carrinho[svid]['preco_quantitativo']
             preco_unt_promo = carrinho[svid]['preco_quantitativo_promocional']
