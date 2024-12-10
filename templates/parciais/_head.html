@@ -4,91 +4,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 <link rel="stylesheet" href="{% static 'assets/bootstrap/css/bootstrap.css'%}" />
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css" />
 <link rel="stylesheet" href="{% static 'assets/custom/css/style.css'%}" />
 
-<link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css" />
-
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-
 <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
+
+<script src="{% static 'assets/custom/js/funcoes_pre_carregadas.js' %} "></script>
 <script>
-    function showDialogModalStatus(id, status, token){
-        
-        $.ajaxSetup({
-            headers:
-            { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
-        });
-        
-        $('.btnChangeStatus').on('click', function(){
-            var de = $(this).attr('data-status');
-            var para = getNextStep(de);
-
-            $('#dialog-confirm-status').dialog({
-                resizable: false,
-                height: "auto",
-                width: 400,
-                modal: true,
-                buttons: {
-                    "Mudar situação": function() {
-                        $.ajax({
-                                type: "POST",
-                                dataType: "json",
-                                url: "{% url 'pedido:atualizapedido' %}",
-                                data: {
-                                    "pedidoid" : id,
-                                    "de": de,
-                                    "para" : para,
-                                    "csrfmiddlewaretoken": $('meta[name="csrf-token"]').attr('content')
-                                },
-                                success: function(jsonData) { 
-                                    status_pedido  = '#status_' + id;
-                                    $(status_pedido).html(getStatusNameExtenso(jsonData)); 
-                                    $('#'+id).parent().children().eq(2).html(getStatusNameExtenso(jsonData));
-                                    return jsonData;
-                                }
-                            });
-                            $( this ).dialog( "close" );
-                    },
-                    Cancel: function() {                        
-                        $( this ).dialog( "close" );
-                    }
-                }
-            });
-        });
-    }
-
-    function showDialogModalDeactivate(id){
-        $('.btn-delete').on('click', function(){
-            $("#dialog-confirm-deactivate").dialog({
-                resizable: false,
-                height: "auto",
-                width: 400,
-                modal: true,
-                buttons: {
-                        "Desativar": function() {
-                            $.ajax({
-                                type: "POST",
-                                dataType: "json",
-                                url: "{% url 'pedido:desativar' %}",
-                                data: {
-                                    "pedidoid" : id,
-                                    "csrfmiddlewaretoken": $('meta[name="csrf-token"]').attr('content')
-                                },
-                                success: function(jsonData) { 
-                                    if(jsonData=="True")
-                                        return console.log("returned: " + jsonData);
-                                }
-                            });
-                        window.location.reload()    
-                        $( this ).dialog( "close" );
-                    },
-                    Cancel: function() {
-                        $( this ).dialog( "close" );
-                    }
-                }
-            });
-        });
-    }
 
     function showDialogModalChangeQuantity(){
         $("#continuar_comprando").on('click', function(e){
@@ -118,21 +41,21 @@
 
 {% if pagina_tabela %}
 
-<script src="https://cdn.datatables.net/2.0.8/js/dataTables.js"></script>
-<script src="https://cdn.datatables.net/colreorder/2.0.3/js/dataTables.colReorder.min.js"></script>
-<script src="https://cdn.datatables.net/keytable/2.12.1/js/dataTables.keyTable.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/3.0.2/js/dataTables.buttons.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.colVis.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-<script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.html5.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/colreorder/2.0.3/js/dataTables.colReorder.min.js"></script>
+    <script src="https://cdn.datatables.net/keytable/2.12.1/js/dataTables.keyTable.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.0.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.colVis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.print.min.js"></script>
 
-<link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.css" />
-<link rel="stylesheet" href="https://cdn.datatables.net/colreorder/2.0.3/css/colReorder.dataTables.min.css" />
-<link rel="stylesheet" href="https://cdn.datatables.net/keytable/2.12.1/css/keyTable.dataTables.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.0.2/css/buttons.dataTables.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/colreorder/2.0.3/css/colReorder.dataTables.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/keytable/2.12.1/css/keyTable.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.0.2/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.css" />
 
 {% endif %}
