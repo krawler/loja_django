@@ -28,7 +28,7 @@
                 <td>{{ item.quantidade }}</td>                        
                 <td>
                     {% if item.preco_quantitativo_promocional %}
-                        R$  {{ item.preco_quantitativo_promocional }}
+                        {{ item.preco_quantitativo_promocional|formata_preco }}
                     {% else %}
                         R$  {{ item.preco_quantitativo }}
                     {% endif %}    
