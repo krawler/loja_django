@@ -43,6 +43,7 @@
         {% endfor %}
     </tbody>
 </table>
+<input type="hidden" name="url_delete" id="url_delete" value="{{url_delete}}">
 <div id="dialog-confirm-status" class="hide" title="Alteração da situação do pedido">
     <p>
         <span class="ui-icon ui-icon-alert" 
@@ -154,6 +155,7 @@
                 '<a class="btn btn-primary btn-block btn-lg" href="'+ href +'">' +
                 ' Ver detalhes do pedido </a>'+ 
                 '<button class="btn btn-danger btn-block btn-lg btn-delete"' +
+                ' url="' + $("#url_delete").val() + '"' +
                 ' onclick="showDialogModalDeactivate('+ id_pedido +')">' +    
                 ' Desativar pedido </button>'+ 
             '</div>' +    
