@@ -32,9 +32,9 @@
 
         <p class="mt-4">Se esqueceu sua senha, clique aqui para cadastrar uma nova senha:</p>
         <div class="card-body">
-            <button type="submit" class="btn btn-primary btn-block btn-lg btn_login">
+            <a href="{% url 'perfil:password_reset' %}" class="btn btn-primary btn-block btn-lg btn_login">
                 Esqueci minha senha
-            </button>    
+            </a>     
         </div>
 
         <p class="mt-4">Se não tem cadastro, clique aqui para se cadastrar:</p>
