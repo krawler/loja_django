@@ -13,6 +13,17 @@ import json
 
 class ProdutoService():
 
+    def cart_total_preco(self, carrinho):
+        return sum(
+            [
+                float(item.get('preco_quantitativo_promocional'))
+                if item.get('preco_quantitativo_promocional')
+                else 
+                float(item.get('preco_quantitativo'))
+                for item in carrinho.values()
+            ]
+        ) 
+
     def get_produtos_mais_vendidos(self):
         agg_count_pedidos = ItemPedido.objects.values('produto_id').annotate(num_pedidos=Count('id')).order_by('-num_pedidos')[:4]
         itens = list(agg_count_pedidos)
