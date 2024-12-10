@@ -3,6 +3,8 @@
 {% load static %}
 {% block conteudo %}
 
+<meta name="csrf-token" content="{{ csrf_token }}">
+
 <div class="row">
     <div class="col">
         <h3>{{pedido}}</h3>
@@ -27,8 +29,8 @@
             <div class="col" style="width:25%">
                 <button data-status="{{pedido.status}}" 
                         class="btn btn-secondary btn-block btn-lg btnChangeStatus"
-                        onclick="showDialogModalStatus()">
-                        Mudar de {{pedido.get_status_display}}   para 
+                        onclick="showDialogModalStatus({{pedido.id}}, '{{pedido.status}}', '{{csrf_token}}')">
+                        Mudar de {{pedido.get_status_display}}   para {{pedido.status|get_next_step}}
                 </button> 
                 
             </div>
@@ -77,6 +79,16 @@
             </div>
 
     </div>
+
+    <div id="dialog-confirm-status" class="hide" title="Alteração da situação do pedido">
+        <p>
+            <span class="ui-icon ui-icon-alert" 
+                style="float:left; margin:12px 12px 20px 0;">
+            </span>
+            <span id="msg-de-para">Isso irá alterar o status do pedido. Você tem certeza?</span>
+        </p>
+    </div>  
+    
     
 </div>
 {% endblock %}
