@@ -222,3 +222,7 @@ tbody > tr.selected > * {
 .input-number{
     width:120px;   
 }
+
+.card-img-top {
+    height:240px;
+}
