@@ -28,7 +28,7 @@
         {% for pedido in pedidos %}
         <tr data-endereco="{{pedido.perfil_data.endereco}},{{pedido.perfil_data.numero}}, {{pedido.perfil_data.bairro}}, {{pedido.perfil_data.cep}}"
             data-cidade="{{pedido.perfil_data.cidade}},{{pedido.perfil_data.estado}}"
-            data-ultimacompra="{{pedido.data_ultima_compra}}"
+            data-codigo-rastreio="{{pedido.codigo_rastreio_correio}}"
             data-token="'{{csrf_token}}'"
             data-href="{% url 'pedido:admin_detalhe' pedido.id %}">
             <td class="dt-control" id="{{pedido.id}}"></td> 
@@ -109,7 +109,7 @@
             }
             else {
                 row.child(format(row.data(), id_pedido, $(tr).attr('data-endereco'), 
-                                $(tr).attr('data-cidade'), $(tr).attr('data-ultimacompra'),
+                                $(tr).attr('data-cidade'), $(tr).attr('codigo_rastreio'),
                                 $(tr).attr('data-token'), $(tr).attr('data-href'))).show();
                 showTabelaItens(id_pedido);
             }
@@ -117,7 +117,10 @@
         
     });
 
-    function format(d, id_pedido,dados_endereco,dados_cidade,data_ultima_compra,token, href) {
+    function format(d, id_pedido,dados_endereco,dados_cidade,codigo_rastreio,token, href) {
+        if(codigo_rastreio == undefined){
+            codigo_rastreio = "Não informado"
+        }
         return (
             '<div class="row">' +
                 '<div class="col" >' +
@@ -144,8 +147,8 @@
                     '<dd>' +
                     dados_cidade +
                     '</dd>' +
-                    '<dt>Última compra:</dt>' +
-                    '<dd>'+ data_ultima_compra +'</dd>' +
+                    '<dt>Código rastreio:</dt>' +
+                    '<dd>'+ codigo_rastreio +'</dd>' +
                     '</dl>' +
                 '</div>' +    
                 '<div class="col" style=""">' +
