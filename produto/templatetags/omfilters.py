@@ -64,3 +64,14 @@ def get_status_extenso(val):
         case 'P': return 'Preparando'
         case 'E': return 'Enviado'
         case 'F': return 'Finalizado'
+
+#TODO: parametrizar
+@register.filter
+def get_next_step(val):
+    match val:
+        case 'A': return 'Preparando'
+        case 'C': return 'Aprovado'
+        case 'R': return 'Finalizado'
+        case 'P': return 'Enviado'
+        case 'E': return 'Finalizado'
+        case 'F': return 'Criado'
