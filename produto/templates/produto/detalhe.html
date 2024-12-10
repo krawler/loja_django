@@ -111,10 +111,12 @@
 
         $("#select-variacoes").change(function(){
             id_variacao = $(this).val();
-            if(estoques[id_variacao] === 0){
+            if(estoques[id_variacao] === 0)
                 $("#pergunta_aviso_produto_disponivel").show();
-                $("#saldo_estoque").html(estoques[id_variacao]);
-            } 
+            else
+                $("#pergunta_aviso_produto_disponivel").hide();
+
+            $("#saldo_estoque").html(estoques[id_variacao]);
         });
 
         $("#sim_produto_disponivel").click(function(){
