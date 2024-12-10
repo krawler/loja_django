@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.core import serializers
 from django.views import View
+from django.urls import reverse
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.http import HttpResponse, JsonResponse
@@ -209,11 +210,10 @@ class Tabela(DispachLoginRequired, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['pagina_tabela'] = True
+        context['url_delete'] = reverse('pedido:desativar')
         pedidos = context['pedidos']
         pedidos = Pedido.objects.filter(desativado=False).order_by('id').reverse()
         for pedido in pedidos:            
-            #data_datetime = datetime.datetime.strptime(pedido.data_emissao, "%d/%m/%Y")
-            #pedido.data_emissao = data_datetime
             perfil = pedido.usuario.perfilusuario
             pedido.perfil_data = perfil
             data_ultima_compra = pedido_service.Pedido_Service().get_data_ultimo_pedido(user=pedido.usuario)
