@@ -1,9 +1,8 @@
 
 var urlCarrinhoPost = '';
-var urlDestinoContinuar = '';
 var variacao_id = null;
 var quantidade = 0;
-var quantidadeAlterada = false;
+
 $(document).ready(function(){
 
     $.ajaxSetup({
@@ -13,10 +12,12 @@ $(document).ready(function(){
 
     $("#continuar_comprando").on('click', function(e){
 
-        dialogChangeQuantity();
+        url = $(this).attr('url-destino');
+        dialogChangeQuantity(url);
     });
 
     function isQuantidadeAlterada(){
+        var quantidadeAlterada = false;
         $('tr[data-quant]').each(function() {
             var $row = $(this);
             var quantidadeOriginal = $row.data('quant');
@@ -24,7 +25,7 @@ $(document).ready(function(){
 
             if (quantidade != quantidadeOriginal) {
                 quantidadeAlterada = true;
-                return false;
+                return false; //return false to stop jquey loop
             }
         });
         if(quantidadeAlterada == true)
@@ -46,7 +47,8 @@ $(document).ready(function(){
     });
 
     $("#finaliza_compra").click(function(){
-        dialogChangeQuantity();
+        url = $(this).data('url');
+        dialogChangeQuantity(url);
     });
 
     $("#btnFecharDialog2").on('click', function(){
@@ -59,6 +61,7 @@ $(document).ready(function(){
 
     $("#changeCartQuantity").click(function(){
         
+        urlDestino = $(this).data('url');
         $("#dialogModal").hide(); 
         $.ajax({
             type: "POST",
@@ -69,19 +72,19 @@ $(document).ready(function(){
                 "quantidade": quantidade,
                 "csrfmiddlewaretoken": $('meta[name="csrf-token"]').attr('content')
             },
-            success: function(jsonData) {                
-                quantidadeAlterada = false;
+            success: function(jsonData) {   
+                console.log(jsonData);             
                 $('tr[data-quant]').each(function() {
                     var $row = $(this);
                     if(variacao_id  == $row.data('variacaoid'))
                         $row.data('quant', quantidade);
                 });
+                dialogChangeQuantity(urlDestino)
             }
         });
-        dialogChangeQuantity();
     });
     
-    function dialogChangeQuantity(){
+    function dialogChangeQuantity(urlDestino){
         
         if(isQuantidadeAlterada()){
             $('tr[data-quant]').each(function() {
@@ -90,12 +93,12 @@ $(document).ready(function(){
                 var nomeProduto = $row.children('td.nome_produto').children('a').html();
                 quantidade             = $row.find('.quantidade').val();            
                 variacao_id            = $row.data('variacaoid');
-                urlCarrinhoPost        = $(this).data('url');
-                urlDestinoContinuar    = $(this).attr('url-destino');
-                
+                urlCarrinhoPost        = $(this).data('url');                
     
                 if (quantidade != quantidadeOriginal) {
+                    
                     quantidadeAlterada = true;
+                    $("#dialogModal").find('button').attr('data-url', urlDestino)
                     $("#dialogModal").children('div')
                                         .children('div')
                                         .children('div.modal-body')
@@ -106,7 +109,7 @@ $(document).ready(function(){
             });      
         }
         if(!isQuantidadeAlterada())
-            $("#dialogModal2").show();                     
+            window.location.href = urlDestino;
     }
 
 });
