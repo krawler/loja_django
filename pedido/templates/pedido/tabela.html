@@ -64,7 +64,7 @@
 <script>
     $(document).ready(function(){
         
-        $.noConflict();
+        $ = jQuery;
 
         const table = $('#table_id').DataTable({
             colReorder: true,
@@ -233,29 +233,6 @@
         return parseInt(numsStr);
     }
 
-    function getNextStep(status){
-        
-        switch(status){
-            case 'Aprovado': return 'Preparando';
-            case 'Criado': return 'Aprovado';
-            case 'Reprovado': return 'Criado';
-            case 'Preparando': return 'Enviado';
-            case 'Enviado': return 'Finalizado';
-            case 'Finalizado': return 'Preparando';
-        }
-    }
-    function getStatusNameExtenso(sigla){
-
-        switch(sigla){
-            case 'A': return 'Aprovado';
-            case 'C': return 'Criado';
-            case 'R': return 'Reprovado';
-            case 'P': return 'Preparando';
-            case 'E': return 'Enviado';
-            case 'F': return 'Finalizado';
-        }
-    }
-    
 </script> 
 
 {% endblock conteudo %}
