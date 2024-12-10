@@ -28,6 +28,7 @@
             </div>
             <div class="col" style="width:25%">
                 <button data-status="{{pedido.status}}" 
+                        data-url="{% url 'pedido:atualizapedido' %}"
                         class="btn btn-secondary btn-block btn-lg btnChangeStatus"
                         onclick="showDialogModalStatus({{pedido.id}}, '{{pedido.status}}', '{{csrf_token}}')">
                         Mudar de {{pedido.get_status_display}}   para {{pedido.status|get_next_step}}
@@ -36,7 +37,8 @@
             </div>
             <div class="col" style="width:25%">
                 <button class="btn btn-danger btn-block btn-lg btn-delete"
-                        onclick="showDialogModalDeactivate()">    
+                        url="{% url 'pedido:desativar' %}"
+                        onclick="showDialogModalDeactivate({{pedido.id}})">    
                     Desativar pedido 
                 </button>
             </div>
@@ -86,6 +88,14 @@
                 style="float:left; margin:12px 12px 20px 0;">
             </span>
             <span id="msg-de-para">Isso irá alterar o status do pedido. Você tem certeza?</span>
+        </p>
+    </div>  
+    <div id="dialog-confirm-deactivate" class="hide" title="Desativação do pedido">
+        <p>
+            <span class="ui-icon ui-icon-alert" 
+                style="float:left; margin:12px 12px 20px 0;">
+            </span>
+            Isso irá desativar o pedido e você não poderá usá-lo no sistema da loja . Você tem certeza?
         </p>
     </div>  
     
