@@ -128,20 +128,7 @@ class SalvarPedido(View):
             preco_unt = carrinho[svid]['preco_quantitativo']
             preco_unt_promo = carrinho[svid]['preco_quantitativo_promocional']
             
-            if estoque < qtd_carrinho:
-                carrinho[svid]['quantidade'] = estoque        
-                carrinho[svid]['preco_quantitativo'] = estoque * preco_unt
-                carrinho[svid]['preco_quantidade_promocional'] = estoque * preco_unt_promo    
-                
-                messages.error(
-                    self.request,
-                    'Estoque insuficiente para alguns produtos do seu carrinho. '
-                    'Reduzimos a quantidade desses produtos. Por favor, verifique '
-                    'em quais produtos foram afetados a seguir'
-                )
-                self.request.session.save()
-                return redirect('produto:carrinho')       
-        
+                    
         qtd_total_carrinho = sum([int(item['quantidade']) for item in carrinho.values()])
         valor_total_carrinho =  sum(
                                     [
