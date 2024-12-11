@@ -25,6 +25,7 @@ class Pedido(models.Model):
     )
     desativado = models.BooleanField(default=False)
     codigo_rastreio_correio = models.CharField(max_length=50, blank=True, null=True)
+    observacoes = models.TextField(max_length=1000, null=True)
 
     def __str__(self):
         return f'Pedido N. {self.pk}'
