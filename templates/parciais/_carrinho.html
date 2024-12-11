@@ -34,7 +34,7 @@
                     {% endif %}    
                 </td> 
                 <td>
-                    <a class="ml-3" href="{% url 'produto:removerdocarrinho' %}?vid={{item.variacao_id}}">
+                    <a class="ml-3 icone_remover_carrinho" data-variacao="{{item.variacao_id}}" data-url="{% url 'produto:removerdocarrinho' %}?vid={{item.variacao_id}}">
                         <i class="fas fa-times-circle text-danger" aria-hidden="true"></i>
                     </a>
                 </td>
@@ -43,4 +43,36 @@
         </tbody>    
 
     </table>
+</div>
+
+<div class="modal" id="dialogModal" tabindex="-1" aria-labelledby="dialogModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Confirmação</h5>
+                <button type="button" 
+                        class="btn-close" 
+                        data-bs-dismiss="modal" 
+                        aria-label="Close"
+                        id="btnFecharDialog">
+                        <i class="fa fa-times" aria-hidden="true"></i>  
+                </button>
+            </div>
+            <div class="modal-body">
+                Tem certeza que deseja excluir este item do carrinho?
+            </div>
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-secondary" 
+                        id="closeDialogModal" >
+                        Voltar
+                </button>
+                <button type="button" 
+                        class="btn btn-primary" 
+                        id="deleteItemCarrinho">
+                        Excluir
+                </button>
+            </div>
+        </div> 
+    </div>
 </div>
