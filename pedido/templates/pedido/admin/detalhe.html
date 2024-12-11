@@ -10,32 +10,60 @@
         <h3>{{pedido}}</h3>
         
         <div class="row mt-4">
-            <div class="col" style="width:50%">
+            <div class="col-lg-5">
                 <div class="row-lg-2 font-weight-bold">Status:</div>
                 <div class="row-lg-4">{{pedido.get_status_display}}</div>
 
-                <div class="row-lg-2 font-weight-bold">Total:</div>
+                <div class="row-lg-2 font-weight-bold mt-2">Total:</div>
                 <div class="row-lg-4">{{pedido.total|formata_preco}}</div>
 
-                <div class="row-lg-2 font-weight-bold">Qtd. Itens:</div>
+                <div class="row-lg-2 font-weight-bold mt-2">Qtd. Itens:</div>
                 <div class="row-lg-4">{{pedido.qtd_total|converte_int}}</div>
 
-                <div class="row-lg-2 font-weight-bold">Código Rastreio:</div>
-                <div class="row-lg-4">{{pedido.codigo_rastreio_correio}}</div>
-
-                <div class="row-lg-2 font-weight-bold">Código Rastreio:</div>
+                <div class="row-lg-2 font-weight-bold mt-2">Nome comprador:</div>
                 <div class="row-lg-4">{{perfil.nome_completo}}</div>
+
+                <form action="{% url 'pedido:admin_detalhe' pedido.id %}" method="POST">
+                {% csrf_token %}    
+                <input type="hidden" id="id_pedido" name="id_pedido" value="{{pedido.id}}">
+                
+                <div class="row-lg-2 font-weight-bold mt-2">Código Rastreio:</div>
+                <div class="row-lg-4">
+                    <input type="text" 
+                            id="codigo_rastreio"
+                            name="codigo_rastreio" 
+                            codigo="codigo_rastreio" 
+                            class="form-control" 
+                            style="width:50%" 
+                            value="{{pedido.codigo_rastreio_correio|none_to_blank}}" />
+                </div>
+                
+                <div class="row-lg-2 font-weight-bold mt-2">Observações:</div>
+                <div class="row-lg-4">
+                    <textarea 
+                            rows="5"
+                            cols="100"
+                            id="observacoes" 
+                            name="observacoes" 
+                            class="form-control"  >
+                            {{pedido.observacoes|none_to_blank}}    
+                    </textarea>
+                </div>   
+                <button type="submit" class="btn btn-primary btn-block btn-lg mt-3 mb-2">
+                        Salvar
+                </button> 
+            </form>
             </div>
-            <div class="col" style="width:25%">
+            <div class="col">
+                
+            </div>
+            <div class="col" style="width:15%">
                 <button data-status="{{pedido.status}}" 
                         data-url="{% url 'pedido:atualizapedido' %}"
                         class="btn btn-secondary btn-block btn-lg btnChangeStatus"
                         onclick="showDialogModalStatus({{pedido.id}}, '{{pedido.status}}', '{{csrf_token}}')">
                         Mudar de {{pedido.get_status_display}}   para {{pedido.status|get_next_step}}
                 </button> 
-                
-            </div>
-            <div class="col" style="width:25%">
                 <button class="btn btn-danger btn-block btn-lg btn-delete"
                         url="{% url 'pedido:desativar' %}"
                         onclick="showDialogModalDeactivate({{pedido.id}})">    
@@ -44,41 +72,41 @@
             </div>
         </div>
             
-            <div class="row mt-4">
-                <div class="col">
-                    <h3>Produtos</h3>
-                </div>
+        <div class="row mt-4">
+            <div class="col">
+                <h3>Produtos</h3>
             </div>
-            <div class="table-responsive mt-3">
-                <table class="table">
-                    <tr>
-                        <th class="d-nome d-lg-block">Imagem</th>
-                        <th>Produto</th>
-                        <th>Variação</th>
-                       <!-- <th>Preço</th> -->
-                        <th>Quantidade</th>
-                        <th>Total</th>
-                    </tr>
-                    {% for item in pedido.itempedido_set.all %}
-                    <tr>
-                        <td class="d-none d-lg-block"> 
-                            <img class="cart-img" src="{% get_media_prefix %}{{item.imagem|remove_aspas}}">
-                        </td>
-                        <td>{{item.produto}}</td>
-                        <td>{{item.variacao}}</td>
-                      <!--  <td>{{item.preco}}</td> -->
-                        <td>{{item.quantidade}}</td>
-                        <td>
-                            {% if item.preco_promocional %}
-                            {{item.preco_promocional|formata_preco}}
-                            {% else %}
-                            {{item.preco|formata_preco}}
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
+        </div>
+        <div class="table-responsive mt-3">
+            <table class="table">
+                <tr>
+                    <th class="d-nome d-lg-block">Imagem</th>
+                    <th>Produto</th>
+                    <th>Variação</th>
+                    <!-- <th>Preço</th> -->
+                    <th>Quantidade</th>
+                    <th>Total</th>
+                </tr>
+                {% for item in pedido.itempedido_set.all %}
+                <tr>
+                    <td class="d-none d-lg-block"> 
+                        <img class="cart-img" src="{% get_media_prefix %}{{item.imagem|remove_aspas}}">
+                    </td>
+                    <td>{{item.produto}}</td>
+                    <td>{{item.variacao}}</td>
+                    <!--  <td>{{item.preco}}</td> -->
+                    <td>{{item.quantidade}}</td>
+                    <td>
+                        {% if item.preco_promocional %}
+                        {{item.preco_promocional|formata_preco}}
+                        {% else %}
+                        {{item.preco|formata_preco}}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
 
     </div>
 
