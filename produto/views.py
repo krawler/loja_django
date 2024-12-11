@@ -43,7 +43,7 @@ class ListaProdutos(DispachProdutosMaisVendidos, ListView):
     model = Produto
     template_name = 'produto/lista.html' 
     context_object_name = 'produtos'
-    paginate_by = 6
+    paginate_by = 9
 
 
 class DetalheProduto(DispachProdutosMaisVendidos, DetailView):
