@@ -2,6 +2,8 @@
 
 {% load omfilters %}
 
+{% load static %}
+
 {% block conteudo %}
 
 <div class="row mb-5">
@@ -80,5 +82,7 @@
 <a href="{% url 'pedido:pagar' %}" class="btn btn-primary btn-block btn-lg">
     Realizar pedido e pagar
 </a>
+
+<script src="{% static 'assets/custom/js/resumo_compra.js' %}"></script>
 
 {% endblock %}
