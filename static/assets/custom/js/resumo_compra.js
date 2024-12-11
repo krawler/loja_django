@@ -17,6 +17,7 @@ $(document).ready(function(){
     $(".icone_remover_carrinho").click(function(){
         urlCarrinhoPost = $(this).data('url');
         variacao_id = $(this).data("variacao");
+        $("#deleteItemCarrinho").attr("variacao", variacao_id);
         $("#dialogModal").show();
     });
     
