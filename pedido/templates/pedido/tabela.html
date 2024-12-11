@@ -121,6 +121,7 @@
         if(codigo_rastreio == undefined){
             codigo_rastreio = "Não informado"
         }
+        let status = d[2].substr(0,1)
         return (
             '<div class="row">' +
                 '<div class="col" >' +
@@ -154,7 +155,7 @@
                 '<div class="col" style=""">' +
                 '<button data-status="' + d[2] + '" data-token="' + token + '" class="btn btn-secondary btn-block btn-lg btnChangeStatus"' +
                                 'onclick="showDialogModalStatus('+ id_pedido +',' + token + ')">' +
-                'Mudar para ' + getNextStep(d[2]) + '</button>'+ 
+                'Mudar para ' + getNextStep(status) + '</button>'+ 
                 '<a class="btn btn-primary btn-block btn-lg" href="'+ href +'">' +
                 ' Ver detalhes do pedido </a>'+ 
                 '<button class="btn btn-danger btn-block btn-lg btn-delete"' +
