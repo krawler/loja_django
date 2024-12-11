@@ -254,7 +254,7 @@ class Atualizar_Pedido(DispachLoginRequired, View):
         pedido = Pedido.objects.get(id=pedido_id)
         pedido.status = para
         pedido.save()
-        return JsonResponse(para, safe=False)
+        return redirect('pedido:admin_detalhe', pedido_id)
 
 class Desativar_Pedido(View):
     
@@ -286,3 +286,19 @@ class Admin_detalhe_pedido(DispachLoginRequired, View):
             'perfil' : perfil
         }
         return render(self.request, 'pedido/admin/detalhe.html', context)
+
+    def post(self, *args, **kwargs):
+        codigo_rasteio = self.request.POST.get('codigo_rastreio')
+        id_pedido = self.request.POST.get('id_pedido')
+        observacoes = self.request.POST.get('observacoes')
+        
+        if id_pedido is None:
+            return redirect('pedido:tabela')
+
+        if codigo_rasteio or observacoes is not None:
+            pedido = Pedido.objects.get(id=id_pedido)
+            pedido.codigo_rastreio_correio = codigo_rasteio
+            pedido.observacoes = observacoes
+            pedido.save()
+        
+        return redirect('pedido:admin_detalhe', id_pedido)
