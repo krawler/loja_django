@@ -136,16 +136,17 @@ class Cadastro_concluido(View):
     paginate_by = 3
 
     def get(self, *args, **kwargs):
-         usuario = self.request.user
-         perfil = PerfilUsuario.objects.filter(usuario=usuario).get() 
-         produtos = Produto.objects.all()[:3:1]
-         contexto = {
+        usuario = self.request.user
+        perfil = PerfilUsuario.objects.filter(usuario=usuario).get() 
+        produtos = Produto.objects.all()[:3:1]
+        contexto = {
             'usuario': usuario,
             'perfil' : perfil,
             'produtos': produtos,
             'produtos_mais_vendidos' : ProdutoService().get_produtos_mais_vendidos() 
-         }    
-         return render(self.request, self.template_name, contexto)
+        }  
+        
+        return render(self.request, self.template_name, contexto)
 
 class Atualizar(Criar):
 
