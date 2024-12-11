@@ -11,7 +11,7 @@
 
             {% for produto in produtos %}   
             
-            <div class="card">
+            <div class="card mt-4">
                 {% if produto.imagem %}
                   <a href="{% url 'produto:detalhe'  produto.slug %}">  
                     <img class="card-img-top" src="{{ produto.imagem.url }}" alt="Card image cap">
@@ -32,12 +32,14 @@
                             </span>
                     </div>
                 </div>
-                <div class="card-footer bg-transparent border-top-light-custom text-center">
+                <!--                <div class="card-footer bg-transparent border-top-light-custom text-center">
                     <a href="{% url 'produto:detalhe'  produto.slug %}" class="btn btn-primary btn-sm m-1 btn-block">
                         <i class="fa fa-shopping-cart" aria-hidden="true"></i>
                         Comprar
                     </a>
                 </div>
+                -->
+
             </div>
             {% endfor  %}
 
