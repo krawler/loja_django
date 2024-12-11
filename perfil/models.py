@@ -57,17 +57,6 @@ class PerfilUsuario(models.Model):
     def clean(self):
         error_messages = {}
 
-        self.cpf = self.cpf.replace('-','').replace('.','')
-        
-        if not valida_cpf(self.cpf):
-            error_messages['cpf'] = 'Digite um CPF válido'
-        
-        if re.search(r'[^0-9]', self.cpf):
-            error_messages = 'CPF inválido, digite os 11 digitos do CPF'
-
-        if error_messages:
-            raise ValidationError(error_messages)
-
     class Meta:
         verbose_name = 'Perfil'
         verbose_name_plural = 'Perfis'
