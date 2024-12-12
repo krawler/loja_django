@@ -3,7 +3,7 @@
 {% load static %}
 {% block conteudo %}
 
-<div class="row">
+<div class="row mb-4">
     <div class="col">
         <h3>{{pedido}}</h3>
         <div class="row mt-4">
@@ -61,4 +61,7 @@
         </div>
     </div>
 </div>
+
+{% include 'parciais/_mais_acessados.html' %}
+
 {% endblock %}
