@@ -40,7 +40,7 @@
                         Ver ou alterar seu cadastro    
                     </a>    
                     {% else %}
-                    <a class="dropdown-item" href="{% url 'perfil:login' %}">
+                    <a class="dropdown-item" href="{% url 'perfil:login'  %}?url={{request.path}}">
                         Entrar na conta
                     </a>    
                     <a class="dropdown-item" href="{% url 'perfil:criar' %}">
@@ -55,7 +55,7 @@
                     {% endif %}
                 </div>
             </li>
-            {% if request.user.is_authenticated %}
+            {% if request.user.is_authenticated and request.user.is_staff %}
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle active" href="#" id="navbarRelatorio" role="button"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">             
@@ -81,7 +81,8 @@
                 </div>
             </li>
             {% endif %}
-            {% if request.user.is_authenticated %}
+
+            {% if request.user.is_authenticated and request.user.is_staff %}
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle active" href="#" id="navbarRelatorio" role="button"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">             
@@ -111,9 +112,13 @@
             </li>
             {% endif %}
         </ul>
+        
         <form class="form-inline my-2 my-lg-0" action="{% url 'produto:busca' %}">
             <input class="form-control mr-sm-2" type="search" placeholder="o que procura?" aria-label="Search" name="termo">
             <button class="btn btn-secondary my-2 my-sm-0" type="submit">Buscar</button>
         </form>
+        <a href="{% url 'perfil:login' %}" class="btn btn-secondary my-2 my-sm-0 ml-2">
+            Entrar
+        </a>
     </div>
 </nav>
