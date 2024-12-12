@@ -36,7 +36,9 @@
                                 {{ item.produto_nome }} - {{ item.variacao_nome }}
                                 </a>
                             <td>                       
-                            <td class="text-center"><input type="number" class="quantidade" style="width: 20%;" value="{{item.quantidade }}" /></td>                        
+                            <td class="text-center">
+                                <input type="number" class="quantidade" style="width: 20%;" value="{{item.quantidade }}" />
+                            </td>                        
                             <td class="text-right">
                                 {% if item.preco_quantitativo_promocional %}
                                     {{ item.preco_quantitativo_promocional | formata_preco }}
