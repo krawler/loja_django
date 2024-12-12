@@ -31,7 +31,12 @@ class DispachLoginRequired(View):
 class DispachProdutosMaisVendidos(View):
 
     def dispatch(self, *args, **kwargs):
-        self.produtos_mais_vendidos = ProdutoService().get_produtos_mais_acessados_por_usuario(self.request.user)
+        produtos_retorno = ProdutoService().get_produtos_mais_acessados_por_usuario(self.request.user)
+        if produtos_retorno is None or len(produtos_retorno) < 4:
+            self.produtos_mais_vendidos = ProdutoService().get_produtos_mais_vendidos()
+        else:    
+            self.produtos_mais_vendidos = produtos_retorno    
+        
         return super().dispatch(*args, **kwargs)
     
     def get_context_data(self, **kwargs):
@@ -121,11 +126,10 @@ class AdicionarCarrinho(View):
             self.request.session['carrinho'] = {}
             self.request.session.save()
             
-        carrinho = self.request.session['carrinho']
-        
+        carrinho = self.request.session['carrinho']  
+
         if variacao_id in carrinho:
             quantidade_carrinho = float(carrinho[variacao_id]['quantidade'])
-            #TODO: pegar quantidade dinamicamente
             quantidade_carrinho += float(quantidade)
             
             if variacao_estoque < int(quantidade_carrinho):
@@ -139,6 +143,7 @@ class AdicionarCarrinho(View):
             carrinho[variacao_id]['quantidade'] = quantidade_carrinho
             carrinho[variacao_id]['preco_quantitativo'] = preco_unitario * quantidade_carrinho
             carrinho[variacao_id]['preco_quantitativo_promocional'] = preco_unitario_promocional * quantidade_carrinho  
+            
         else:
             carrinho[variacao_id] = {
                 'produto_id' : produto_id,
@@ -213,6 +218,7 @@ class Carrinho(DispachProdutosMaisVendidos, View):
         carrinho = self.request.session.get('carrinho')
         item_carrinho = carrinho[variacao_id]
         item_carrinho['quantidade'] = quantidade
+        item_carrinho['preco_quantitativo_promocional'] = item_carrinho['preco_unitario'] * float(quantidade)
         carrinho[variacao_id] = item_carrinho
         self.request.session['carrinho'] = carrinho
         json_data = carrinho
