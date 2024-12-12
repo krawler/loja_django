@@ -47,6 +47,19 @@ class Pagar(DispachLoginRequired, View):
                 'quantity': 1
             })
             
+            """
+                    shipping_cost: {
+            // Adiciona o custo do frete como um item de linha
+            shipping_rate_data: {
+                type: 'fixed_amount',
+                fixed_amount: {
+                amount: frete.valor * 100,
+                currency: 'brl',
+                },
+            },
+            },
+        """
+        
         try:
             checkout_session = stripe.checkout.Session.create(
                 line_items=line_items,
