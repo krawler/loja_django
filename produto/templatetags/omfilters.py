@@ -46,7 +46,7 @@ def cart_total_qtd(carrinho):
 def cart_total_preco(carrinho):
     return sum(
         [
-            (float(item.get('preco_quantitativo_promocional')) * float(item.get('quantidade')))
+            (float(item.get('preco_quantitativo_promocional')))
             if item.get('preco_quantitativo_promocional')
             else 
             float(item.get('preco_quantitativo'))
