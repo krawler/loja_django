@@ -205,6 +205,7 @@ class Login(View):
                     'variacao_nome': item.Variacao.nome,
                     'produto_nome': item.Variacao.produto.nome,
                     'imagem': json.dumps(str(item.Variacao.produto.imagem)),
+                    'preco_unitario': item.preco_quantitativo / item.quantidade,
                     'preco_quantitativo': item.preco_quantitativo,
                     'preco_quantitativo_promocional': item.preco_quantitativo_promocional,
                     'quantidade': item.quantidade,
