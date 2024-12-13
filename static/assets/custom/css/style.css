@@ -230,3 +230,7 @@ tbody > tr.selected > * {
 .codigo-validacao {
     font-size: 2rem;
 }
+
+#termo{
+    width:500px;
+}
