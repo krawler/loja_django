@@ -100,3 +100,14 @@ function showDialogModalDeactivate(id){
         });
     });
 }
+
+function formata_preco(numero){
+    if(numero != undefined)
+        return numero.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    return '';
+}
+
+function apenasNumeros(string){
+    var numsStr = string.replace(/[^0-9]/g,'');
+    return parseInt(numsStr);
+}
