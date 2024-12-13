@@ -103,7 +103,7 @@ class AdicionarCarrinho(View):
             return redirect(http_referer)
         
         variacao = get_object_or_404(Variacao, id=variacao_id)
-        variacao_estoque = variacao.estoque
+        variacao_estoque = ProdutoService().getEstoqueAtual(variacao_id)
         produto = variacao.produto
         
         produto_id = produto.id
@@ -112,6 +112,7 @@ class AdicionarCarrinho(View):
         preco_unitario = variacao.preco
         preco_unitario_promocional = variacao.preco_promocional
         quantidade = qtd_form_param if qtd_form_param is not None else 1 
+        quantidade = int(quantidade)
         slug = produto.slug
         imagem = json.dumps(str(produto.imagem))
         
@@ -129,8 +130,8 @@ class AdicionarCarrinho(View):
         carrinho = self.request.session['carrinho']  
 
         if variacao_id in carrinho:
-            quantidade_carrinho = float(carrinho[variacao_id]['quantidade'])
-            quantidade_carrinho += float(quantidade)
+            quantidade_carrinho = int(carrinho[variacao_id]['quantidade'])
+            quantidade_carrinho += quantidade
             
             if variacao_estoque < int(quantidade_carrinho):
                 messages.error(
@@ -143,7 +144,8 @@ class AdicionarCarrinho(View):
             carrinho[variacao_id]['quantidade'] = quantidade_carrinho
             carrinho[variacao_id]['preco_quantitativo'] = preco_unitario * quantidade_carrinho
             carrinho[variacao_id]['preco_quantitativo_promocional'] = preco_unitario_promocional * quantidade_carrinho  
-            
+            carrinho[variacao_id]['preco_unitario'] = preco_unitario
+            carrinho[variacao_id]['preco_unitario_promocional'] = preco_unitario_promocional
         else:
             carrinho[variacao_id] = {
                 'produto_id' : produto_id,
@@ -155,7 +157,7 @@ class AdicionarCarrinho(View):
                 'quantidade' : quantidade,
                 'slug' : slug,
                 'preco_quantitativo_promocional': preco_unitario_promocional * int(quantidade),
-                'preco_quantitativo' : preco_unitario * int(quantidade),
+                'preco_quantitativo' : preco_unitario * quantidade,
                 'imagem' : imagem
             }
 
@@ -218,7 +220,7 @@ class Carrinho(DispachProdutosMaisVendidos, View):
         carrinho = self.request.session.get('carrinho')
         item_carrinho = carrinho[variacao_id]
         item_carrinho['quantidade'] = quantidade
-        item_carrinho['preco_quantitativo_promocional'] = item_carrinho['preco_unitario'] * float(quantidade)
+        item_carrinho['preco_quantitativo_promocional'] = item_carrinho['preco_unitario_promocional'] * float(quantidade)
         carrinho[variacao_id] = item_carrinho
         self.request.session['carrinho'] = carrinho
         json_data = carrinho
