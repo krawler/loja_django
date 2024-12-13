@@ -22,14 +22,14 @@
                     <h5 class="card-title">{{ produto.nome }}</h5>
                     <p class="card-text">{{ produto.descricao }}</p>
                     <div class="container product-price-block text-center">
-                        {% if produto.preco_marketing_promocional > 0 %}
+                        {% if produto.variacao_set.first.preco_promocional > 0 %}
+                            <span class="product-old-price text-muted">
+                                {{ produto.variacao_set.first.preco|formata_preco }}
+                            </span>
                             <span class="product-price">
-                                {{ produto.preco_marketing_promocional|formata_preco }}
+                                {{ produto.variacao_set.first.preco_promocional|formata_preco }}
                             </span>
                         {% endif %}
-                            <span class="product-old-price text-muted">
-                                {{ produto.preco_marketing|formata_preco }}
-                            </span>
                     </div>
                 </div>
                 <!--                <div class="card-footer bg-transparent border-top-light-custom text-center">
