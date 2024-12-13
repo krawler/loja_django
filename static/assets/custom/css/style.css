@@ -234,3 +234,7 @@ tbody > tr.selected > * {
 #termo{
     width:500px;
 }
+
+.table td{
+    border-bottom: 1px solid #dee2e6;
+}
