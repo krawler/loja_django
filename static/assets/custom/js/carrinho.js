@@ -1,6 +1,5 @@
 
 var urlCarrinhoPost = '';
-var variacao_id = null;
 var quantidade = 0;
 
 $(document).ready(function(){
@@ -34,6 +33,17 @@ $(document).ready(function(){
             return false;
     }
 
+    $(".quantidade").change(function(){
+        let preco_unitario = $(this).parent().parent().children('td.preco_unitario').html();
+        let quantidade = $(this).val();
+        preco_unitario = preco_unitario.replace('R$','')
+        preco_unitario = parseFloat(preco_unitario);
+        quantidade = parseInt(quantidade);
+        total_parcial = preco_unitario * quantidade;
+        total_parcial = formata_preco(total_parcial);
+        $(this).parent().parent().children('td.total_parcial').children('span').html(total_parcial);
+    });
+
     $("#closeDialogModal2").click(function(){
         $("#dialogModal2").hide(); 
     });
@@ -62,6 +72,7 @@ $(document).ready(function(){
     $("#changeCartQuantity").click(function(){
         
         urlDestino = $(this).data('url');
+        variacao_id = $(this).data('variacao')
         $("#dialogModal").hide(); 
         $.ajax({
             type: "POST",
@@ -92,6 +103,7 @@ $(document).ready(function(){
                 var nomeProduto = $row.children('td.nome_produto').children('a').html();
                 quantidade             = $row.find('.quantidade').val();            
                 variacao_id            = $row.data('variacaoid');
+                $("#changeCartQuantity").data("variacao", variacao_id)
                 urlCarrinhoPost        = $(this).data('url');                
     
                 if (quantidade != quantidadeOriginal) {
