@@ -30,8 +30,11 @@
                     {% if request.user.is_authenticated %}
                         {{request.user}}
                     {% else %}
-                        Conta
+                        Conta  
                     {% endif %}    
+                    <span class="ml-1">
+                        <i class="far fa-user" style="color: #fafafa"></i>
+                    </span>
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                     
@@ -54,6 +57,7 @@
                         <a class="dropdown-item" href="{% url 'perfil:logout' %}">Sair</a>
                     {% endif %}
                 </div>
+               
             </li>
             {% if request.user.is_authenticated and request.user.is_staff %}
             <li class="nav-item dropdown">
