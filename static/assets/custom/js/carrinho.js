@@ -72,8 +72,7 @@ $(document).ready(function(){
                 "quantidade": quantidade,
                 "csrfmiddlewaretoken": $('meta[name="csrf-token"]').attr('content')
             },
-            success: function(jsonData) {   
-                console.log(jsonData);             
+            success: function(jsonData) {            
                 $('tr[data-quant]').each(function() {
                     var $row = $(this);
                     if(variacao_id  == $row.data('variacaoid'))
