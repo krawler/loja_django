@@ -1,6 +1,7 @@
 from produto.models import ProdutoSimples
 from .models import Pedido
 from django.db import connection
+from pagseguro import PagSeguro
 
 class Pedido_Service():
 
@@ -8,6 +9,7 @@ class Pedido_Service():
         if not hasattr(cls, 'instance'):
             cls.instance = super(Pedido_Service, cls).__new__(cls)
         return cls.instance    
+
 
     def getItemsProdutos(self, pedido_id):
 
@@ -31,6 +33,7 @@ class Pedido_Service():
             
             return produtos
 
+
     def get_data_ultimo_pedido(self, user):
 
         usuario_id = user.id
@@ -47,6 +50,7 @@ class Pedido_Service():
             row = cursor.fetchone()
             return row[0]
 
+
     def get_sigla_status(self, status):
         
         match status:
@@ -57,8 +61,43 @@ class Pedido_Service():
             case 'Enviado': return 'E'
             case 'Finalizado': return 'F'
 
+
     def desativar_pedido(self, pedidoid):
         pedido = Pedido.objects.get(id=pedidoid)
         pedido.desativado = True
         pedido.save()
         return pedido
+
+
+    def checkout_pagseguro(self, user, variacoes):
+        pg = PagSeguro(email="seuemail@dominio.com", token="ABCDEFGHIJKLMNO")
+        #dados do usuario e do perfil
+        perfil = user.perfilusuario
+        pg.sender = {
+            "name": perfil.nome_completo,
+            "area_code": 14,
+            "phone": 996064031,
+            "email": "august.rafael@gmail.com",
+        }
+        #dados do perfil
+        pg.shipping = {
+            "type": pg.SEDEX,
+            "street": perfil.endereco,
+            "number": int(perfil.numero),
+            "complement": perfil.complemento,
+            "district": perfil.bairro,
+            "postal_code": perfil.cep,
+            "city": perfil.cidade,
+            "state": perfil.estado,
+            "country": "BRA"
+        }
+        for variacao in variacoes:
+            pg.items.append(
+                {"id": "0003", 
+                    "description": variacao.produto.descricao, 
+                    "amount": variacao.preco if variacao.preco_promocional is None else variacao.preco_promocional, 
+                    "quantity": 2, 
+                    "weight": 200},
+            )
+        pg.redirect_url = "http://localhost:8000/pedido/salvarpedido"
+        response = pg.checkout()
