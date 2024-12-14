@@ -24,6 +24,7 @@ class ProdutoService():
             ]
         ) 
 
+
     def get_produtos_mais_vendidos(self):
         agg_count_pedidos = ItemPedido.objects.values('produto_id').annotate(num_pedidos=Count('id')).order_by('-num_pedidos')[:4]
         itens = list(agg_count_pedidos)
@@ -32,6 +33,7 @@ class ProdutoService():
             id_produtos.append(item['produto_id'])
         return Produto.objects.filter(id__in=id_produtos)
     
+
     def insert_item_session_carrinho(self, sessao_carrinho, user):
         variacao_sessao = Variacao.objects.filter(id=sessao_carrinho['variacao_id']).first()
         usuario = User.objects.filter(username=user).first()
@@ -49,19 +51,20 @@ class ProdutoService():
             else:
                 variacao_user_sessao.quantidade = sessao_carrinho['quantidade']
                 variacao_user_sessao.save()
-                #TODO Altera a quantidade
-        else:
-            print("Anonynous")
+                
 
     def limpa_session_carrinho_user(self, user):
         if not user.is_anonymous:
             SessaoCarrinho.objects.filter(user=user).delete()
 
+
     def delete_item_session_carrinho(self, usuario, variacao):
         SessaoCarrinho.objects.filter(user=usuario, Variacao=variacao).delete()
 
+
     def getCarrinhoSessao(self, user):
         return SessaoCarrinho.objects.filter(user=user).all()
+
 
     def salvar_saida_produto(self, variacao, preco_final, quantidade, user, data, hora, pedido):
         saida_produto = SaidaProduto(variacao=variacao,
@@ -74,6 +77,7 @@ class ProdutoService():
         )
         saida_produto.save()
 
+
     def salvar_entrada_produto(self, variacao, preco_final, quantidade, user):
         model_variacao = Variacao.objects.filter(id=variacao).first()
         data = datetime.today()
@@ -85,6 +89,7 @@ class ProdutoService():
                                     data=data,
                                     hora=hora)
         entrada_produto.save()
+
 
     def getEstoqueAtual(self, variacao_id):
 
@@ -99,6 +104,7 @@ class ProdutoService():
         
         return saldo
 
+
     def get_saldo_estoque_variacoes(self, produto):
         saldos = {}
         variacoes = Variacao.objects.filter(produto=produto)
@@ -106,6 +112,7 @@ class ProdutoService():
             saldos[variacao.id] = self.getEstoqueAtual(variacao.id)
         
         return saldos    
+
 
     def salvar_categoria(self, nome, id):
         datahora_criacao = datetime.now()
@@ -115,11 +122,13 @@ class ProdutoService():
         else:    
             categoria = Categoria(nome=nome, datahora_criacao=datahora_criacao)
         categoria.save()
-    
+
+
     def salvar_acesso_produto(self, user, slug):
         produto = Produto.objects.filter(slug=slug).first()
         acesso = AcessoProduto(produto=produto, user=user)
         acesso.save()
+
 
     def salvar_aviso_produto_disponivel(self, user, id_variacao):
         variacao = Variacao.objects.get(id=id_variacao)
@@ -128,7 +137,7 @@ class ProdutoService():
         return True;
 
 
-    def get_produtos_mais_acessados_por_usuario(request, user):
+    def get_produtos_mais_acessados_por_usuario(self, user):
         user = User.objects.filter(username=user).first()
         if user == None:
             return
@@ -144,6 +153,30 @@ class ProdutoService():
                         LIMIT 4;
                         """
             cursor.execute(str_sql, [user.id])
+
+            rows = cursor.fetchall()
+            produtos = []
+            for row in rows:
+                produtos.append(ProdutoMaisAcessado(nome=row[0], descricao=row[1], imagem=row[2], 
+                                                    slug=row[3], preco=row[4], preco_promocional=row[5], 
+                                                    total_acessos=row[6]))
+
+        return produtos
+
+
+    def get_produtos_mais_acessados_por_geral(self):
+        
+        with connection.cursor() as cursor:
+            str_sql = """
+                        SELECT p.nome, p.descricao, p.imagem, p.slug, p.preco_marketing, 
+                        p.preco_marketing_promocional, COUNT(ap.id) AS total_acessos
+                        FROM produto_acessoproduto ap
+                        INNER JOIN produto_produto p ON ap.produto_id = p.id
+                        GROUP BY p.id
+                        ORDER BY total_acessos DESC
+                        LIMIT 4;
+                        """
+            cursor.execute(str_sql)
 
             rows = cursor.fetchall()
             produtos = []
