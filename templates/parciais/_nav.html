@@ -20,6 +20,21 @@
         {% endif %}
 
         <ul class="navbar-nav ml-auto">
+            {% for categoria in categorias %}
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle active" href="#" id="navbarRelatorio" role="button"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">             
+                        {{categoria.nome}}    
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    {% for produto in  categoria.produto_set.all  %}
+                    <a class="dropdown-item" href="{% url 'pedido:tabela' %}">
+                        {{produto.nome}}    
+                    </a>   
+                    {% endfor %}
+                </div>
+            </li>
+            {% endfor %}
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -59,7 +74,7 @@
                     <span class="nav-cart-text mr-1">
                         Carrinho
                     </span>
-                    <span class="nav-cart-count mr-1">
+                    <span class="nav-cart-count mr-1" id="qtd_carrinho_nav">
                         {% if request.session.carrinho %}
                             <strong>{{request.session.carrinho|cart_total_qtd}}x</strong>
                         {% endif %}
