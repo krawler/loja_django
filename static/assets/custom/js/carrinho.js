@@ -44,6 +44,20 @@ $(document).ready(function(){
         $(this).parent().parent().children('td.total_parcial').children('span').html(total_parcial);
     });
 
+    $(".quantidade").blur(function(){
+        let total_carrinho = 0;
+        let qtd_show_str = 0;
+        $('tr[data-quant]').each(function() {
+            total_parcial = $(this).children('td.total_parcial').children('span').html();
+            total_parcial = total_parcial.replace('R$&nbsp;','').replace('R$','').trim();
+            total_carrinho = total_carrinho + parseFloat(total_parcial)  
+            qtd_show_str = parseInt($(this).children('td').children('input').val()) + qtd_show_str;
+        });
+        qtd_show_str = qtd_show_str + 'x';
+        $(".total_carrinho").html(formata_preco(total_carrinho));
+        $("#qtd_carrinho_nav").children('strong').html(qtd_show_str);
+    });
+
     $("#closeDialogModal2").click(function(){
         $("#dialogModal2").hide(); 
     });
