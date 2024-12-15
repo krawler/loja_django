@@ -186,3 +186,14 @@ class ProdutoService():
                                                     total_acessos=row[6]))
 
         return produtos
+
+
+    def get_all_product_names(self):
+        produtos = Produto.objects.only('nome')
+        produtos = list(produtos)
+        return produtos
+
+
+    def get_all_categorias(self):
+        categorias = Categoria.objects.all()
+        return categorias    
