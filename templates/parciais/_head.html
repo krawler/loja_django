@@ -59,3 +59,19 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.css" />
 
 {% endif %}
+
+<script>
+    $(document).ready(function(){
+        var produtos = '{{produtos_autocomplete}}';
+        produtos = produtos.replace('[','').replace(']','')
+        produtos = produtos.split(",")
+
+        for(produto in produtos){
+            produtos[produto] = produtos[produto].substring(produtos[produto].indexOf(':') + 1, produtos[produto].lastIndexOf('&'))
+        }
+
+        $("#termo").autocomplete({
+            source: produtos
+        });
+    });
+</script>
