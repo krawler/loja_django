@@ -31,9 +31,9 @@ class DispachLoginRequired(View):
 class DispachProdutosMaisVendidos(View):
 
     def dispatch(self, *args, **kwargs):
-        produtos_retorno = ProdutoService().get_produtos_mais_acessados_por_usuario(self.request.user)
+        produtos_retorno = ProdutoService().get_produtos_mais_acessados_por_usuario(user=self.request.user)
         if produtos_retorno is None or len(produtos_retorno) < 4:
-            self.produtos_mais_vendidos = ProdutoService().get_produtos_mais_vendidos()
+            self.produtos_mais_vendidos = ProdutoService().get_produtos_mais_acessados_por_geral()
         else:    
             self.produtos_mais_vendidos = produtos_retorno    
         
@@ -45,10 +45,21 @@ class DispachProdutosMaisVendidos(View):
         return context
     
 class ListaProdutos(DispachProdutosMaisVendidos, ListView):    
-    model = Produto
     template_name = 'produto/lista.html' 
-    context_object_name = 'produtos'
-    paginate_by = 9
+
+    def get(self, *args, **kwargs):
+        produtos = Produto.objects.filter(imagem__isnull=False).order_by('?')
+        page = self.request.GET.get('page', 1)
+        paginator = Paginator(produtos, per_page=4,allow_empty_first_page=True)
+        page_object = paginator.get_page(page)
+
+        context = {
+            'produtos': produtos,
+            'produtos_mais_vendidos': self.produtos_mais_vendidos,
+            "page_obj": page_object,
+            "is_paginated": True
+        }
+        return render(self.request, self.template_name, context)
 
 
 class DetalheProduto(DispachProdutosMaisVendidos, DetailView):
