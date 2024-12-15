@@ -36,30 +36,31 @@ class Pagar(DispachLoginRequired, View):
     
     stripe.api_key = 'sk_test_51PRDqWFqNwY82ww5DnAS83DgAsvwPRLbVCTtcHDoWXU8G8I4UGy13f5LHXYsQsl3wDlgFSBdRRMzXeILk8Blenhd00BmZJK1Me'
     
-    def create_checkout_session(self, variacoes):
+    def create_checkout_session(self, variacoes, carrinho):
         
-        #TODO: Falta passar a quantidade do carrinho
-            
         line_items = []       
+
+        carrinho = self.request.session.get('carrinho')
+        for item in carrinho.items():
+            line_items.append({
+                'price': Variacao.objects.get(id=item[0]).id_preco_stripe,
+                'quantity': item[1]['quantidade']
+            })
+
+
+        """   
         for variacao in variacoes:
             line_items.append({
                 'price': variacao.id_preco_stripe,
                 'quantity': 1
-            })
-            
-            """
-                    shipping_cost: {
-            // Adiciona o custo do frete como um item de linha
-            shipping_rate_data: {
-                type: 'fixed_amount',
-                fixed_amount: {
-                amount: frete.valor * 100,
-                currency: 'brl',
-                },
-            },
-            },
+            }) 
+        shipping_rate = stripe.ShippingRate.create(
+                            display_name="Ground shipping",
+                            type="calculate",
+                            fixed_amount={"amount": "500", "currency": "usd"},
+        )
+        shipping_rates = [shipping_rate]
         """
-        
         try:
             checkout_session = stripe.checkout.Session.create(
                 line_items=line_items,
@@ -119,7 +120,9 @@ class Pagar(DispachLoginRequired, View):
                 self.request.session.save()
                 return redirect('produto:carrinho')
         
-        return self.create_checkout_session(bd_variacoes)
+        return self.create_checkout_session(carrinho, bd_variacoes)
+        #user = self.request.user
+        #return pedido_service.Pedido_Service().checkout_pagseguro(user, bd_variacoes)
 
 class SalvarPedido(View):    
     
