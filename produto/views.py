@@ -35,13 +35,15 @@ class DispachProdutosMaisVendidos(View):
         if produtos_retorno is None or len(produtos_retorno) < 4:
             self.produtos_mais_vendidos = ProdutoService().get_produtos_mais_acessados_por_geral()
         else:    
-            self.produtos_mais_vendidos = produtos_retorno    
-        
+            self.produtos_mais_vendidos = produtos_retorno   
+        self.produtos_autocomplete = ProdutoService().get_all_product_names()        
+        self.categorias = ProdutoService().get_all_categorias()
+
         return super().dispatch(*args, **kwargs)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['produtos_mais_vendidos'] = self.produtos_mais_vendidos     
+        context['produtos_mais_vendidos'] = self.produtos_mais_vendidos        
         return context
     
 class ListaProdutos(DispachProdutosMaisVendidos, ListView):    
@@ -56,6 +58,8 @@ class ListaProdutos(DispachProdutosMaisVendidos, ListView):
         context = {
             'produtos': produtos,
             'produtos_mais_vendidos': self.produtos_mais_vendidos,
+            'produtos_autocomplete' : self.produtos_autocomplete,
+            'categorias' : self.categorias,  
             "page_obj": page_object,
             "is_paginated": True
         }
@@ -231,7 +235,8 @@ class Carrinho(DispachProdutosMaisVendidos, View):
         carrinho = self.request.session.get('carrinho')
         item_carrinho = carrinho[variacao_id]
         item_carrinho['quantidade'] = quantidade
-        item_carrinho['preco_quantitativo_promocional'] = item_carrinho['preco_unitario_promocional'] * float(quantidade)
+        item_carrinho['preco_quantitativo_promocional'] = item_carrinho.get('preco_unitario_promocional', 0) * float(quantidade)
+        item_carrinho['preco_quantitativo'] = item_carrinho.get('preco_unitario', 0) * float(quantidade)
         carrinho[variacao_id] = item_carrinho
         self.request.session['carrinho'] = carrinho
         json_data = carrinho
