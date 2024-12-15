@@ -1,5 +1,4 @@
 
-var urlCarrinhoPost = '';
 var quantidade = 0;
 
 $(document).ready(function(){
@@ -11,8 +10,9 @@ $(document).ready(function(){
 
     $("#continuar_comprando").on('click', function(e){
 
-        url = $(this).attr('url-destino');
-        dialogChangeQuantity(url);
+        url = $(this).data('urldestino');
+        $("#changeCartQuantity").data('urldestino', url);
+        dialogChangeQuantity();
     });
 
     function isQuantidadeAlterada(){
@@ -57,8 +57,9 @@ $(document).ready(function(){
     });
 
     $("#finaliza_compra").click(function(){
-        url = $(this).data('url');
-        dialogChangeQuantity(url);
+        url = $(this).data('urldestino');
+        $("#dialogModal").find("button").data('urldestino', url)
+        dialogChangeQuantity();
     });
 
     $("#btnFecharDialog2").on('click', function(){
@@ -71,8 +72,9 @@ $(document).ready(function(){
 
     $("#changeCartQuantity").click(function(){
         
-        urlDestino = $(this).data('url');
-        variacao_id = $(this).data('variacao')
+        urlDestino = $(this).data('urldestino');
+        variacao_id = $(this).data('variacao');
+        urlCarrinhoPost = $('#url-post-carrinho').val();
         $("#dialogModal").hide(); 
         $.ajax({
             type: "POST",
@@ -94,22 +96,23 @@ $(document).ready(function(){
         });
     });
     
-    function dialogChangeQuantity(urlDestino){
+    function dialogChangeQuantity(){
         
         if(isQuantidadeAlterada()){
             $('tr[data-quant]').each(function() {
-                var $row = $(this);
+                var $row    =   $(this);
                 var quantidadeOriginal = $row.data('quant');
                 var nomeProduto = $row.children('td.nome_produto').children('a').html();
-                quantidade             = $row.find('.quantidade').val();            
-                variacao_id            = $row.data('variacaoid');
+                var urlCarrinhoPost  = $('#url_carrinho_post').val();
+                var variacao_id      = $row.data('variacaoid');
+                quantidade          = $row.find('.quantidade').val();            
+                
                 $("#changeCartQuantity").data("variacao", variacao_id)
-                urlCarrinhoPost        = $(this).data('url');                
-    
+                        
                 if (quantidade != quantidadeOriginal) {
                     
                     quantidadeAlterada = true;
-                    $("#dialogModal").find('button').attr('data-url', urlDestino)
+                    //$("#dialogModal").find('button').attr('data-urldestino', urlDestino)
                     $("#dialogModal").children('div')
                                         .children('div')
                                         .children('div.modal-body')
@@ -120,7 +123,7 @@ $(document).ready(function(){
             });      
         }
         if(!isQuantidadeAlterada())
-            window.location.href = urlDestino;
+            window.location.href = $("#changeCartQuantity").data('urldestino');
     }
 
 });
