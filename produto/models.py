@@ -123,7 +123,7 @@ class SaidaProduto(models.Model):
 class Categoria(models.Model):
     nome = models.TextField(max_length=50, null=False)
     desativado = models.BooleanField(default=False)
-    datahora_criacao = models.DateTimeField()
+    datahora_criacao = models.DateTimeField(default=django.utils.timezone.now)
 
     def __str__(self):
         return self.nome
@@ -134,6 +134,12 @@ class AcessoProduto(models.Model):
     data = models.DateField(default=django.utils.timezone.now)
     hora = models.TimeField(default=django.utils.timezone.now)
     desativado = models.BooleanField(default=False)
+
+class AvisoProdutoDisponivel(models.Model):
+    variacao = models.ForeignKey(Variacao, on_delete=models.CASCADE, null=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
+    data = models.DateField(default=django.utils.timezone.now)
+    hora = models.TimeField(default=django.utils.timezone.now)
 
 class ProdutoMaisAcessado(models.Model):
     nome = models.CharField(max_length=200)
@@ -147,8 +153,6 @@ class ProdutoMaisAcessado(models.Model):
     class Meta:
         managed: False
 
-class AvisoProdutoDisponivel(models.Model):
-    variacao = models.ForeignKey(Variacao, on_delete=models.CASCADE, null=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
-    data = models.DateField(default=django.utils.timezone.now)
-    hora = models.TimeField(default=django.utils.timezone.now)
+class ProdutoCheckout(models.Model):
+    id_preco_stripe = models.CharField(max_length=50, blank=True, null=True)
+    quantidade = models.IntegerField()
