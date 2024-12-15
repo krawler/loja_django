@@ -216,7 +216,7 @@ class Login(View):
         if len(dict(carrinho_sessao)) > 0:
             return redirect('produto:carrinho')             
 
-        url_destino = self.request.session['url_destino']
+        url_destino = self.request.session.get('url_destino')
         if url_destino is not None:
             return redirect(url_destino)
         else:    
@@ -225,10 +225,8 @@ class Login(View):
 
 class Logout(View):
 
-    def get(self, *args, **kwargs):
-        
-        carrinho = self.request.session.get('carrinho')
-        
+    def get(self, *args, **kwargs):        
+        carrinho = self.request.session.get('carrinho')        
         logout(self.request)
         self.request.session.save()
         return redirect('produto:lista')
@@ -327,7 +325,7 @@ class Reset_password(View):
                             user.set_password(form.cleaned_data['new_password1'])
                             user.save()
                             PasswordResetCode.objects.filter(usuario=user).delete()
-                            messages.error(
+                            messages.success(
                                 self.request,
                                 'Sua senha foi alterada com sucesso, pode fazer o login'
                             )   
