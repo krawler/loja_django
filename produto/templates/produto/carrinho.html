@@ -77,12 +77,14 @@
 
 {% if carrinho.values %}
     <div class="row mt-3">
-        
+        <input type="hidden" 
+                name="url-post-carrinho" 
+                id="url-post-carrinho" 
+                value="{% url 'produto:carrinho' %}">
         <div class="col-lg mt-auto bottom_40pixel">
-            <button class="btn btn-lg btn-block btn-primary" 
+            <button class="btn btn-lg btn-block btn-primary"
                     id="continuar_comprando" 
-                    data-url="{% url 'produto:carrinho' %}"
-                    url-destino="{% url 'produto:lista' %}">
+                    data-urldestino="{% url 'produto:lista' %}">
                 Continuar comprando
             </button>    
         </div>  
@@ -90,7 +92,7 @@
             {% if request.user.is_authenticated %}
             <button class="btn btn-lg btn-block btn-primary" 
                 id="finaliza_compra" 
-                data-url="{% url 'produto:resumodacompra' %}">
+                data-urldestino="{% url 'produto:resumodacompra' %}">
                 Finalizar compra
             </button>
             {% else %}
@@ -144,7 +146,7 @@
                     </button>
                     <button type="button" 
                             class="btn btn-primary" 
-                            data-variacao=""
+                            data-urldestino="{% url 'produto:lista' %}"
                             id="changeCartQuantity">
                             Alterar
                     </button>
