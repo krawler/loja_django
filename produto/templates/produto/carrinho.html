@@ -52,7 +52,7 @@
                                     {% if item.preco_quantitativo_promocional %}
                                         {{ item.preco_quantitativo_promocional | formata_preco }}
                                     {% else %}
-                                        R$  {{ item.preco_quantitativo | formata_preco }}
+                                        {{ item.preco_quantitativo | formata_preco }}
                                     {% endif %}
                                 </span>    
                                 <a class="ml-3" href="{% url 'produto:removerdocarrinho' %}?vid={{item.variacao_id}}">
@@ -110,7 +110,7 @@
                     <tr>
                         <td class="text-right">
                         {% if request.session.carrinho %}  
-                            <p class="lead" style="font-size:1.75em">
+                            <p class="lead total_carrinho" style="font-size:1.75em">
                             {{request.session.carrinho|cart_total_preco|formata_preco}}
                             </p>
                         {% endif %}
