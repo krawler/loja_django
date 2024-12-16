@@ -2,6 +2,8 @@
 
 {% load omfilters %}
 
+{% load static %}
+
 {% block conteudo %}
 
 <meta name="csrf-token" content="{{ csrf_token }}">
@@ -96,9 +98,9 @@
 
 <div class="row">
     <div class="col-lg-6">
-        <div class="mt-5 mb-5">
+        <div class="mt-5 mb-5" id="descricao_longa">
             <h3>Descrição de {{produto.nome}}</h3>
-            {{produto.descricao_longa | linebreaks}}
+            {{produto.descricao_longa | linebreaks}}         
         </div>
     </div>
     <div class="col-lg-6">
@@ -132,68 +134,30 @@
 {% include 'parciais/_mais_acessados.html' %}
 
 <script src="https://cdn.rawgit.com/igorlino/elevatezoom-plus/1.1.6/src/jquery.ez-plus.js" type="text/javascript"></script>
+<script src="{% static 'assets/custom/js/detalhe_produto.js' %} "></script>
+
 <script>
-    $(document).ready(function(){
+$("#sim_produto_disponivel").click(function(){
 
-        $("#imagem_produto").ezPlus();    
+    id_variacao = {{ produto.variacao_set.first.id }};
 
-        estoques = JSON.parse($('#estoques_variacoes').val());
-        saldo_estoque = estoques[$("#select-variacoes").val()];
-        $("#saldo_estoque").html(saldo_estoque);
-        if(saldo_estoque === 0){
-            $("#pergunta_aviso_produto_disponivel").show();
-            $("#btnAdicionarCarrinho").addClass('disabled');
-        }    
-
-        dimensoesVariacoes = $('#dimensoes').val().replaceAll('\'', '"')
-        dimensoesVariacoes = JSON.parse(dimensoesVariacoes);
-
-        $("#select-variacoes").change(function(){
-            id_variacao = $(this).val();
-            if(estoques[id_variacao] === 0){
-                $("#pergunta_aviso_produto_disponivel").show();
-                $("#btnAdicionarCarrinho").addClass('disabled');
-            }else{
-                $("#btnAdicionarCarrinho").removeClass('disabled');
-                $("#pergunta_aviso_produto_disponivel").hide();
-            }
-
-            $("#saldo_estoque").html(estoques[id_variacao]);
-
-            for(dimensao in dimensoesVariacoes){
-                if(dimensoesVariacoes[dimensao].id == $("#select-variacoes").val()){
-                    $("#desc_largura").html(dimensoesVariacoes[dimensao].largura);
-                    $("#desc_comprimento").html(dimensoesVariacoes[dimensao].comprimento);
-                    $("#desc_altura").html(dimensoesVariacoes[dimensao].altura);
-                    $("#desc_peso").html(dimensoesVariacoes[dimensao].peso);
-                }
-                    
-            }
-        });
-
-        $("#sim_produto_disponivel").click(function(){
-
-            id_variacao = {{ produto.variacao_set.first.id }};
-
-            $.ajax({
-                type: "POST",
-                dataType: "json",
-                url: "{% url 'produto:detalhe' produto.slug %}",
-                data: {
-                    "id_variacao" : id_variacao,
-                    "csrfmiddlewaretoken": $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function(jsonData) { 
-                    if(jsonData=="True")
-                        return console.log("returned: " + jsonData);
-                }
-            });
-
-            $("#pergunta_aviso_produto_disponivel").html("Você receberá um email quando esse produto estiver disponível em estoque")
-
-        });
-
+    $.ajax({
+        type: "POST",
+        dataType: "json",
+        url: "{% url 'produto:detalhe' produto.slug %}",
+        data: {
+            "id_variacao" : id_variacao,
+            "csrfmiddlewaretoken": $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(jsonData) { 
+            if(jsonData=="True")
+                return console.log("returned: " + jsonData);
+        }
     });
+
+    $("#pergunta_aviso_produto_disponivel").html("Você receberá um email quando esse produto estiver disponível em estoque")
+
+});
 </script>
 
 {% endblock %}
