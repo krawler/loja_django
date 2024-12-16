@@ -111,7 +111,21 @@ class ProdutoService():
         for variacao in variacoes:
             saldos[variacao.id] = self.getEstoqueAtual(variacao.id)
         
-        return saldos    
+        return saldos 
+
+    def get_dimensoes_variacoes(self, produto):
+        dimensoes = []
+        variacoes = Variacao.objects.filter(produto=produto)
+        for variacao in variacoes:
+            dimensoes.append({
+                "id"  : variacao.id,
+                "peso" : variacao.peso,
+                "largura" : variacao.largura,
+                "comprimento" : variacao.comprimento,
+                "altura" : variacao.altura
+            })
+        
+        return dimensoes    
 
 
     def salvar_categoria(self, nome, id, ativo_menu):
