@@ -44,6 +44,11 @@
             }
             $("#id_categoria").val(row.attr('categoria_id'));
             $('#nome').val(nomecategoria_selecionado);
+            menu_ativo = ''+row.attr("ativo_menu")+'';
+            if(menu_ativo == "True")
+                $("#ativo_menu").attr('checked', true);
+            else
+                $("#ativo_menu").attr('checked', false);
         });  
 
     } );  
@@ -61,7 +66,7 @@
                 </thead>
                 <tbody>
                     {% for categoria in categorias %}
-                    <tr categoria_id="{{categoria.id}}">
+                    <tr categoria_id="{{categoria.id}}" ativo_menu="{{categoria.ativo_menu}}">
                         <td class="nome_categoria">{{categoria.nome}}</td>             
                     </tr>
                     {% endfor %}
@@ -78,6 +83,10 @@
                     <label for="nome">Nome</label>
                     <input type="text" name="nome" id="nome" 
                             placeholder="Nome da categoria" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="ativo_menu">Aparece no menu?</label>
+                    <input type="checkbox" name="ativo_menu" id="ativo_menu">
                 </div>
                 <button type="submit" class="btn btn-primary btn-block btn-lg">
                     Cadastrar
