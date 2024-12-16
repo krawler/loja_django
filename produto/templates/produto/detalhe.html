@@ -11,7 +11,10 @@
         <div class="row no-gutters">
             <div class="col-lg-12">
                 {% if produto.imagem %}
-                    <img class="img-fluid" src="{{ produto.imagem.url }}">
+                    <img class="img-fluid"
+                            id="imagem_produto"
+                            data-zoom-image="{{ produto.imagem.url }}" 
+                            src="{{ produto.imagem.url }}">
                 {% endif %}    
             </div>
         </div>
@@ -44,6 +47,8 @@
                 {% if produto.variacao_set %}
                     <input type="hidden" name="csrf_token" value="{{csrf_token}}">
                     <input type="hidden" id="estoques_variacoes" value="{{saldo_estoque_variacoes}}" />
+                    <input type="hidden" name="dimensoes" id="dimensoes" value="{{dimensoes}}">
+                    {{estoques}}
                     <div class="form-group">
                         <input type="number" id="quantidade" name="quantidade" value="1" 
                             class="form-control form-control-lg input_qtd">
@@ -102,19 +107,19 @@
             <div class="row">
                 <div class="col-lg-3">
                     <h6>Peso</h6>
-                    <p>{{produto.variacao_set.first.peso}}</p>
+                    <p id="desc_peso">{{produto.variacao_set.first.peso}}</p>
                 </div>
                 <div class="col-lg-3">
                     <h6>Largura</h6>
-                    <p>{{produto.variacao_set.first.largura}}</p>
+                    <p id="desc_largura">{{produto.variacao_set.first.largura}}</p>
                 </div>
                 <div class="col-lg-3">
                     <h6>Comprimento</h6>
-                    <p>{{produto.variacao_set.first.comprimento}}</p>
+                    <p id="desc_comprimento">{{produto.variacao_set.first.comprimento}}</p>
                 </div>
                 <div class="col-lg-3">
                     <h6>Altura</h6>
-                    <p>{{produto.variacao_set.first.altura}}</p>
+                    <p id="desc_altura">{{produto.variacao_set.first.altura}}</p>
                 </div>
             </div>
             <div class="row">
@@ -126,8 +131,11 @@
 
 {% include 'parciais/_mais_acessados.html' %}
 
+<script src="https://cdn.rawgit.com/igorlino/elevatezoom-plus/1.1.6/src/jquery.ez-plus.js" type="text/javascript"></script>
 <script>
     $(document).ready(function(){
+
+        $("#imagem_produto").ezPlus();    
 
         estoques = JSON.parse($('#estoques_variacoes').val());
         saldo_estoque = estoques[$("#select-variacoes").val()];
@@ -137,15 +145,30 @@
             $("#btnAdicionarCarrinho").addClass('disabled');
         }    
 
+        dimensoesVariacoes = $('#dimensoes').val().replaceAll('\'', '"')
+        dimensoesVariacoes = JSON.parse(dimensoesVariacoes);
+
         $("#select-variacoes").change(function(){
             id_variacao = $(this).val();
             if(estoques[id_variacao] === 0){
                 $("#pergunta_aviso_produto_disponivel").show();
-                $("#btnAdicionarCarrinho").addClass('disable');
-            }else
+                $("#btnAdicionarCarrinho").addClass('disabled');
+            }else{
+                $("#btnAdicionarCarrinho").removeClass('disabled');
                 $("#pergunta_aviso_produto_disponivel").hide();
+            }
 
             $("#saldo_estoque").html(estoques[id_variacao]);
+
+            for(dimensao in dimensoesVariacoes){
+                if(dimensoesVariacoes[dimensao].id == $("#select-variacoes").val()){
+                    $("#desc_largura").html(dimensoesVariacoes[dimensao].largura);
+                    $("#desc_comprimento").html(dimensoesVariacoes[dimensao].comprimento);
+                    $("#desc_altura").html(dimensoesVariacoes[dimensao].altura);
+                    $("#desc_peso").html(dimensoesVariacoes[dimensao].peso);
+                }
+                    
+            }
         });
 
         $("#sim_produto_disponivel").click(function(){
