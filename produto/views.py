@@ -80,14 +80,15 @@ class DetalheProduto(DispachProdutosMaisVendidos, DetailView):
                 ProdutoService().salvar_acesso_produto(user, kwargs['slug'])
             
             produto = Produto.objects.filter(slug=kwargs['slug']).first()
-            
+            dimensoes = ProdutoService().get_dimensoes_variacoes(produto)
             lista_estoque_variacoes = ProdutoService().get_saldo_estoque_variacoes(produto)
         
         context = { 
             'saldo_estoque_variacoes' : json.dumps(lista_estoque_variacoes),
             'produto'       : produto,
             'produtos_mais_vendidos' : self.produtos_mais_vendidos,
-            'categorias'       :  self.categorias
+            'categorias'       :  self.categorias,
+            'dimensoes' : dimensoes
         }
 
         return render(self.request, self.template_name, context)
