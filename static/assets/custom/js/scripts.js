@@ -18,6 +18,7 @@
         variation_preco.innerHTML = preco;
 
         if (variation_preco_promocional) {
+            preco_promocional = formata_preco(parseFloat(preco_promocional));
             variation_preco_promocional.innerHTML = preco_promocional;
         }
     })
