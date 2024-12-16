@@ -114,13 +114,15 @@ class ProdutoService():
         return saldos    
 
 
-    def salvar_categoria(self, nome, id):
+    def salvar_categoria(self, nome, id, ativo_menu):
         datahora_criacao = datetime.now()
         if id != None and id != '':
             categoria = Categoria.objects.filter(id=id).first()
             categoria.nome = nome
+            categoria.ativo_menu = ativo_menu
+            categoria.datahora_criacao = datahora_criacao
         else:    
-            categoria = Categoria(nome=nome, datahora_criacao=datahora_criacao)
+            categoria = Categoria(nome=nome, datahora_criacao=datahora_criacao, ativo_menu=ativo_menu)
         categoria.save()
 
 
