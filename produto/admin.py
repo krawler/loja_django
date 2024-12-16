@@ -1,11 +1,19 @@
 from django.contrib import admin
-from .models import Produto, Variacao
+from .models import Produto, Variacao, ImagemProduto
+
+class imagemItemInline(admin.TabularInline):
+    model = ImagemProduto
+    extra = 1  
 
 class VariacaoAdmin(admin.ModelAdmin):
     display_fields = ['nome','produto','preco','preco_promocional','estoque']
+    inlines = [
+        imagemItemInline
+    ] 
     list_filter = ('produto','estoque',)
-    search_fields = ('nome',)
-    
+    search_fields = ('nome',) 
+
+
 class ItemVariacaoInline(admin.TabularInline):
     model = Variacao
     extra = 1   
@@ -18,6 +26,7 @@ class ProdutoAdmin(admin.ModelAdmin):
     ]   
     list_filter = ('slug',) 
     search_fields = ('nome',)
+
 
 # Register your models here.
 admin.site.register(Produto, ProdutoAdmin)
