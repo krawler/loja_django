@@ -229,7 +229,8 @@ class Carrinho(DispachProdutosMaisVendidos, View):
         context = {
             'carrinho': self.request.session.get('carrinho'),
             'produtos_mais_vendidos': self.produtos_mais_vendidos,
-            'categorias': self.categorias
+            'categorias': self.categorias,
+            'produtos_autocomplete' : self.produtos_autocomplete
         }
         return render(self.request, 'produto/carrinho.html', context)
     
