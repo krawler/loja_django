@@ -124,7 +124,7 @@ class Categoria(models.Model):
     nome = models.TextField(max_length=50, null=False)
     desativado = models.BooleanField(default=False)
     datahora_criacao = models.DateTimeField(default=django.utils.timezone.now)
-
+    ativo_menu = models.BooleanField(default=True)
     def __str__(self):
         return self.nome
 
@@ -156,3 +156,6 @@ class ProdutoMaisAcessado(models.Model):
 class ProdutoCheckout(models.Model):
     id_preco_stripe = models.CharField(max_length=50, blank=True, null=True)
     quantidade = models.IntegerField()
+
+    class Meta:
+        managed: False
