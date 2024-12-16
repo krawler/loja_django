@@ -21,19 +21,23 @@
 
         <ul class="navbar-nav ml-auto">
             {% for categoria in categorias %}
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle active" href="#" id="navbarRelatorio" role="button"
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">             
-                        {{categoria.nome}}    
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    {% for produto in  categoria.produto_set.all  %}
-                    <a class="dropdown-item" href="{% url 'pedido:tabela' %}">
-                        {{produto.nome}}    
-                    </a>   
-                    {% endfor %}
-                </div>
-            </li>
+                {% if categoria.ativo_menu %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" id="navbarRelatorio" role="button"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">             
+                                {{categoria.nome}}    
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            {% for produto in  categoria.produto_set.all  %}
+                                {% if produto.imagem %}
+                                    <a class="dropdown-item" href="{% url 'produto:detalhe' produto.slug %}">
+                                        {{produto.nome}}    
+                                    </a>
+                                {% endif %}   
+                            {% endfor %}
+                        </div>
+                    </li>
+                {% endif %}
             {% endfor %}
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button"
