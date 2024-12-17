@@ -9,9 +9,9 @@ $("#imagem_produto").ezPlus({
     
 Fancybox.bind('[data-fancybox="gallery"]', {
             compact: false,
-            idle: false,
+            idle: true,
         
-            animated: true,
+            animated: false,
             showClass: false,
             hideClass: false,
         
@@ -23,20 +23,21 @@ Fancybox.bind('[data-fancybox="gallery"]', {
             },
         
             Toolbar: {
-            display: {
-                left: [],
-                middle: [],
-                right: ['close'],
-            },
+                display: {
+                    left: [],
+                    middle: [],
+                    right: ['close'],
+                },
             },
         
             Thumbs: {
-            type: 'classic',
-            Carousel: {
-                center: function () {
-                return this.contentDim > this.viewportDim;
+                type: 'classic',
+                Carousel: {
+                    center: function () {
+                        return this.contentDim > this.viewportDim;
+                    },
+                    Novigation: true
                 },
-            },
             },
         
             Carousel: {

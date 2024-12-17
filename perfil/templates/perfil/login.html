@@ -24,6 +24,7 @@
                     <input type="password" name="password" placeholder="Digite sua senha"
                            class="form-control" id="exampleInputPassword">
                 </div>
+                <input type="checkbox" class="form-check-inline mb-2" name="lembrarme" id="lembrarme" />  Lembrar-me
                 <button type="submit" id="btn_login_perfil" class="btn btn-primary btn-block btn-lg btn_login">
                     Entrar
                 </button>  
@@ -50,4 +51,25 @@
 {% endif %}
 
 </div>
+
+<script>
+    $(document).ready(function() {
+    // Verifica se o nome de usuário está armazenado
+    var username = localStorage.getItem('username');
+    if (username) {
+        $('#username').val(username);
+        $('#lembrarme').prop('checked', true);
+    }
+
+    // Evento para armazenar ou remover o nome de usuário
+    $('#lembrarme').change(function() {
+        if ($(this).is(':checked')) {
+            localStorage.setItem('username', $('#username').val());
+        } else {
+            localStorage.removeItem('username');
+        }
+    });
+});
+</script>
+
 {% endblock %}
