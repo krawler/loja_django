@@ -154,18 +154,16 @@ ul.errorlist li {
 
 .btn-add-cart{
     text-align: left;
-    padding-top: 60px;
+    padding-top: 10px;
 }
 
 .input_qtd{
-    float: left; 
-    width: 15%;
+    width: 85%;
     padding: 0.2rem 0.5rem;
 }
 
 .input_variacao{
-    float:right; 
-    width:75%
+    width:50%
 }
 
 .text-red-validation{
