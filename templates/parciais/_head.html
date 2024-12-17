@@ -5,39 +5,13 @@
 
 <link rel="stylesheet" href="{% static 'assets/bootstrap/css/bootstrap.css'%}" />
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css"/>
 <link rel="stylesheet" href="{% static 'assets/custom/css/style.css'%}" />
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
 
 <script src="{% static 'assets/custom/js/funcoes_pre_carregadas.js' %} "></script>
-<script>
-
-    function showDialogModalChangeQuantity(){
-        $("#continuar_comprando").on('click', function(e){
-        
-            e.preventDefault();    
-
-            $('#dialog').dialog({
-                    resizable: false,
-                    height: "auto",
-                    width: 400,
-                    modal: true,
-                    buttons: {
-                        "Mudar situação": function() {
-                            
-                                
-        
-                                $( this ).dialog( "close" );
-                        },
-                        Cancel: function() {                        
-                            $( this ).dialog( "close" );
-                        }
-                    }
-                });
-        });
-    }
-</script>
 
 {% if pagina_tabela %}
 
