@@ -1,5 +1,11 @@
 $(document).ready(function(){
 
+$("#imagem_produto").ezPlus({
+    zoomType: "inner",
+    cursor: "pointer",
+    zoomWindowFadeIn: 500,
+    zoomWindowFadeOut: 750
+}); 
     
 Fancybox.bind('[data-fancybox="gallery"]', {
             compact: false,
@@ -37,9 +43,7 @@ Fancybox.bind('[data-fancybox="gallery"]', {
             // Remove the navigation arrows
             Navigation: true,
             },
-        });     
-
-    $("#imagem_produto").ezPlus();    
+        });        
 
     $("#descricao_longa").find("p").addClass("lead");
     
