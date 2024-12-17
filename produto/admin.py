@@ -10,9 +10,6 @@ class VariacaoAdmin(admin.ModelAdmin):
     inlines = [
         imagemItemInline
     ] 
-    list_filter = ('produto','estoque',)
-    search_fields = ('nome',) 
-
 
 class ItemVariacaoInline(admin.TabularInline):
     model = Variacao
