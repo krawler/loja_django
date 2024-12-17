@@ -5,7 +5,7 @@ Fancybox.bind('[data-fancybox="gallery"]', {
             compact: false,
             idle: false,
         
-            animated: false,
+            animated: true,
             showClass: false,
             hideClass: false,
         
@@ -35,7 +35,7 @@ Fancybox.bind('[data-fancybox="gallery"]', {
         
             Carousel: {
             // Remove the navigation arrows
-            Navigation: false,
+            Navigation: true,
             },
         });     
 
