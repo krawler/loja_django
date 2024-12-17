@@ -63,10 +63,7 @@
                     <input type="hidden" name="csrf_token" value="{{csrf_token}}">
                     <input type="hidden" id="estoques_variacoes" value="{{saldo_estoque_variacoes}}" />
                     <input type="hidden" name="dimensoes" id="dimensoes" value="{{dimensoes}}">
-                    {{estoques}}
-                    <div class="form-group">
-                        <input type="number" id="quantidade" name="quantidade" value="1" 
-                            class="form-control form-control-lg input_qtd">
+                    <div class="form-group">        
                         <select id="select-variacoes" name="vid" 
                             class="form-control form-control-lg input_variacao">
                             
@@ -96,12 +93,22 @@
                     </div>
                 {% endif %}    
                 <div class="btn-add-cart">
-                    <button type="submit" class="btn btn-primary btn-lg btn-block" id="btnAdicionarCarrinho">
-                        <i class="fa fa-shopping-cart" aria-hidden="true"></i>
-                        Adicionar ao carrinho
-                    </button>
-                </div>
+                    <div class="row">
+                        <div class="col-lg-2">
+                            <input type="number" id="quantidade" name="quantidade" value="1" 
+                            class="form-control form-control-lg input_qtd">
+                        </div>
+                        <div class="col-lg-8">
+                            <button type="submit" class="btn btn-primary btn-lg btn-block" id="btnAdicionarCarrinho">
+                                <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                                Adicionar ao carrinho
+                            </button>
+                        </div>
+                        <div class="col-lg-2">
 
+                        </div>
+                    </div>               
+                </div>
             </form>
 
 
