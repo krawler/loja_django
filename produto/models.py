@@ -163,3 +163,4 @@ class ProdutoCheckout(models.Model):
 class ImagemProduto(models.Model):
     variacao = models.ForeignKey(Variacao, on_delete=models.CASCADE)
     imagem = models.ImageField(upload_to='produto_imagens/%Y/%m/', blank=False, null=False)
+    miniatura = models.ImageField(upload_to='produto_imagens/%Y/%m/miniaturas/', blank=False, null=False)
