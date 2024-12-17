@@ -158,12 +158,12 @@ ul.errorlist li {
 }
 
 .input_qtd{
-    width: 85%;
+    width: 100%;
     padding: 0.2rem 0.5rem;
 }
 
 .input_variacao{
-    width:50%
+    width:65%
 }
 
 .text-red-validation{
@@ -235,4 +235,8 @@ tbody > tr.selected > * {
 
 .table td{
     border-bottom: 1px solid #dee2e6;
+}
+
+.col-distancia-curta{
+    padding-left: 5px;
 }
