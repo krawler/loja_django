@@ -13,11 +13,24 @@
         <div class="row no-gutters">
             <div class="col-lg-12">
                 {% if produto.imagem %}
-                    <img class="img-fluid"
-                            id="imagem_produto"
-                            data-zoom-image="{{ produto.imagem.url }}" 
-                            src="{{ produto.imagem.url }}">
-                {% endif %}    
+                    <a data-fancybox="gallery" href="{{ produto.imagem.url }}">
+                        <img class="img-fluid"
+                                id="imagem_produto"
+                                data-zoom-image="{{ produto.imagem.url }}" 
+                                src="{{ produto.imagem.url }}">
+                    </a>        
+                {% endif %}
+                <div class="grid grid-cols-3 gap-4 max-w-xl mx-auto p-10 mt-2">
+                    {% for imagem in produto.variacao_set.last.imagemproduto_set.all %}
+                        
+                            <a data-fancybox="gallery" href="{{imagem.imagem.url}}">
+                                <img class="img-fluid rounded"
+                                            id="imagem_produto"
+                                            data-zoom-image="{{imagem.imagem}}" 
+                                            src="{{imagem.miniatura.url}}">
+                            </a>     
+                    {% endfor %} 
+                </div>       
             </div>
         </div>
     </div>
@@ -109,19 +122,19 @@
             <div class="row">
                 <div class="col-lg-3">
                     <h6>Peso</h6>
-                    <p id="desc_peso">{{produto.variacao_set.first.peso}}</p>
+                    <p id="desc_peso" class="lead">{{produto.variacao_set.first.peso}}</p>
                 </div>
                 <div class="col-lg-3">
                     <h6>Largura</h6>
-                    <p id="desc_largura">{{produto.variacao_set.first.largura}}</p>
+                    <p id="desc_largura" class="lead">{{produto.variacao_set.first.largura}}</p>
                 </div>
                 <div class="col-lg-3">
                     <h6>Comprimento</h6>
-                    <p id="desc_comprimento">{{produto.variacao_set.first.comprimento}}</p>
+                    <p id="desc_comprimento" class="lead">{{produto.variacao_set.first.comprimento}}</p>
                 </div>
                 <div class="col-lg-3">
                     <h6>Altura</h6>
-                    <p id="desc_altura">{{produto.variacao_set.first.altura}}</p>
+                    <p id="desc_altura" class="lead">{{produto.variacao_set.first.altura}}</p>
                 </div>
             </div>
             <div class="row">
@@ -133,6 +146,7 @@
 
 {% include 'parciais/_mais_acessados.html' %}
 
+<script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
 <script src="https://cdn.rawgit.com/igorlino/elevatezoom-plus/1.1.6/src/jquery.ez-plus.js" type="text/javascript"></script>
 <script src="{% static 'assets/custom/js/detalhe_produto.js' %} "></script>
 
