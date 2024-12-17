@@ -1,5 +1,7 @@
 $(document).ready(function(){
 
+    Fancybox.bind("[data-fancybox]", {});      
+
     $("#imagem_produto").ezPlus();    
 
     $("#descricao_longa").find("p").addClass("lead");
