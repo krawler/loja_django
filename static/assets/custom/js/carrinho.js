@@ -121,6 +121,15 @@ $(document).ready(function(){
                 var variacao_id      = $row.data('variacaoid');
                 quantidade          = $row.find('.quantidade').val();            
                 
+                if(quantidade < 1){
+                    $("#dialogModal").children('div')
+                                    .children('div')
+                                    .children('div.modal-body')
+                                    .html('Não é possível adicionar produto com quantidade abaixo de 1');
+                    $("#dialogModal").show();                
+                    return false;
+                }
+
                 $("#changeCartQuantity").data("variacao", variacao_id)
                         
                 if (quantidade != quantidadeOriginal) {
