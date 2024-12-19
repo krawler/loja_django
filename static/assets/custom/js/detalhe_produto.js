@@ -1,5 +1,7 @@
 $(document).ready(function(){
 
+$("#descricao_longa").find("p").addClass("lead");
+
 $("#imagem_produto").ezPlus({
     zoomType: "inner",
     cursor: "pointer",
@@ -7,46 +9,20 @@ $("#imagem_produto").ezPlus({
     zoomWindowFadeOut: 750
 }); 
     
-Fancybox.bind('[data-fancybox="gallery"]', {
-            compact: false,
-            idle: true,
+Fancybox.bind('[data-fancybox="gallery"]', {}); 
+    
+    $(".imagem_variacao").hover(function(){
+        $("#imagem_produto").removeData('elevateZoom');
+        $("#imagem_produto").attr("src", $(this).attr("data-zoom-image"));
+        $("#imagem_produto").data("zoom-image", $(this).attr("data-zoom-image"));
+        $("#imagem_produto").ezPlus({
+            zoomType: "inner",
+            cursor: "pointer",
+            zoomWindowFadeIn: 500,
+            zoomWindowFadeOut: 750
+        }); 
         
-            animated: false,
-            showClass: false,
-            hideClass: false,
-        
-            dragToClose: false,
-        
-            Images: {
-            // Disable animation from/to thumbnail on start/close
-            zoom: false,
-            },
-        
-            Toolbar: {
-                display: {
-                    left: [],
-                    middle: [],
-                    right: ['close'],
-                },
-            },
-        
-            Thumbs: {
-                type: 'classic',
-                Carousel: {
-                    center: function () {
-                        return this.contentDim > this.viewportDim;
-                    },
-                    Novigation: true
-                },
-            },
-        
-            Carousel: {
-            // Remove the navigation arrows
-            Navigation: true,
-            },
-        });        
-
-    $("#descricao_longa").find("p").addClass("lead");
+    });
     
     estoques = JSON.parse($('#estoques_variacoes').val());
     saldo_estoque = estoques[$("#select-variacoes").val()];
