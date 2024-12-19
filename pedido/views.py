@@ -23,6 +23,8 @@ class DispachLoginRequired(View):
     def dispatch(self, *args, **kwargs):
         if not self.request.user.is_authenticated:
             return redirect("perfil:login")
+
+        self.produtos_autocomplete = ProdutoService().get_all_product_names()    
     
         return super().dispatch(*args, **kwargs)
     
@@ -46,21 +48,6 @@ class Pagar(DispachLoginRequired, View):
                 'price': Variacao.objects.get(id=item[0]).id_preco_stripe,
                 'quantity': item[1]['quantidade']
             })
-
-
-        """   
-        for variacao in variacoes:
-            line_items.append({
-                'price': variacao.id_preco_stripe,
-                'quantity': 1
-            }) 
-        shipping_rate = stripe.ShippingRate.create(
-                            display_name="Ground shipping",
-                            type="calculate",
-                            fixed_amount={"amount": "500", "currency": "usd"},
-        )
-        shipping_rates = [shipping_rate]
-        """
         try:
             checkout_session = stripe.checkout.Session.create(
                 line_items=line_items,
@@ -73,7 +60,7 @@ class Pagar(DispachLoginRequired, View):
             return str(e)
 
         return redirect(checkout_session.url, code=303)
- 
+
     def get(self, *args, **kwargs):
 
         carrinho = self.request.session.get('carrinho')
@@ -121,8 +108,6 @@ class Pagar(DispachLoginRequired, View):
                 return redirect('produto:carrinho')
         
         return self.create_checkout_session(carrinho, bd_variacoes)
-        #user = self.request.user
-        #return pedido_service.Pedido_Service().checkout_pagseguro(user, bd_variacoes)
 
 class SalvarPedido(View):    
     
@@ -163,7 +148,6 @@ class SalvarPedido(View):
                         hora_emissao=datetime.now())   
         pedido.save()
         
-         
         ItemPedido.objects.bulk_create([
             ItemPedido(
                 pedido=pedido,
@@ -189,10 +173,13 @@ class SalvarPedido(View):
         del self.request.session['carrinho']
         ProdutoService().limpa_session_carrinho_user(self.request.user)
         self.request.session['pedido_id'] = pedido.id 
-        return redirect('pedido:compraconcluida')        
+
+        return pedido_service.Pedido_Service().checkout_pagseguro( self.request, carrinho, pedido.id)
+
+        ##return redirect('pedido:compraconcluida')        
         
 
-class CompraConcluida(View):
+class CompraConcluida(DispachLoginRequired, View):
     
     def get(self, *args, **kwargs):
         pedido_id =  self.request.session.get('pedido_id')   
@@ -200,11 +187,19 @@ class CompraConcluida(View):
         produtos_mais_vendidos = ProdutoService().get_produtos_mais_vendidos()
         contexto = {                   
                     'pedido': pedido, 
-                    'produtos_mais_vendidos': produtos_mais_vendidos
-                   }       
+                    'produtos_mais_vendidos': produtos_mais_vendidos,
+                    'produtos_autocomplete' : self.produtos_autocomplete
+                    }       
         py_email = PyEmail(pedido.usuario.email)
         py_email.set_body(username=self.request.user, nro_pedido=pedido_id, request=self.request)
         py_email.enviar()
+        return render(self.request, 'pedido/compraconcluida.html', contexto)
+
+    def post(self, *args, **kwargs):
+        notification_code = self.request.POST.get('notificationCode')
+        pg = PagSeguro(email="seuemail@dominio.com", token="ABCDEFGHIJKLMNO")
+        notification_data = pg.check_notification(notification_code)
+        print(notification_data)
         return render(self.request, 'pedido/compraconcluida.html', contexto)
     
 class MeusPedidos(DispachLoginRequired, ListView):  
