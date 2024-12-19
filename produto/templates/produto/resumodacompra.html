@@ -61,6 +61,7 @@
         </p>
     </div>
 </div>
+
 <div class="row mt-3">
     <div class="col">
         <p class="lead">Opções de fretes</p>
@@ -79,11 +80,28 @@
     </div>
 </div>
 
-<a href="{% url 'pedido:pagar' %}" class="btn btn-primary btn-block btn-lg">
+<a href="{% url 'pedido:salvarpedido' %}" class="btn btn-primary btn-block btn-lg">
     Realizar pedido e pagar
 </a>
 
+<div id="wallet_container" data-id="{{preference.id}}"></div>
+
 {% include 'parciais/_mais_acessados.html' %}
+
+<script>    
+    const mp = new MercadoPago('APP_USR-5be3b699-2727-4257-a722-9cf2af55646b');
+    const bricksBuilder = mp.bricks();
+    mp.bricks().create("wallet", "wallet_container", {
+                    initialization: {
+                        preferenceId: $("#wallet_container").data("id"),
+                    },
+                    customization: {
+                        texts: {
+                        valueProp: 'smart_option',
+                        },
+                    },
+                });
+</script>
 
 <script src="{% static 'assets/custom/js/resumo_compra.js' %}"></script>
 
