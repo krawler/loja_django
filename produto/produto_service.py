@@ -212,4 +212,19 @@ class ProdutoService():
 
     def get_all_categorias(self):
         categorias = Categoria.objects.all()
-        return categorias    
+        return categorias
+
+
+    def create_preference_mercadopago(self, carrinho):
+        items= []
+        for item in carrinho.values():
+            nome = item["produto_nome"] + ' - ' + item["variacao_nome"]
+            preco = item["preco_unitario"] if item["preco_unitario_promocional"] is None else item["preco_unitario_promocional"] 
+            items.append({"title": nome, "quantity": item["quantidade"], "unit_price": preco})
+        
+        preference_data = {         
+
+            "items": items
+        }
+
+        return preference_data
