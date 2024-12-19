@@ -20,6 +20,7 @@
                                 src="{{ produto.imagem.url }}">
                     </a>        
                 {% endif %}
+        
                 <div class="grid grid-cols-3 gap-4 max-w-xl mx-auto p-10 mt-2">
                     {% for imagem in produto.variacao_set.last.imagemproduto_set.all %}
                         
@@ -30,6 +31,7 @@
                             </a>     
                     {% endfor %} 
                 </div>       
+
             </div>
         </div>
     </div>
@@ -161,18 +163,6 @@
 
 <script>
 
-$(".imagem_variacao").hover(function(){
-    $("#imagem_produto").removeData('elevateZoom');
-    $("#imagem_produto").attr("src", $(this).attr("data-zoom-image"));
-    $("#imagem_produto").data("zoom-image", $(this).attr("data-zoom-image"));
-    $("#imagem_produto").ezPlus({
-        zoomType: "inner",
-        cursor: "pointer",
-        zoomWindowFadeIn: 500,
-        zoomWindowFadeOut: 750
-    }); 
-    
-});
 
 $("#sim_produto_disponivel").click(function(){
 
