@@ -14,6 +14,7 @@ from pedido.models import ItemPedido
 from .serializers import VariacaoSerializer
 import json
 import requests
+import mercadopago
 
 class DispachLoginRequired(View):
     
@@ -252,6 +253,8 @@ class ResumoDaCompra(DispachProdutosMaisVendidos, View):
     #verificar validate do token, transferir para arquivo
     bearer_token = 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiZWU4OWMyMmE1ZTIyNjlmNWQyOTA1MzJiMzVjYzY2ZjMyY2FlMDIyZDM1OGEwMDFmMTNhZGViZTNjN2VjYzBmY2IxNDM1NzAzMDI4MjgxMTMiLCJpYXQiOjE3MTkwMTAzMTIuOTA1NjI3LCJuYmYiOjE3MTkwMTAzMTIuOTA1NjI5LCJleHAiOjE3NTA1NDYzMTIuODkxMDIzLCJzdWIiOiI5YzU3YzA5NS0wZTVhLTRmODEtYjlhOC0yYmM4ZTAzZDI4NzciLCJzY29wZXMiOlsic2hpcHBpbmctY2FsY3VsYXRlIiwiZWNvbW1lcmNlLXNoaXBwaW5nIl19.ZlVxabpqdJe8K_PYL9bo0MaElGo9YwxCCCEaPsA5GLOW_q82syoirhkLUsHg82DZUvLVeJH5W8jGAWyqAp8VxOc22YL-3rLLKiFTLQvsapO1vS9j6C9YXXQx0PXzkvBIknIri--1L5lpaRR9nPj3bp_OQULIOsnYkzI2aJ8H8OQ5XA3HT-b7lEqMOoyrpZbHGNtHXaOYL0NWyFb9Bft2Nbez10oRy5uEPm9svUj6RruLjbRMFIIBkGkdqjpSMtcAwCJCQm8OyDgdLxA16YseXkx6Gc32FkiuB_gaORxw_LckOIgO6z4f15PMkytB_MGsHDT7sIv6pXyd9d11qu_aXjHEXxcWuJ_4QszDmKnfXRQ8JJ4JYmw6F2W18sJSynuaSId2te8Sh3gBIkb-wCUC2e89uYXf33eI40SZ0cIgIHqJ4xd11qWtS-I7TzdDjWWPOILf2wdRwXNwiHr5QVsBIm0eoqmud65I9ttIKL9JTQ_JlT0E0f-4iLV392_LabJ8R9ikQq03AC5JwlhEcg3fogIITWLs3K6MNlxcPooVpSmr97u-1fmuDk_naE2mzCwS_4nI8N3QyufO4q-Vzfi6xEYsvsVhtyufU0sJRq3X9DgwJtupip2VGwmfoLoXmrAEXnCNKwdfdNj9T1ePzVMkWSWWM2wnYsrpLbQLkpNVIOg'
     
+    sdk = mercadopago.SDK('APP_USR-5076726799470930-121821-0e8bf1f523409c5afc78c3e96567f972-2162903807')
+
     def get_lista_frete_melhorenvio(self, perfil):
         
         url = 'https://melhorenvio.com.br/api/v2/me/shipment/calculate'
@@ -293,7 +296,12 @@ class ResumoDaCompra(DispachProdutosMaisVendidos, View):
 
     
     def get(self, *args, **kwargs):
-        
+
+        carrinho = self.request.session.get('carrinho')
+        preference_data = ProdutoService().create_preference_mercadopago(carrinho)
+        preference_response = self.sdk.preference().create(preference_data)
+        preference = preference_response["response"] 
+
         if not self.request.user.is_authenticated:
             return redirect('perfil:login')
         
@@ -317,7 +325,8 @@ class ResumoDaCompra(DispachProdutosMaisVendidos, View):
             'perfil': perfil,
             'fretes': fretes,
             'produtos_mais_vendidos': ProdutoService().get_produtos_mais_vendidos(),
-            'categorias': self.categorias
+            'categorias': self.categorias,
+            'preference' : preference
         }
         return render(self.request, 'produto/resumodacompra.html', contexto)
 
