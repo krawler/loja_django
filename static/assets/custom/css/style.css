@@ -11,6 +11,11 @@
     font-size: 1.5rem;
 }
 
+.product-old-price_footer {
+    text-decoration: line-through;
+    font-size: 1.3rem;
+}
+
 .product-price_footer{
     font-size: 1.5rem;
 }
