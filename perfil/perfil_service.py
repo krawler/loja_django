@@ -11,8 +11,17 @@ from datetime import datetime, timedelta
 from perfil.templates.email.py_email import PyEmail
 import random
 import string
+import re
 
 class PerfilService():
+
+    def validar_email(self, email):
+        regex = r'\S+@\S+\.\S+'
+        # Verifica se a string corresponde ao padrão
+        if re.match(regex, email):
+            return True
+        else:
+            return False
 
     def password_reset(self, form, request):
 
