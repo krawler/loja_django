@@ -240,3 +240,64 @@ tbody > tr.selected > * {
 .col-distancia-curta{
     padding-left: 5px;
 }
+
+.card-columns .card{
+    width:90%;
+} 
+
+/*Waltzerjs*/
+.outerWrapper {
+	text-align: center;
+	position:relative;
+	margin:40px 0 40px 0;
+	width:1100px;
+}
+
+.item {
+	float:left;
+	margin-right:18px;
+    margin-left:18px;
+	width:232px;
+	padding:0px;
+	height:420px;
+}
+
+.item div {
+	width:99%;
+	height:99%;
+	text-align:center;
+	line-height: 22px;
+	font-size:60px;
+}
+
+.left-nav-btn, .right-nav-btn {
+	position:absolute;
+	width:37px;
+	height:37px;
+	top:80px;
+	cursor:pointer;
+	opacity: 0.8;
+	background:transparent url('../images/arrows.png') top left no-repeat;
+	-webkit-transition:opacity 0.2s linear;
+  	-moz-transition:opacity 0.2s linear;
+  	-o-transition:opacity 0.2s linear;
+  	transition:opacity 0.2s linear;
+}
+
+.left-nav-btn {
+	left:-80px;
+}
+
+.right-nav-btn {
+	right:-80px;
+	background-position: top right;
+}
+
+.left-nav-btn:hover, .right-nav-btn:hover {
+	opacity: 1;
+}
+
+.descricao_produto_rodape{
+    font-size:1rem;
+    font-weight:300;
+}
