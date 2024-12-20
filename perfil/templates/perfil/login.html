@@ -15,7 +15,7 @@
             <form method="POST" action="{% url 'perfil:login' %}">
                 {% csrf_token %}
                 <div class="form-group">
-                    <label for="InputUsuario">Usuário</label>
+                    <label for="InputUsuario">Email ou nome de usuário</label>
                     <input type="text" name="username" id="username" placeholder="Digite seu usuário"
                            class="form-control" aria-describedby="usuarioHelp">
                 </div>
