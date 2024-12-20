@@ -181,6 +181,9 @@ class Login(View):
             )
             return redirect('perfil:criar')
         
+        if PerfilService().validar_email(username):
+            username = str(username).split('@')[0]
+        
         usuario = authenticate(self.request, username=username, password=password)
         
         if not usuario:
