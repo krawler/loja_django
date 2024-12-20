@@ -51,8 +51,13 @@ class ListaProdutos(DispachProdutosMaisVendidos, ListView):
     template_name = 'produto/lista.html' 
 
     def get(self, *args, **kwargs):
-        produtos = Produto.objects.filter(imagem__isnull=False).order_by('?')
         page = self.request.GET.get('page', 1)
+        termo = self.request.GET.get('termo') #or self.request.session.get('termo')
+        if termo is not None and termo != '':
+            #self.request.session['termo'] = termo
+            produtos = Produto.objects.filter(imagem__isnull=False).filter(Q(nome__icontains=termo) | Q(descricao__icontains=termo) | Q(descricao_longa__icontains=termo)).order_by('?')[:9]
+        else:
+            produtos = Produto.objects.filter(imagem__isnull=False).order_by('?')[:9]
         paginator = Paginator(produtos, per_page=4,allow_empty_first_page=True)
         page_object = paginator.get_page(page)
 
@@ -255,6 +260,7 @@ class ResumoDaCompra(DispachProdutosMaisVendidos, View):
     
     sdk = mercadopago.SDK('APP_USR-5076726799470930-121821-0e8bf1f523409c5afc78c3e96567f972-2162903807')
 
+    #TODO: Mover para produto_service
     def get_lista_frete_melhorenvio(self, perfil):
         
         url = 'https://melhorenvio.com.br/api/v2/me/shipment/calculate'
@@ -324,7 +330,7 @@ class ResumoDaCompra(DispachProdutosMaisVendidos, View):
             'carrinho': self.request.session['carrinho'],
             'perfil': perfil,
             'fretes': fretes,
-            'produtos_mais_vendidos': ProdutoService().get_produtos_mais_vendidos(),
+            'produtos_mais_vendidos': self.produtos_mais_vendidos,
             'categorias': self.categorias,
             'preference' : preference
         }
