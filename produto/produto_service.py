@@ -159,14 +159,15 @@ class ProdutoService():
             return
         with connection.cursor() as cursor:
             str_sql = """
-                        SELECT p.nome, p.descricao, p.imagem, p.slug, p.preco_marketing, 
-                        p.preco_marketing_promocional, COUNT(ap.id) AS total_acessos
+                        SELECT p.nome, p.descricao, p.imagem, p.slug, v.preco, v.preco_promocional, 
+                        COUNT(ap.id) AS total_acessos                        
                         FROM produto_acessoproduto ap
                         INNER JOIN produto_produto p ON ap.produto_id = p.id
+                        INNER  JOIN produto_variacao v ON p.id = v.produto_id  
                         WHERE ap.user_id = %s
                         GROUP BY p.id
                         ORDER BY total_acessos DESC
-                        LIMIT 4;
+                        LIMIT 9
                         """
             cursor.execute(str_sql, [user.id])
 
