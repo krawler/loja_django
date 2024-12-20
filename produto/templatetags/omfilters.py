@@ -54,6 +54,25 @@ def cart_total_preco(carrinho):
         ]
     ) 
 
+@register.filter
+def resumir_texto(texto, max_caracteres=80):
+
+    if len(texto) <= max_caracteres:
+        return texto
+
+    palavras = texto.split()
+    resumo = []
+    contador = 0
+
+    for palavra in palavras:
+        if contador + len(palavra) + 1 <= max_caracteres:
+            resumo.append(palavra)
+            contador += len(palavra) + 1
+        else:
+            break
+
+    return ' '.join(resumo) + '...'
+
 
 @register.filter
 def get_status_extenso(val):
