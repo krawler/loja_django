@@ -74,11 +74,10 @@ class Pedido_Service():
 
         user = request.user
         perfil = user.perfilusuario
-        config = {'sandbox': True}
+        config = {'sandbox': False}
         pg = PagSeguro(email="august.rafael@gmail.com", token="9d724eb2-b076-4ec6-a3f6-2eb62e3be240f701023145f0bcf5fcf389ad5ee0602f587c-7946-4635-be65-30827c01c169", config=config)        
         try:
             pg.reference = id_pedido
-            '''
             pg.sender = {
                 "name": "Iza Marina Viccino",
                 "area_code": "14",
@@ -96,7 +95,6 @@ class Pedido_Service():
                 "state": perfil.estado,
                 "country": "BRA"
             }
-            '''
             for item in carrinho:
                 variacao = Variacao.objects.get(id=item) 
                 pg.items.append(
