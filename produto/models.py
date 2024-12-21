@@ -5,6 +5,8 @@ from datetime import datetime
 from PIL import Image
 from django.utils import timezone
 from django.utils.text import slugify 
+from django.utils.functional import cached_property
+from urllib.parse import urljoin
 import os
 import django
 
@@ -25,7 +27,43 @@ class Produto(models.Model):
         )
     ),
     categoria = models.ForeignKey('produto.Categoria', on_delete=models.CASCADE)
+    
+    @cached_property
+    def miniatura_media(self):
+        if self.imagem:
+            return self.get_thumbnail_url(300)
+        return None
 
+    @cached_property
+    def miniatura_grande(self):
+        if self.imagem:
+            return self.get_thumbnail_url(600)
+        return None
+
+    def get_thumbnail_url(self, size):
+        if not self.imagem:
+            return None
+        # Construir o caminho completo da imagem original
+        img_path = self.imagem.path
+        img_path = img_path + '/' + size
+
+        # Criar o nome do arquivo da miniatura
+        base, ext = os.path.splitext(img_path)
+        thumbnail_name = f"{base}_{size}{ext}"
+
+        # Verificar se a miniatura já existe no cache
+        if os.path.exists(thumbnail_name):
+            thumbnail_name = ProdutoMaisAcessado.convert_path_to_url(path=thumbnail_name)
+            return thumbnail_name
+
+        # Criar a miniatura
+        img = Image.open(img_path)
+        img.thumbnail((size, size))
+        img.save(thumbnail_name, quality=95)
+        thumbnail_name = ProdutoMaisAcessado.convert_path_to_url(path=thumbnail_name) 
+        
+        return thumbnail_name
+        
     @staticmethod
     def resize(img, new_width=800):
         img_full_path = os.path.join(settings.MEDIA_ROOT, img.name)
@@ -149,6 +187,21 @@ class ProdutoMaisAcessado(models.Model):
     preco = models.FloatField()
     preco_promocional = models.FloatField(default=0)
     total_acessos = models.IntegerField()
+    
+    @cached_property
+    def miniatura_pequena(self): 
+        if self.imagem:
+            return Produto.get_thumbnail_url(self, 300)
+        return None
+
+    def convert_path_to_url(path): 
+        # Defina a URL base do seu servidor 
+        base_url = "http://localhost:8000/produto_imagens/" 
+        # Extraia o caminho relativo da imagem 
+        relative_path = os.path.relpath(path, start="C:\\Users\\Usuario\\projects\\python\\loja_django\\produto_imagens") 
+        # Converta o caminho relativo para uma URL 
+        url = urljoin(base_url, relative_path.replace("\\", "/")) 
+        return url
 
     class Meta:
         managed: False
@@ -159,6 +212,8 @@ class ProdutoCheckout(models.Model):
 
     class Meta:
         managed: False
+    
+
 
 class ImagemProduto(models.Model):
     variacao = models.ForeignKey(Variacao, on_delete=models.CASCADE)
