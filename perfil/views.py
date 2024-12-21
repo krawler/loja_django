@@ -19,7 +19,8 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 import copy
 import json
 import random
-import string
+import string    
+
 
 class BasePerfil(View):
     
@@ -124,7 +125,12 @@ class Criar(BasePerfil):
                     login(self.request, user=usuario)
         
         self.request.session['carrinho'] = self.carrinho
-        self.request.session.save()       
+        self.request.session.save()      
+        msg = 'Seu cadastro foi atualizado com sucesso'  
+        messages.success(self.request, msg)  
+
+        if self.request.session.get('url_destino') is not None:
+            return redirect(self.request.session['url_destino'])
 
         return redirect('perfil:cadastro_concluido')
             
@@ -155,6 +161,9 @@ class Atualizar(Criar):
     def get(self, *args, **kwargs):
         if not self.request.user.is_authenticated:
             return redirect('perfil:login')
+
+        url = self.request.GET.get('url')
+        self.request.session['url_destino'] = url   
         
         return self.renderizar    
 
@@ -354,3 +363,30 @@ class Reset_password(View):
         except Exception as e:
             print(e)
             return render(self.request, 'perfil/reset_password.html', {'error': f'Ocorreu um erro.'})
+
+class ListaDesejoProduto(View):
+
+    def post(self, *args, **kwargs):
+        adiciona = self.request.POST.get("adiciona")
+        id_produto = self.request.POST.get("id_produto")
+        user = self.request.user
+        return PerfilService().adiciona_remove_lista_desejos(user=user, adiciona=adiciona, id_produto=id_produto)
+            
+    def get(self, *args, **kwargs):
+        template_name = 'produto/lista.html' 
+
+    def get(self, *args, **kwargs):
+        page = self.request.GET.get('page', 1)
+        produtos = Produto.objects.filter(imagem__isnull=False).order_by('?')[:9]
+        paginator = Paginator(produtos, per_page=4,allow_empty_first_page=True)
+        page_object = paginator.get_page(page)
+
+        context = {
+            'produtos': produtos,
+            'produtos_mais_vendidos': ProdutoService().get_produtos_mais_acessados_por_geral(),
+            'produtos_autocomplete' : ProdutoService().get_all_product_names(),
+            'categorias' : ProdutoService().get_all_categorias(),  
+            "page_obj": page_object,
+            "is_paginated": True
+        }
+        return render(self.request, self.template_name, context)
