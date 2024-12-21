@@ -39,10 +39,13 @@
 </div>
 {%  endif %}
 <script>
-    $("#carousel_slider_rodape").waltzer({
-        auto:true,
-        autoPause: 7000,
-        scroll:1,
-        speed:100, 
+    $ = jQuery
+    $(document).ready(function(){
+        $("#carousel_slider_rodape").waltzer({
+            auto:true,
+            autoPause: 7000,
+            scroll:1,
+            speed:100, 
+        });
     });
 </script>
