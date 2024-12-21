@@ -1,3 +1,4 @@
+from produto.models import Produto
 from django.db import models
 from django.contrib.auth.models import User
 from django.forms import ValidationError
@@ -66,3 +67,9 @@ class PasswordResetCode(models.Model):
     codigo = models.CharField(max_length=50, unique=True)
     criado_em = models.DateTimeField(auto_now_add=True)
     token = models.CharField(max_length=50, unique=False)
+
+class ListaDesejoProduto(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
+    adicionado_em = models.DateTimeField(auto_now_add=True)
+    desativado = models.BooleanField(default=False)
