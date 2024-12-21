@@ -14,7 +14,7 @@
             <div class="card mt-4">
                 {% if produto.imagem %}
                   <a href="{% url 'produto:detalhe'  produto.slug %}">  
-                    <img class="card-img-top" src="{{ produto.imagem.url }}" alt="Card image cap">
+                    <img class="card-img-top" src="{{ produto.miniatura_media }}" alt="Card image cap">
                   </a>
                 {% endif %} 
 
