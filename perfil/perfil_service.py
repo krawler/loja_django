@@ -1,6 +1,9 @@
-from .models import PasswordResetCode
+from .models import PasswordResetCode, ListaDesejoProduto
+from produto.models import Produto
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
+from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 from django.shortcuts import redirect, reverse, render
 from django.template.loader import render_to_string
@@ -24,6 +27,7 @@ class PerfilService():
             return False
 
     def password_reset(self, form, request):
+
 
         if form.is_valid():
             email = form.cleaned_data['email']
@@ -72,3 +76,20 @@ class PerfilService():
                 'Email não foi informado ou está inválido'
             )
             return render(request, 'perfil/password_reset.html', {'form': form})  
+
+    def adiciona_remove_lista_desejos(self, adiciona, id_produto, user):
+        try:
+            try:
+                produto = Produto.objects.get(id=id_produto)
+                item_lista_desejo = ListaDesejoProduto.objects.filter(produto=produto,usuario=user).last();
+                if item_lista_desejo is None:
+                    item_lista_desejo = ListaDesejoProduto(produto=produto, usuario=user, desativado=not adiciona)
+                    item_lista_desejo.save()
+                else:
+                    item_lista_desejo.desativado = not adiciona == "true"   
+                    item_lista_desejo.save()  
+                return HttpResponse("Produto adicionado.", status=200)   
+            except ObjectDoesNotExist as obj_notfounf:
+                return HttpResponse("Produto não encontrado.", status=404)        
+        except Exception as global_except:
+            return HttpResponse("Produto não encontrado.", status=404)            
