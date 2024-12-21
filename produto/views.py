@@ -153,6 +153,14 @@ class AdicionarCarrinho(View):
             
         carrinho = self.request.session['carrinho']  
 
+        for item in carrinho:
+            if carrinho.get(item).get("quantidade") < 1:
+                messages.error(
+                    self.request,
+                    'Algum item no carrinho tem quantidade abaixo de 1'
+                )
+                return redirect('produto:carrinho')
+
         if variacao_id in carrinho:
             quantidade_carrinho = int(carrinho[variacao_id]['quantidade'])
             quantidade_carrinho += quantidade
@@ -324,6 +332,14 @@ class ResumoDaCompra(DispachProdutosMaisVendidos, View):
         print(payment)
         """
         carrinho = self.request.session.get('carrinho')
+        for item in carrinho:
+            if int(carrinho.get(item).get("quantidade")) < 1:
+                messages.error(
+                    self.request,
+                    'Algum item no carrinho tem quantidade abaixo de 1'
+                )
+                return redirect('produto:carrinho')
+
         preference_data = ProdutoService().create_preference_mercadopago(carrinho)
         preference_response = self.sdk.preference().create(preference_data)
         preference = preference_response["response"] 
