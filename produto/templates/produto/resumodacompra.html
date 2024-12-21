@@ -89,15 +89,15 @@
 {% include 'parciais/_mais_acessados.html' %}
 
 <script>    
-    const mp = new MercadoPago('APP_USR-5be3b699-2727-4257-a722-9cf2af55646b');
-    const bricksBuilder = mp.bricks();
+    const mp = new MercadoPago('TEST-0e2ade60-102d-4523-9785-1fb01e3582a0');
+    const bricksBuilder = mp.bricks();  
     mp.bricks().create("wallet", "wallet_container", {
                     initialization: {
                         preferenceId: $("#wallet_container").data("id"),
                     },
                     customization: {
                         texts: {
-                        valueProp: 'smart_option',
+                            valueProp: 'smart_option',
                         },
                     },
                 });
