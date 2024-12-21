@@ -269,10 +269,10 @@ tbody > tr.selected > * {
 
 .item div {
 	width:99%;
-	height:99%;
+	height:89%;
 	text-align:center;
-	line-height: 22px;
-	font-size:60px;
+	line-height: 12px;
+	font-size:50px;
 }
 
 .left-nav-btn, .right-nav-btn {
