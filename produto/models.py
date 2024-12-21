@@ -45,10 +45,12 @@ class Produto(models.Model):
             return None
         # Construir o caminho completo da imagem original
         img_path = self.imagem.path
-        img_path = img_path + '/' + size
+        path_img = Produto.get_directory_path(img_path)
+        file_name = Produto.get_file_name(img_path)
+        thumbnail_path = path_img + '\\' + str(size) + '\\' + file_name
 
         # Criar o nome do arquivo da miniatura
-        base, ext = os.path.splitext(img_path)
+        base, ext = os.path.splitext(thumbnail_path)
         thumbnail_name = f"{base}_{size}{ext}"
 
         # Verificar se a miniatura já existe no cache
@@ -63,6 +65,22 @@ class Produto(models.Model):
         thumbnail_name = ProdutoMaisAcessado.convert_path_to_url(path=thumbnail_name) 
         
         return thumbnail_name
+
+    def get_file_name(file_path): 
+        # Verifica se o caminho do arquivo é absoluto 
+        if not os.path.isabs(file_path): 
+            # Converte o caminho relativo para absoluto 
+            file_path = os.path.abspath(file_path) 
+        # Retorna o nome do arquivo 
+        return os.path.basename(file_path)
+
+    def get_directory_path(file_path): 
+        # Verifica se o caminho do arquivo é absoluto 
+        if not os.path.isabs(file_path): 
+            # Converte o caminho relativo para absoluto 
+            file_path = os.path.abspath(file_path) 
+            # Retorna o caminho absoluto do diretório 
+        return os.path.dirname(file_path)
         
     @staticmethod
     def resize(img, new_width=800):
