@@ -57,7 +57,23 @@
                 <button class="btn btn-primary" id="sim_produto_disponivel">Sim</button>
             </p>
             <p class="lead">
-                <span id="saldo_estoque"></span> em estoque  
+                <span id="saldo_estoque"></span> em estoque 
+                
+            </p>
+            <p class="lead" data-adicionado="{{is_lista_desejo}}">
+                <i id="star-r" 
+                    class="fa-regular far fa-star" 
+                    style="color: #19aabe; "
+                    data-url="{% url 'perfil:lista_desejos' %}"
+                    data-id_produto="{{produto.id}}">
+                </i>
+                <i id="star-s" 
+                    class="fa-solid fas fa-star" 
+                    style="color: #19aabe; display: none;"
+                    data-url="{% url 'perfil:lista_desejos' %}"
+                    data-id_produto="{{produto.id}}">
+                </i>
+                <span>Adicionar na minha lista de desejos</span>  
             </p>
             <form action="{% url 'produto:adicionaraocarrinho' %}" id="form-add-to-cart">
                 {% if produto.variacao_set %}
@@ -163,6 +179,48 @@
 
 <script>
 
+    $(document).ready(function(){
+
+        adicionado = $("#star-r").parent("p").data("adicionado");
+        if("True" == adicionado){
+            $("#star-r").hide();  
+            $("#star-s").show();
+        }
+        
+        $("#star-r").click(function() { 
+            $(this).hide();
+            $("#star-s").show();  
+            url = $(this).data("url");
+            id_produto = $(this).data("id_produto");
+            adicionaOuRemoveItemListaDesejos(true, url, id_produto);
+            $(this).parent().children('span').html("Produto adicionado na lista de desejos");        
+        });
+
+        $("#star-s").click(function() { 
+            $(this).hide();
+            $("#star-r").show(); 
+            url = $(this).data("url");
+            id_produto = $(this).data("id_produto");
+            adicionaOuRemoveItemListaDesejos(false, url, id_produto);
+            $(this).parent().children('span').html("Produto removido da lista de desejos");           
+        });
+
+        function adicionaOuRemoveItemListaDesejos(adiciona, url, id_produto){
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: url,
+                data: {
+                    "adiciona" : adiciona,
+                    "id_produto" : id_produto,
+                    "csrfmiddlewaretoken": $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(jsonData) { 
+                    console.log(jsonData);    
+                }
+            });
+        }
+    });
 
 $("#sim_produto_disponivel").click(function(){
 
