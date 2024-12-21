@@ -9,6 +9,8 @@ from django.contrib import messages
 from django.db.models import Q, Count, QuerySet
 from produto.models import Produto, Variacao, Categoria 
 from produto.produto_service import ProdutoService
+from perfil.perfil_service import PerfilService
+from perfil.models import ListaDesejoProduto
 from perfil.models import PerfilUsuario
 from pedido.models import ItemPedido
 from .serializers import VariacaoSerializer
@@ -88,13 +90,18 @@ class DetalheProduto(DispachProdutosMaisVendidos, DetailView):
             produto = Produto.objects.filter(slug=kwargs['slug']).first()
             dimensoes = ProdutoService().get_dimensoes_variacoes(produto)
             lista_estoque_variacoes = ProdutoService().get_saldo_estoque_variacoes(produto)
-        
+            item_lista_desejo = ListaDesejoProduto.objects.filter(produto=produto, usuario=user).last()
+            if item_lista_desejo is None:
+                is_lista_desejo = False
+            else:   
+                is_lista_desejo = not item_lista_desejo.desativado    
         context = { 
             'saldo_estoque_variacoes' : json.dumps(lista_estoque_variacoes),
             'produto'       : produto,
             'produtos_mais_vendidos' : self.produtos_mais_vendidos,
             'categorias'       :  self.categorias,
-            'dimensoes' : dimensoes
+            'dimensoes' : dimensoes,
+            'is_lista_desejo' : is_lista_desejo
         }
 
         return render(self.request, self.template_name, context)
