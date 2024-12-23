@@ -3,11 +3,12 @@ from django.views.generic import ListView
 from django.views import View
 from datetime import datetime
 from . import forms
-from .models import PerfilUsuario, PasswordResetCode
+from .models import PerfilUsuario, PasswordResetCode, ListaDesejoProduto as ListaDesejo
 from produto.models import Produto
 from produto.produto_service import ProdutoService
 from .perfil_service import PerfilService
 from django.core.mail import send_mail
+from django.core.paginator import Paginator
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
@@ -371,13 +372,19 @@ class ListaDesejoProduto(View):
         id_produto = self.request.POST.get("id_produto")
         user = self.request.user
         return PerfilService().adiciona_remove_lista_desejos(user=user, adiciona=adiciona, id_produto=id_produto)
-            
-    def get(self, *args, **kwargs):
-        template_name = 'produto/lista.html' 
 
     def get(self, *args, **kwargs):
+        template_name = 'produto/lista.html' 
         page = self.request.GET.get('page', 1)
-        produtos = Produto.objects.filter(imagem__isnull=False).order_by('?')[:9]
+        user = self.request.user
+        
+        lista_desejos = ListaDesejo.objects.values("produto_id").filter(usuario=user)
+        itens = list(lista_desejos)
+        id_itens = []
+        for item in itens:
+            id_itens.append(item['produto_id'])
+
+        produtos = Produto.objects.filter(id__in=id_itens).order_by('?')[:9]    
         paginator = Paginator(produtos, per_page=4,allow_empty_first_page=True)
         page_object = paginator.get_page(page)
 
@@ -389,4 +396,4 @@ class ListaDesejoProduto(View):
             "page_obj": page_object,
             "is_paginated": True
         }
-        return render(self.request, self.template_name, context)
+        return render(self.request, template_name, context)
