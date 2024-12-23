@@ -24,7 +24,12 @@
                     <input type="password" name="password" placeholder="Digite sua senha"
                            class="form-control" id="exampleInputPassword">
                 </div>
-                <input type="checkbox" class="form-check-inline mb-2" name="lembrarme" id="lembrarme" />  Lembrar-me
+                <input type="checkbox" class="form-check-inline mb-2" name="lembrarme" id="lembrarme" /> 
+                Lembrar-me
+                <span id="capslock" style="display:none">
+                    <i class="fa-regular fa-keyboard far ml-4" style="color: #c85f5f;"></i>
+                    Caps Lock ligado
+                </span>
                 <button type="submit" id="btn_login_perfil" class="btn btn-primary btn-block btn-lg btn_login">
                     Entrar
                 </button>  
@@ -69,6 +74,14 @@
             localStorage.removeItem('username');
         }
     });
+});
+
+window.addEventListener("keydown", function(event) {
+    if (event.getModifierState("CapsLock")) {
+        $("#capslock").show();
+    } else {
+        $("#capslock").hide();
+    }
 });
 </script>
 
