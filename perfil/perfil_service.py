@@ -51,10 +51,14 @@ class PerfilService():
                 token = default_token_generator.make_token(user)
                 password_reset = PasswordResetCode.objects.create(usuario=user, codigo=code, token=token)
                 subject = 'Recuperação de Senha'
-                message = render_to_string('email/template_password_reset.html', {'code': code})
+                
+                to_30_minutes = timezone.now() + timedelta(minutes=30)
+                str_cod_valid = f'Esse código é válido até {to_30_minutes.day}/{to_30_minutes.month}/{to_30_minutes.year}'
+                str_cod_valid += f' as {to_30_minutes.hour}:{to_30_minutes.minute}'
+                message = render_to_string('email/template_password_reset.html', {'code': code, 'valid': str_cod_valid})
                 
                 py_email = PyEmail(email)
-                py_email.set_body(user.perfilusuario.nome_completo, code, request)
+                py_email.set_body(user.perfilusuario.nome_completo, code, str_cod_valid, request)
                 py_email.enviar()
 
                 if user is not None:    

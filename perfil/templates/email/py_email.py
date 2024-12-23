@@ -13,7 +13,7 @@ class PyEmail:
         self.msg['from'] = 'Rafael'
         self.msg['to'] = email 
     
-    def set_body(self, nome_completo, codigo, request):
+    def set_body(self, nome_completo, codigo, valid, request):
         base_path = request.build_absolute_uri()
         base_path = base_path.replace(request.path, '').replace('http//', 'http://')
         module_dir = os.path.dirname(__file__) 
@@ -24,6 +24,7 @@ class PyEmail:
         self.corpo_msg  = template.safe_substitute(
                                     nome=nome_completo, 
                                     codigo=codigo,
+                                    valid=valid,
                                     base_url=base_path)       
         self.msg['subject'] = f'Código para recadastramento de senha'
         self.msg.attach(MIMEText(self.corpo_msg, 'html'))   
