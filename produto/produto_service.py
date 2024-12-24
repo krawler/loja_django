@@ -8,7 +8,7 @@ from decimal import Decimal
 from datetime import datetime
 from django.utils import timezone
 from .models import Produto, SessaoCarrinho, Variacao, SaidaProduto, AvisoProdutoDisponivel 
-from .models import EntradaProduto, Categoria, AcessoProduto, ProdutoMaisAcessado
+from .models import EntradaProduto, AcessoProduto, ProdutoMaisAcessado, Categoria
 import json
 
 class ProdutoService():
