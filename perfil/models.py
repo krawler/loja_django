@@ -9,7 +9,7 @@ from utils.validacpf import valida_cpf
 class PerfilUsuario(models.Model):
 
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
-    nome_completo = models.CharField(null=False, max_length=100) 
+    nome_completo = models.CharField(null=True, max_length=100) 
     cpf = models.CharField(max_length=14,null=True, blank=True)
     endereco = models.CharField(null=False, max_length=100)
     numero = models.CharField(max_length=15)
@@ -50,7 +50,7 @@ class PerfilUsuario(models.Model):
             ('TO', 'Tocantins'),
         )
     )
-    telefone = models.CharField(null=False, max_length=50)
+    telefone = models.CharField(null=True, max_length=50)
     
     def __str__(self) :
         return f'{self.usuario}'
