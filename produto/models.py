@@ -10,6 +10,15 @@ from urllib.parse import urljoin
 import os
 import django
 
+class Categoria(models.Model):
+    nome = models.TextField(max_length=50, null=False)
+    desativado = models.BooleanField(default=False)
+    datahora_criacao = models.DateTimeField(default=django.utils.timezone.now)
+    ativo_menu = models.BooleanField(default=True)
+    
+    def __str__(self):
+        return self.nome
+
 class Produto(models.Model):
     nome = models.CharField(max_length=200)
     descricao = models.TextField(max_length=255)
@@ -26,8 +35,8 @@ class Produto(models.Model):
             ('S', 'Simples'),
         )
     ),
-    categoria = models.ForeignKey('produto.Categoria', on_delete=models.CASCADE)
-    
+    categoria = models.ForeignKey(Categoria, null=True, on_delete=models.SET_NULL)
+
     @cached_property
     def miniatura_media(self):
         if self.imagem:
@@ -174,15 +183,9 @@ class SaidaProduto(models.Model):
     data = models.DateField(default=datetime.now().date())
     hora = models.TimeField(default=django.utils.timezone.now)
     desativado = models.BooleanField(default=False)
-    pedido = models.ForeignKey('pedido.Pedido', on_delete=models.CASCADE)
+    #pedido = models.ForeignKey('pedido.Pedido', null=True, on_delete=models.SET_NULL)
 
-class Categoria(models.Model):
-    nome = models.TextField(max_length=50, null=False)
-    desativado = models.BooleanField(default=False)
-    datahora_criacao = models.DateTimeField(default=django.utils.timezone.now)
-    ativo_menu = models.BooleanField(default=True)
-    def __str__(self):
-        return self.nome
+
 
 class AcessoProduto(models.Model):
     produto = models.ForeignKey(Produto, on_delete=models.CASCADE, null=False)
