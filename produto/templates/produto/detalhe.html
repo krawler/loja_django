@@ -54,7 +54,12 @@
             </p>
             <p class="lead hide" id="pergunta_aviso_produto_disponivel">
                 Deseja ser avisado quando este produto estiver disponível?
-                <button class="btn btn-primary" id="sim_produto_disponivel">Sim</button>
+                <button class="btn btn-primary" 
+                        id="sim_produto_disponivel"
+                        data-url="{% url 'produto:detalhe' produto.slug %}"
+                        data-variacaoid="{{produto.variacao_set.first.id}}">
+                    Sim
+                </button>
             </p>
             <p class="lead">
                 <span id="saldo_estoque"></span> em estoque 
@@ -224,12 +229,14 @@
 
 $("#sim_produto_disponivel").click(function(){
 
-    id_variacao = {{ produto.variacao_set.first.id }};
+    id_variacao = $(this).data("variacaoid");
+
+    url = $(this).data("url");
 
     $.ajax({
         type: "POST",
         dataType: "json",
-        url: "{% url 'produto:detalhe' produto.slug %}",
+        url: url,
         data: {
             "id_variacao" : id_variacao,
             "csrfmiddlewaretoken": $('meta[name="csrf-token"]').attr('content')
