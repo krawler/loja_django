@@ -69,7 +69,7 @@ class PasswordResetCode(models.Model):
     token = models.CharField(max_length=50, unique=False)
 
 class ListaDesejoProduto(models.Model):
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
-    produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    produto = models.ForeignKey(Produto, on_delete=models.SET_NULL, null=True)
     adicionado_em = models.DateTimeField(auto_now_add=True)
     desativado = models.BooleanField(default=False)
