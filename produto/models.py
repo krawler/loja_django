@@ -133,6 +133,7 @@ class ProdutoSimples(models.Model):
 
     class Meta:
         managed = False 
+        abstract = True
 
 class Variacao(models.Model):
     
@@ -158,6 +159,8 @@ class SessaoCarrinho(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
     Variacao = models.ForeignKey(Variacao, on_delete=models.CASCADE, null=False)
     quantidade = models.PositiveIntegerField(null=False)
+    preco = models.FloatField()
+    preco_promocional = models.FloatField()
     preco_quantitativo = models.FloatField()
     preco_quantitativo_promocional = models.FloatField()
     slug = models.TextField(null=True)
@@ -225,16 +228,16 @@ class ProdutoMaisAcessado(models.Model):
         return url
 
     class Meta:
-        managed: False
+        managed = False
 
 class ProdutoCheckout(models.Model):
     id_preco_stripe = models.CharField(max_length=50, blank=True, null=True)
     quantidade = models.IntegerField()
 
     class Meta:
-        managed: False
+        managed = False
+        abstract = True
     
-
 
 class ImagemProduto(models.Model):
     variacao = models.ForeignKey(Variacao, on_delete=models.CASCADE)
