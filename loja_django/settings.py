@@ -85,15 +85,22 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'loja_django.wsgi.application'
 
+'''
+     
+     '''
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+     'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'loja_django',
+        'USER': 'postgres',
+        'PASSWORD': '1234',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }     
 }
 
 
