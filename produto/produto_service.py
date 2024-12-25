@@ -26,6 +26,7 @@ class ProdutoService():
 
 
     def get_produtos_mais_vendidos(self):
+    
         agg_count_pedidos = ItemPedido.objects.values('produto_id').annotate(num_pedidos=Count('id')).order_by('-num_pedidos')[:4]
         itens = list(agg_count_pedidos)
         id_produtos = []
@@ -35,6 +36,7 @@ class ProdutoService():
     
 
     def insert_item_session_carrinho(self, sessao_carrinho, user):
+    
         variacao_sessao = Variacao.objects.filter(id=sessao_carrinho['variacao_id']).first()
         usuario = User.objects.filter(username=user).first()
         if not user.is_anonymous:
@@ -43,6 +45,8 @@ class ProdutoService():
                 sessao = SessaoCarrinho()
                 sessao.Variacao = variacao_sessao
                 sessao.user = usuario
+                sessao.preco_unitario = sessao_carrinho['preco_unitario']
+                sessao.preco_unitario_promocional = sessao_carrinho['preco_unitario_promocional']
                 sessao.quantidade = sessao_carrinho['quantidade']             
                 sessao.preco_quantitativo = sessao_carrinho['preco_quantitativo']
                 sessao.preco_quantitativo_promocional = sessao_carrinho['preco_quantitativo_promocional']
@@ -67,6 +71,7 @@ class ProdutoService():
 
 
     def salvar_saida_produto(self, variacao, preco_final, quantidade, user, data, hora, pedido):
+    
         saida_produto = SaidaProduto(variacao=variacao,
                                     preco_final=preco_final,
                                     quantidade=quantidade,
@@ -141,6 +146,7 @@ class ProdutoService():
 
 
     def salvar_acesso_produto(self, user, slug):
+    
         produto = Produto.objects.filter(slug=slug).first()
         acesso = AcessoProduto(produto=produto, user=user)
         acesso.save()
