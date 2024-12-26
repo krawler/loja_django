@@ -159,8 +159,8 @@ class SessaoCarrinho(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
     Variacao = models.ForeignKey(Variacao, on_delete=models.CASCADE, null=False)
     quantidade = models.PositiveIntegerField(null=False)
-    preco = models.FloatField()
-    preco_promocional = models.FloatField()
+   # preco = models.FloatField()
+   # preco_promocional = models.FloatField()
     preco_quantitativo = models.FloatField()
     preco_quantitativo_promocional = models.FloatField()
     slug = models.TextField(null=True)
@@ -241,5 +241,10 @@ class ProdutoCheckout(models.Model):
 
 class ImagemProduto(models.Model):
     variacao = models.ForeignKey(Variacao, on_delete=models.CASCADE)
-    imagem = models.ImageField(upload_to='produto_imagens/%Y/%m/', blank=False, null=False)
-    miniatura = models.ImageField(upload_to='produto_imagens/%Y/%m/miniaturas/', blank=False, null=False)
+    imagem = models.ImageField(upload_to='produto_imagens/variacoes/%Y/%m/', blank=False, null=False)
+
+    @cached_property
+    def miniatura_minuscula(self): 
+        if self.imagem:
+            return Produto.get_thumbnail_url(self, 150)
+        return None
