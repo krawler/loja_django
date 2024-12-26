@@ -45,8 +45,8 @@ class ProdutoService():
                 sessao = SessaoCarrinho()
                 sessao.Variacao = variacao_sessao
                 sessao.user = usuario
-                sessao.preco_unitario = sessao_carrinho['preco_unitario']
-                sessao.preco_unitario_promocional = sessao_carrinho['preco_unitario_promocional']
+                #sessao.preco_unitario = sessao_carrinho['preco_unitario']
+                #sessao.preco_unitario_promocional = sessao_carrinho['preco_unitario_promocional']
                 sessao.quantidade = sessao_carrinho['quantidade']             
                 sessao.preco_quantitativo = sessao_carrinho['preco_quantitativo']
                 sessao.preco_quantitativo_promocional = sessao_carrinho['preco_quantitativo_promocional']
@@ -171,7 +171,7 @@ class ProdutoService():
                         INNER JOIN produto_produto p ON ap.produto_id = p.id
                         INNER  JOIN produto_variacao v ON p.id = v.produto_id  
                         WHERE ap.user_id = %s
-                        GROUP BY p.id
+                        GROUP BY p.id, v.preco, v.preco_promocional
                         ORDER BY total_acessos DESC
                         LIMIT 9
                         """
