@@ -1,8 +1,4 @@
 
-var urlCarrinhoPost = '';
-var variacao_id = null;
-var quantidade = 0;
-
 $(document).ready(function(){
 
     $.ajaxSetup({
@@ -15,7 +11,7 @@ $(document).ready(function(){
     });
 
     $(".icone_remover_carrinho").click(function(){
-        urlCarrinhoPost = $(this).data('url');
+        $("#deleteItemCarrinho").data('url', $(this).data('url'));
         variacao_id = $(this).data("variacao");
         $("#deleteItemCarrinho").attr("variacao", variacao_id);
         $("#dialogModal").show();
@@ -25,12 +21,14 @@ $(document).ready(function(){
     $("#deleteItemCarrinho").click(function(){
         
         $("#dialogModal").hide();
-        window.location.href = urlCarrinhoPost;
+        url = $(this).data("url");
+        variacao_id = $(this).attr("variacao");
+        window.location.href = url;
 
         $.ajax({
             type: "POST",
             dataType: "json",
-            url: urlCarrinhoPost,
+            url: url,
             data: {
                 "variacaoid" : variacao_id,
                 "csrfmiddlewaretoken": $('meta[name="csrf-token"]').attr('content')
