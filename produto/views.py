@@ -7,7 +7,7 @@ from django.views.generic.detail import DetailView
 from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 from django.db.models import Q, Count, QuerySet
-from produto.models import Produto, Variacao, Categoria 
+from produto.models import Produto, Variacao, Categoria, EntradaProduto 
 from produto.produto_service import ProdutoService
 from perfil.perfil_service import PerfilService
 from perfil.models import ListaDesejoProduto
@@ -97,6 +97,13 @@ class DetalheProduto(DispachProdutosMaisVendidos, DetailView):
                 ProdutoService().salvar_acesso_produto(user, kwargs['slug'])
             
             produto = Produto.objects.filter(slug=kwargs['slug']).first()
+            if produto is None:
+                messages.error(
+                    self.request,
+                    'Produto não encontrado'
+                )
+                return redirect('produto:lista')
+
             dimensoes = ProdutoService().get_dimensoes_variacoes(produto)
             lista_estoque_variacoes = ProdutoService().get_saldo_estoque_variacoes(produto)
             if isinstance(user, User):
@@ -403,7 +410,7 @@ class Tabela(ListView):
 
         return context
 
-class EntradaProduto(DispachLoginRequired, View):
+class EntradaProdutoView(DispachLoginRequired, View):
     
     def get(self, *args, **kwargs):
         
@@ -428,7 +435,21 @@ class EntradaProduto(DispachLoginRequired, View):
         user = self.request.user
         ProdutoService().salvar_entrada_produto(id_variacao, preco_final, quantidade, user)
 
-        return redirect('produto:tabela')
+        return redirect('produto:tabela_entrada')
+
+class TabelaEntradaProduto(DispachLoginRequired, View):
+    model = EntradaProduto
+    template_name = 'produto/tabela_entrada.html'
+    context_object_name = 'entradas'
+
+    def get(self, *args, **kwargs):
+        entradas = EntradaProduto.objects.all()
+        context = {
+            'entradas': entradas,
+            'pagina_tabela' : True
+        }
+        return render(self.request, self.template_name, context)
+
 
 class Variacoes_json(ListView):
     
