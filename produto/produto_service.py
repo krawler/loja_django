@@ -148,8 +148,9 @@ class ProdutoService():
     def salvar_acesso_produto(self, user, slug):
     
         produto = Produto.objects.filter(slug=slug).first()
-        acesso = AcessoProduto(produto=produto, user=user)
-        acesso.save()
+        if produto is not None:
+            acesso = AcessoProduto(produto=produto, user=user)
+            acesso.save()
 
 
     def salvar_aviso_produto_disponivel(self, user, id_variacao):
@@ -165,13 +166,13 @@ class ProdutoService():
             return
         with connection.cursor() as cursor:
             str_sql = """
-                        SELECT p.nome, p.descricao, p.imagem, p.slug, v.preco, v.preco_promocional, 
-                        COUNT(ap.id) AS total_acessos                        
+                       SELECT distinct p.nome, p.descricao, p.imagem, p.slug,COUNT(ap.id) AS total_acessos,
+                       (SELECT v.preco from produto_variacao v where v.produto_id = p.id order by v.preco asc limit 1) as preco,
+                       (SELECT v.preco_promocional from produto_variacao v where v.produto_id = p.id order by v.preco_promocional asc limit 1) as preco_promocional
                         FROM produto_acessoproduto ap
                         INNER JOIN produto_produto p ON ap.produto_id = p.id
-                        INNER  JOIN produto_variacao v ON p.id = v.produto_id  
                         WHERE ap.user_id = %s
-                        GROUP BY p.id, v.preco, v.preco_promocional
+                        GROUP BY p.id
                         ORDER BY total_acessos DESC
                         LIMIT 9
                         """
