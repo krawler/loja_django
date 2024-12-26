@@ -54,13 +54,21 @@ class ListaProdutos(DispachProdutosMaisVendidos, ListView):
     template_name = 'produto/lista.html' 
 
     def get(self, *args, **kwargs):
+        
         page = self.request.GET.get('page', 1)
-        termo = self.request.GET.get('termo') #or self.request.session.get('termo')
-        if termo is not None and termo != '':
+        termo = self.request.GET.get('termo') 
+        categ = self.request.GET.get('categ')
+        
+        if categ is not None:
+            categoria = Categoria.objects.get(id=categ)
+            produtos = Produto.objects.filter(imagem__isnull=False, categoria=categoria)[:9]
+        
+        elif termo is not None and termo != '':
             #self.request.session['termo'] = termo
             produtos = Produto.objects.filter(imagem__isnull=False).filter(Q(nome__icontains=termo) | Q(descricao__icontains=termo) | Q(descricao_longa__icontains=termo)).order_by('?')[:9]
         else:
             produtos = Produto.objects.filter(imagem__isnull=False).order_by('?')[:9]
+        
         paginator = Paginator(produtos, per_page=4,allow_empty_first_page=True)
         page_object = paginator.get_page(page)
 
