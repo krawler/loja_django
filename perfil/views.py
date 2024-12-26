@@ -50,14 +50,14 @@ class BasePerfil(View):
                                 data=self.request.POST or None,
                                 instance=self.perfil, 
                                 perfil=self.perfil),
-                'produtos_mais_vendidos' : ProdutoService().get_produtos_mais_vendidos(),
+                'produtos_mais_vendidos' : ProdutoService().get_produtos_mais_acessados_por_geral(),
                 'pagina_cadastro': True 
             }
         else:
             self.context = {
                 'userform': forms.UserForm(data=self.request.POST or None),
                 'perfilform': forms.PerfilForm(data=self.request.POST or None),
-                'produtos_mais_vendidos' : ProdutoService().get_produtos_mais_vendidos(),
+                'produtos_mais_vendidos' : ProdutoService().get_produtos_mais_acessados_por_geral(),
                 'pagina_cadastro': True 
             }
             
@@ -133,7 +133,7 @@ class Criar(BasePerfil):
         if self.request.session.get('url_destino') is not None:
             return redirect(self.request.session['url_destino'])
 
-        return redirect('perfil:cadastro_concluido')
+        return redirect('perfil:atualizar')
             
 
 class Cadastro_concluido(View):
@@ -211,6 +211,7 @@ class Login(View):
             
         carrinho_sessao = self.request.session['carrinho']
         carrinho_bd = ProdutoService().getCarrinhoSessao(usuario) 
+        '''
         if carrinho_bd is not None:
             for item in carrinho_bd:
                 carrinho_sessao[item.Variacao.id] = {
@@ -225,7 +226,7 @@ class Login(View):
                     'slug': item.slug,
                     'produto_id': item.Variacao.produto.id
                 }
-                    
+         '''           
         if len(dict(carrinho_sessao)) > 0:
             return redirect('produto:carrinho')             
 
