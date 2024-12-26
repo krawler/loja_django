@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% load omfilters %}
+
+{% load static %}
+
+{% block conteudo %}
+
+<meta name="csrf-token" content="{{ csrf_token }}">
+
+<h1 class="text-center">Listagem de Entradas</h1>
+
+<br />
+
+<table id="table_id" class="display">
+    <thead>
+        <tr>
+            
+            <th class="text-center" style="width: 10%">Número</th>
+            <th>Data de emissão</th>
+            <th>Usuário</th>
+            <th>Quantidade</th>
+            <th>Preço</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entrada in entradas %}
+        <tr>
+            <td class="text-center">{{entrada.variacao_id}}</td>
+            <td>{{entrada.data|formata_br_date}}   às   {{entrada.hora|formata_br_hora}}</td>
+            <td>{{entrada.user.email}}</td>
+            <td style="width: 10%">{{entrada.quantidade}}</td>
+            <td>{{entrada.preco_final|formata_preco}}</td>
+        </tr>
+        
+        {% endfor %}
+    </tbody>
+</table>
+
+<script>
+
+    function redirecionaNovaEntrada() {
+        window.location.pathname = 'entrada/';
+    }
+
+    $(document).ready(function(){
+        
+        $ = jQuery;
+
+        const table = $('#table_id').DataTable({
+            colReorder: true,
+            keys: true,
+            pageLength:20,
+            layout: {
+                topStart: {
+                    buttons: ['print', 'excel', 'pdf', 'csv', 'colvis' ]
+                }
+            }
+        });
+
+
+        $('.buttons-colvis').children('span').html('Colunas');
+        $('.dt-search').children('label').html('Procurar')
+        var showing = $("#table_id_info").html()
+        showing = showing.replace('Showing','Exibindo').replace('entries', 'registros')
+                                             .replace('to','a')
+                                             .replace('of','de');
+        $("#table_id_info").html(showing);
+
+        $(".dt-paging-button").on('click', function(){
+            $("#table_id_info").html(showing);
+        });     
+
+        strObjBtnNovo = '<button class="dt-button buttons-print" tabindex="0" aria-controls="table_id"' + 
+                        'type="button" onclick="redirecionaNovaEntrada()"><span>Novo</span></button>';
+        
+        $(".dt-button").first().before(strObjBtnNovo);
+
+    });
+
+</script> 
+
+{% endblock conteudo %}
