@@ -14,4 +14,5 @@ urlpatterns = [
    path('atualizapedido/', views.Atualizar_Pedido.as_view(), name="atualizapedido"),
    path('desativar/', views.Desativar_Pedido.as_view(), name="desativar"),
    path('admin-detalhe/<int:pk>', views.Admin_detalhe_pedido.as_view(), name="admin_detalhe"),
+   path('post-payment', views.Pagar.as_view(), name="post_payment"),
 ]  
