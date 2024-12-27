@@ -17,6 +17,7 @@ from .email.py_email import PyEmail
 from datetime import datetime, date
 from pprint import pprint
 import stripe
+import mercadopago
 
 class DispachLoginRequired(View):
     
@@ -108,6 +109,31 @@ class Pagar(DispachLoginRequired, View):
                 return redirect('produto:carrinho')
         
         return self.create_checkout_session(carrinho, bd_variacoes)
+
+    def post(self, *args, **kwargs):
+       
+        sdk = mercadopago.SDK('TEST-6359455923298195-121717-ef84e13d4890009bae8c56d3904036df-68852210')
+
+        payment_data = {
+            "transaction_amount": float(request.POST.get("transaction_amount")),
+            "token": request.POST.get("token"),
+            "description": request.POST.get("description"),
+            "installments": int(request.POST.get("installments")),
+            "payment_method_id": request.POST.get("payment_method_id"),
+            "payer": {
+                "email": request.POST.get("cardholderEmail"),
+                "identification": {
+                    "type": request.POST.get("identificationType"),
+                    "number": request.POST.get("identificationNumber")
+                },
+                "first_name": request.POST.get("cardholderName")
+            }
+        }
+
+        payment_response = sdk.payment().create(payment_data)
+        payment = payment_response["response"]
+
+        print(payment)
 
 class SalvarPedido(View):    
     
