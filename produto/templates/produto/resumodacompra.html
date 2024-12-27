@@ -6,6 +6,8 @@
 
 {% block conteudo %}
 
+<meta name="csrf-token" content="{{ csrf_token }}">
+
 <div class="row mb-5">
     <div class="col-lg">
         <h2>Resumo da sua compra</h2>
@@ -91,6 +93,7 @@
 <script>    
     const mp = new MercadoPago('TEST-0e2ade60-102d-4523-9785-1fb01e3582a0');
     const bricksBuilder = mp.bricks();  
+    /*
     mp.bricks().create("wallet", "wallet_container", {
                     initialization: {
                         preferenceId: $("#wallet_container").data("id"),
@@ -101,6 +104,82 @@
                         },
                     },
                 });
+    */            
+    const renderPaymentBrick = async (bricksBuilder) => {
+      const settings = {
+        initialization: {
+          /*
+            "amount" é a quantia total a pagar por todos os meios de pagamento com exceção da Conta Mercado Pago e Parcelas sem cartão de crédito, que têm seus valores de processamento determinados no backend através do "preferenceId"
+          */
+          amount: 3,
+          preferenceId: $("#wallet_container").data("id"),
+          payer: {
+            firstName: "Rafael",
+            lastName: "Ramos",
+            email: "august.rafael@gmail.com",
+          },
+        },
+        customization: {
+          visual: {
+            style: {
+              theme: "bootstrap",
+            },
+          },
+          paymentMethods: {
+            creditCard: "all",
+										debitCard: "all",
+										ticket: "all",
+										bankTransfer: "all",
+										atm: "all",
+										onboarding_credits: "all",
+										wallet_purchase: "all",
+            maxInstallments: 8
+          },
+        },
+        callbacks: {
+          onReady: () => {
+            /*
+             Callback chamado quando o Brick está pronto.
+             Aqui, você pode ocultar seu site, por exemplo.
+            */
+          },
+          onSubmit: ({ selectedPaymentMethod, formData }) => {
+            // callback chamado quando há click no botão de envio de dados
+            formData.csrfmiddlewaretoken = $('meta[name="csrf-token"]').attr('content');
+            
+            return new Promise((resolve, reject) => {
+              fetch("/pedido/process_payment", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "X-CSRF-TOKEN" : $('meta[name="csrf-token"]').attr('content')
+                },
+                body: JSON.stringify(formData),
+              })
+                .then((response) => response.json())
+                .then((response) => {
+                  // receber o resultado do pagamento
+                  resolve();
+                })
+                .catch((error) => {
+                  // manejar a resposta de erro ao tentar criar um pagamento
+                  reject();
+                });
+            });
+          },
+          onError: (error) => {
+            // callback chamado para todos os casos de erro do Brick
+            console.error(error);
+          },
+        },
+      };
+      window.paymentBrickController = await bricksBuilder.create(
+        "payment",
+        "wallet_container",
+        settings
+      );
+    };
+    renderPaymentBrick(bricksBuilder);
 </script>
 
 <script src="{% static 'assets/custom/js/resumo_compra.js' %}"></script>
