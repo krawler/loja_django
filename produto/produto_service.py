@@ -45,8 +45,8 @@ class ProdutoService():
                 sessao = SessaoCarrinho()
                 sessao.Variacao = variacao_sessao
                 sessao.user = usuario
-                #sessao.preco_unitario = sessao_carrinho['preco_unitario']
-                #sessao.preco_unitario_promocional = sessao_carrinho['preco_unitario_promocional']
+                sessao.preco = sessao_carrinho['preco_unitario']
+                sessao.preco_promocional = sessao_carrinho['preco_unitario_promocional']
                 sessao.quantidade = sessao_carrinho['quantidade']             
                 sessao.preco_quantitativo = sessao_carrinho['preco_quantitativo']
                 sessao.preco_quantitativo_promocional = sessao_carrinho['preco_quantitativo_promocional']
