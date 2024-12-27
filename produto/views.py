@@ -180,7 +180,7 @@ class AdicionarCarrinho(View):
         carrinho = self.request.session['carrinho']  
 
         for item in carrinho:
-            if carrinho.get(item).get("quantidade") < 1:
+            if int(carrinho.get(item).get("quantidade")) < 1:
                 messages.error(
                     self.request,
                     'Algum item no carrinho tem quantidade abaixo de 1'
