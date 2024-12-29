@@ -32,6 +32,7 @@ class DispachLoginRequired(View):
         qs = qs.filter(usuario=self.request.user)
         return qs
 
+
 class DispachProdutosMaisVendidos(View):
 
     def dispatch(self, *args, **kwargs):
@@ -49,7 +50,8 @@ class DispachProdutosMaisVendidos(View):
         context = super().get_context_data(**kwargs)
         context['produtos_mais_vendidos'] = self.produtos_mais_vendidos        
         return context
-    
+
+
 class ListaProdutos(DispachProdutosMaisVendidos, ListView):    
     template_name = 'produto/lista.html' 
 
@@ -64,7 +66,6 @@ class ListaProdutos(DispachProdutosMaisVendidos, ListView):
             produtos = Produto.objects.filter(imagem__isnull=False, categoria=categoria)[:9]
         
         elif termo is not None and termo != '':
-            #self.request.session['termo'] = termo
             produtos = Produto.objects.filter(imagem__isnull=False).filter(Q(nome__icontains=termo) | Q(descricao__icontains=termo) | Q(descricao_longa__icontains=termo)).order_by('?')[:9]
         else:
             produtos = Produto.objects.filter(imagem__isnull=False).order_by('?')[:9]
@@ -137,6 +138,7 @@ class DetalheProduto(DispachProdutosMaisVendidos, DetailView):
             else:
                 json_data = '{false}'    
         return JsonResponse(json_data, safe=False)
+
 
 class AdicionarCarrinho(View):
     
@@ -230,6 +232,7 @@ class AdicionarCarrinho(View):
         
         return redirect('produto:carrinho')
 
+
 class RemoverCarrinho(View):
     
     def get(self, *args, **kwargs):
@@ -263,6 +266,7 @@ class RemoverCarrinho(View):
         
         return redirect(http_referer)
 
+
 class Carrinho(DispachProdutosMaisVendidos, View):
     
     def get(self, *args, **kwargs):
@@ -286,6 +290,7 @@ class Carrinho(DispachProdutosMaisVendidos, View):
         self.request.session['carrinho'] = carrinho
         json_data = carrinho
         return JsonResponse(json_data, safe=False)
+
 
 class ResumoDaCompra(DispachProdutosMaisVendidos, View):
     
@@ -334,29 +339,8 @@ class ResumoDaCompra(DispachProdutosMaisVendidos, View):
         except Exception as error:
             print(error)
 
-    
     def get(self, *args, **kwargs):
-        """
-        request_options = mercadopago.config.RequestOptions()
-        request_options.custom_headers = {
-            'x-idempotency-key': '837243872'
-        }
 
-        payment_data = {
-            "transaction_amount": 100,
-            "token": "CARD_TOKEN",
-            "description": "Payment description",
-            "payment_method_id": 'visa',
-            "installments": 1,
-            "payer": {
-                "email": 'test_user_123456@testuser.com'
-            }
-        }
-        result = self.sdk.payment().create(payment_data, request_options)
-        payment = result["response"]
-
-        print(payment)
-        """
         carrinho = self.request.session.get('carrinho')
         for item in carrinho:
             if int(carrinho.get(item).get("quantidade")) < 1:
@@ -365,11 +349,6 @@ class ResumoDaCompra(DispachProdutosMaisVendidos, View):
                     'Algum item no carrinho tem quantidade abaixo de 1'
                 )
                 return redirect('produto:carrinho')
-
-        preference_data = ProdutoService().create_preference_mercadopago(carrinho)
-        preference_response = self.sdk.preference().create(preference_data)
-        preference = preference_response["response"] 
-
         if not self.request.user.is_authenticated:
             return redirect('perfil:login')
         
@@ -409,6 +388,7 @@ class Tabela(ListView):
         context['pagina_tabela'] = True
 
         return context
+
 
 class EntradaProdutoView(DispachLoginRequired, View):
     
