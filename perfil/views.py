@@ -69,6 +69,7 @@ class BasePerfil(View):
     def get(self, *args, **kwargs):        
         return self.renderizar
 
+
 class Criar(BasePerfil):
     
     def post(self, *args, **kwargs):
@@ -134,7 +135,7 @@ class Criar(BasePerfil):
             return redirect(self.request.session['url_destino'])
 
         return redirect('perfil:atualizar')
-            
+           
 
 class Cadastro_concluido(View):
     model = PerfilUsuario
@@ -155,6 +156,7 @@ class Cadastro_concluido(View):
         
         return render(self.request, self.template_name, contexto)
 
+
 class Atualizar(Criar):
 
     template_name = 'perfil/atualizar.html'
@@ -167,6 +169,7 @@ class Atualizar(Criar):
         self.request.session['url_destino'] = url   
         
         return self.renderizar    
+
 
 class Login(View):
 
@@ -211,7 +214,7 @@ class Login(View):
             
         carrinho_sessao = self.request.session['carrinho']
         carrinho_bd = ProdutoService().getCarrinhoSessao(usuario) 
-        '''
+        
         if carrinho_bd is not None:
             for item in carrinho_bd:
                 carrinho_sessao[item.Variacao.id] = {
@@ -219,22 +222,23 @@ class Login(View):
                     'variacao_nome': item.Variacao.nome,
                     'produto_nome': item.Variacao.produto.nome,
                     'imagem': json.dumps(str(item.Variacao.produto.imagem)),
-                    'preco_unitario': item.preco_quantitativo / item.quantidade,
+                    'preco_unitario': item.preco,
+                    'preco_unitario_promocional': item.preco_promocional,
                     'preco_quantitativo': item.preco_quantitativo,
                     'preco_quantitativo_promocional': item.preco_quantitativo_promocional,
                     'quantidade': item.quantidade,
                     'slug': item.slug,
                     'produto_id': item.Variacao.produto.id
                 }
-         '''           
+                    
         if len(dict(carrinho_sessao)) > 0:
             return redirect('produto:carrinho')             
 
         url_destino = self.request.session.get('url_destino')
         if url_destino is not None:
             return redirect(url_destino)
-        else:    
-            return redirect('produto:lista')        
+        else:   
+            return redirect('produto:lista')     
 
 
 class Logout(View):
@@ -245,6 +249,7 @@ class Logout(View):
         self.request.session.save()
         return redirect('produto:lista')
 
+
 class Password_Reset(View):
 
     def get(self, *args, **kwargs):
@@ -254,7 +259,7 @@ class Password_Reset(View):
     def post(self, *args, **kwargs):
         form = PasswordResetForm(self.request.POST)
         return PerfilService().password_reset(form=form,request=self.request)
-    
+   
 
 class Code_Verification(View):
 
@@ -285,6 +290,7 @@ class Code_Verification(View):
                 context['mensagem_retorno']
             )
             return render(self.request, 'perfil/code_validation.html', context)  
+
 
 class Reset_password(View):
     
@@ -365,6 +371,7 @@ class Reset_password(View):
         except Exception as e:
             print(e)
             return render(self.request, 'perfil/reset_password.html', {'error': f'Ocorreu um erro.'})
+
 
 class ListaDesejoProduto(View):
 
