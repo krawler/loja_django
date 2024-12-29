@@ -51,7 +51,6 @@ class Pedido_Service():
             row = cursor.fetchone()
             return row[0]
 
-
     def get_sigla_status(self, status):
         
         match status:
@@ -62,13 +61,11 @@ class Pedido_Service():
             case 'Enviado': return 'E'
             case 'Finalizado': return 'F'
 
-
     def desativar_pedido(self, pedidoid):
         pedido = Pedido.objects.get(id=pedidoid)
         pedido.desativado = True
         pedido.save()
         return pedido
-
 
     def checkout_pagseguro(self, request, carrinho, id_pedido):
 
