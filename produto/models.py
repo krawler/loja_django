@@ -169,6 +169,7 @@ class SessaoCarrinho(models.Model):
         verbose_name = "Carrinho da sessão salva"
         db_table = "sessao_carrinho"   
 
+
 class EntradaProduto(models.Model):
     variacao = models.ForeignKey(Variacao, on_delete=models.CASCADE, null=False)
     quantidade = models.PositiveIntegerField(null=False)
@@ -178,6 +179,7 @@ class EntradaProduto(models.Model):
     hora = models.TimeField(django.utils.timezone.now)
     desativado = models.BooleanField(default=False)
 
+
 class SaidaProduto(models.Model):
     variacao = models.ForeignKey(Variacao, on_delete=models.CASCADE, null=False)
     quantidade = models.PositiveIntegerField(null=False)
@@ -186,8 +188,7 @@ class SaidaProduto(models.Model):
     data = models.DateField(default=datetime.now().date())
     hora = models.TimeField(default=django.utils.timezone.now)
     desativado = models.BooleanField(default=False)
-    #pedido = models.ForeignKey('pedido.Pedido', null=True, on_delete=models.SET_NULL)
-
+    pedido = models.ForeignKey('pedido.Pedido', null=True, on_delete=models.SET_NULL)
 
 
 class AcessoProduto(models.Model):
@@ -197,11 +198,13 @@ class AcessoProduto(models.Model):
     hora = models.TimeField(default=django.utils.timezone.now)
     desativado = models.BooleanField(default=False)
 
+
 class AvisoProdutoDisponivel(models.Model):
     variacao = models.ForeignKey(Variacao, on_delete=models.CASCADE, null=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
     data = models.DateField(default=django.utils.timezone.now)
     hora = models.TimeField(default=django.utils.timezone.now)
+
 
 class ProdutoMaisAcessado(models.Model):
     nome = models.CharField(max_length=200)
