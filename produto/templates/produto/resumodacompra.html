@@ -145,16 +145,20 @@
           },
           onSubmit: ({ selectedPaymentMethod, formData }) => {
             // callback chamado quando há click no botão de envio de dados
-            formData.csrfmiddlewaretoken = $('meta[name="csrf-token"]').attr('content');
-            
+            formData = {
+                        payer: {email: 'august.rafael@gmail.com'},
+                        payment_method_id: "pix",
+                        transaction_amount : 3,
+                        token : $('meta[name="csrf-token"]').attr('content')
+            }
             return new Promise((resolve, reject) => {
-              fetch("/pedido/process_payment", {
+              fetch("/pedido/post-payment", {
                 method: "POST",
                 headers: {
-                  "Content-Type": "application/json",
-                  "X-CSRF-TOKEN" : $('meta[name="csrf-token"]').attr('content')
+                  "Content-Type": "application/x-www-form-urlencoded",
+                  "X-CSRFToken" : $('meta[name="csrf-token"]').attr('content')
                 },
-                body: JSON.stringify(formData),
+                body: formData,
               })
                 .then((response) => response.json())
                 .then((response) => {
