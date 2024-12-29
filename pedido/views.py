@@ -114,19 +114,24 @@ class Pagar(DispachLoginRequired, View):
        
         sdk = mercadopago.SDK('TEST-6359455923298195-121717-ef84e13d4890009bae8c56d3904036df-68852210')
 
+        request_options = mercadopago.config.RequestOptions()
+        request_options.custom_headers = {
+            'x-idempotency-key': '<SOME_UNIQUE_VALUE>'
+        }
+
         payment_data = {
-            "transaction_amount": float(request.POST.get("transaction_amount")),
-            "token": request.POST.get("token"),
-            "description": request.POST.get("description"),
-            "installments": int(request.POST.get("installments")),
-            "payment_method_id": request.POST.get("payment_method_id"),
-            "payer": {
-                "email": request.POST.get("cardholderEmail"),
-                "identification": {
-                    "type": request.POST.get("identificationType"),
-                    "number": request.POST.get("identificationNumber")
-                },
-                "first_name": request.POST.get("cardholderName")
+            "transaction_amount": 4, #self.request.POST.get("transaction_amount"),
+           # "token": 'TEST-6359455923298195-121717-ef84e13d4890009bae8c56d3904036df-68852210',
+            "description": "testando pagamento em sandbox",
+            "installments": 1, #self.request.POST.get("installments"),
+            "payment_method_id": "visa", #self.request.POST.get("payment_method_id"),
+            "payer": { 
+                    "email":   "august.rafael@gmail.com",        #self.request.POST.get("cardholderEmail"),
+                    "identification": {
+                        "type":  "CPF", #self.request.POST.get("identificationType"),
+                        "number": "35982316873" #request.POST.get("identificationNumber")
+                    },
+                    "first_name": "Rafael A Ramos" #request.POST.get("cardholderName")
             }
         }
 
@@ -135,6 +140,7 @@ class Pagar(DispachLoginRequired, View):
 
         print(payment)
 
+
 class SalvarPedido(View):    
     
     def get(self, *args, **kwargs):
@@ -142,22 +148,21 @@ class SalvarPedido(View):
         if carrinho is None:
             return redirect('pedido:compraconcluida') 
         
-        carrinho_variacao_ids = [v for v in carrinho]
-        bd_variacoes = list(
-            Variacao.objects.select_related('produto').filter(id__in=carrinho_variacao_ids)
-        )
+        #carrinho_variacao_ids = [v for v in carrinho]
+        # bd_variacoes = list(
+        #     Variacao.objects.select_related('produto').filter(id__in=carrinho_variacao_ids)
+        # )
         
-        for variacao in bd_variacoes:
-            vid = variacao.id
-            svid = str(vid)
-            estoque = ProdutoService().getEstoqueAtual(vid)
-            qtd_carrinho = int(carrinho[svid]['quantidade'])
-            preco_unt = carrinho[svid]['preco_quantitativo']
-            preco_unt_promo = carrinho[svid]['preco_quantitativo_promocional']
-            
-                    
+        # for variacao in bd_variacoes:
+        #     vid = variacao.id
+        #     svid = str(vid)
+        #     estoque = ProdutoService().getEstoqueAtual(vid)
+        #     qtd_carrinho = int(carrinho[svid]['quantidade'])
+        #     preco_unt = carrinho[svid]['preco_quantitativo']
+        #     preco_unt_promo = carrinho[svid]['preco_quantitativo_promocional']
+              
         qtd_total_carrinho = sum([int(item['quantidade']) for item in carrinho.values()])
-        valor_total_carrinho =  sum(
+        valor_total_carrinho = sum(
                                     [
                                         item.get('preco_quantitativo_promocional')
                                         if item.get('preco_quantitativo_promocional')
@@ -189,21 +194,21 @@ class SalvarPedido(View):
 
         for v in carrinho.values():
             ProdutoService().salvar_saida_produto(variacao=Variacao.objects.filter(id=v['variacao_id']).first(),
-                                                    preco_final=v['preco_quantitativo_promocional'],
-                                                    quantidade=v['quantidade'],
-                                                    user=self.request.user,
-                                                    data=datetime.today(),
-                                                    hora=datetime.now(),
-                                                    pedido=pedido)
+                                                  preco_final=v['preco_quantitativo_promocional'],
+                                                  quantidade=v['quantidade'],
+                                                  user=self.request.user,
+                                                  data=datetime.today(),
+                                                  hora=datetime.now(),
+                                                  pedido=pedido)
         
         del self.request.session['carrinho']
         ProdutoService().limpa_session_carrinho_user(self.request.user)
         self.request.session['pedido_id'] = pedido.id 
 
-        return pedido_service.Pedido_Service().checkout_pagseguro( self.request, carrinho, pedido.id)
+        pedido_service.Pedido_Service().checkout_pagseguro( self.request, carrinho, pedido.id)
 
-        ##return redirect('pedido:compraconcluida')        
-        
+        return redirect('pedido:compraconcluida')        
+       
 
 class CompraConcluida(DispachLoginRequired, View):
     
@@ -227,7 +232,8 @@ class CompraConcluida(DispachLoginRequired, View):
         notification_data = pg.check_notification(notification_code)
         print(notification_data)
         return render(self.request, 'pedido/compraconcluida.html', contexto)
-    
+
+
 class MeusPedidos(DispachLoginRequired, ListView):  
     model = Pedido
     template_name = 'pedido/lista.html'
@@ -249,6 +255,7 @@ class MeusPedidos(DispachLoginRequired, ListView):
         }
         return render(self.request, self.template_name, contexto)
 
+
 class Detalhe(DispachLoginRequired, DetailView):
     model = Pedido
     produtos_mais_vendidos = ProdutoService().get_produtos_mais_vendidos()
@@ -260,6 +267,7 @@ class Detalhe(DispachLoginRequired, DetailView):
         context = super().get_context_data(**kwargs)
         context['produtos_mais_vendidos'] = self.produtos_mais_vendidos     
         return context
+
 
 class Tabela(DispachLoginRequired, ListView):
     model = Pedido
@@ -281,6 +289,7 @@ class Tabela(DispachLoginRequired, ListView):
         context['pedidos'] = pedidos
         return context
 
+
 class Atualizar_Pedido(DispachLoginRequired, View):
     
     def post(self, *args, **kwargs):
@@ -292,6 +301,7 @@ class Atualizar_Pedido(DispachLoginRequired, View):
         pedido.status = para
         pedido.save()
         return redirect('pedido:admin_detalhe', pedido_id)
+
 
 class Desativar_Pedido(View):
     
@@ -309,6 +319,7 @@ class ItensPedido_json(ListView):
         produtos = pedido_service.Pedido_Service().getItemsProdutos(pedido_id=pedido_id)
         json_data = serializers.serialize('json', produtos)
         return JsonResponse(json_data, safe=False)
+
 
 class Admin_detalhe_pedido(DispachLoginRequired, View):
     
