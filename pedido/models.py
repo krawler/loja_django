@@ -34,7 +34,7 @@ class Pedido(models.Model):
 class ItemPedido(models.Model):
    
     pedido   = models.ForeignKey(Pedido, on_delete=models.CASCADE)
-    produto  = models.ForeignKey(Produto, on_delete=models.SET_NULL, null= True)   
+    produto  = models.ForeignKey(Produto, on_delete=models.DO_NOTHING, null= True)   
     variacao = models.ForeignKey(Variacao, on_delete=models.CASCADE) 
     preco = models.DecimalField(max_digits=10, decimal_places=2)
     preco_promocional = models.DecimalField(max_digits=10, decimal_places=2, default=0)
