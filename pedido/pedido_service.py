@@ -1,8 +1,7 @@
-from produto.models import ProdutoSimples, Variacao
+from produto.models import ProdutoSimples
 from .models import Pedido
 from django.db import connection
-from django.shortcuts import reverse
-from pagseguro import PagSeguro
+
 
 class Pedido_Service():
 
@@ -10,7 +9,6 @@ class Pedido_Service():
         if not hasattr(cls, 'instance'):
             cls.instance = super(Pedido_Service, cls).__new__(cls)
         return cls.instance    
-
 
     def getItemsProdutos(self, pedido_id):
 
@@ -33,7 +31,6 @@ class Pedido_Service():
                 produtos.append(produto)
             
             return produtos
-
 
     def get_data_ultimo_pedido(self, user):
 
