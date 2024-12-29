@@ -26,14 +26,14 @@ class ProdutoService():
 
 
     def get_produtos_mais_vendidos(self):
-    
+        '''
         agg_count_pedidos = ItemPedido.objects.values('produto_id').annotate(num_pedidos=Count('id')).order_by('-num_pedidos')[:4]
         itens = list(agg_count_pedidos)
         id_produtos = []
         for item in itens:
             id_produtos.append(item['produto_id'])
         return Produto.objects.filter(id__in=id_produtos)
-    
+    '''
 
     def insert_item_session_carrinho(self, sessao_carrinho, user):
     
@@ -54,47 +54,41 @@ class ProdutoService():
                 sessao.save()
             else:
                 variacao_user_sessao.quantidade = sessao_carrinho['quantidade']
-                variacao_user_sessao.save()
-                
+                variacao_user_sessao.save()              
 
     def limpa_session_carrinho_user(self, user):
         if not user.is_anonymous:
             SessaoCarrinho.objects.filter(user=user).delete()
 
-
     def delete_item_session_carrinho(self, usuario, variacao):
         SessaoCarrinho.objects.filter(user=usuario, Variacao=variacao).delete()
-
 
     def getCarrinhoSessao(self, user):
         return SessaoCarrinho.objects.filter(user=user).all()
 
-
     def salvar_saida_produto(self, variacao, preco_final, quantidade, user, data, hora, pedido):
     
         saida_produto = SaidaProduto(variacao=variacao,
-                                    preco_final=preco_final,
-                                    quantidade=quantidade,
-                                    user=user,
-                                    data=data,
-                                    hora=hora,
-                                    pedido=pedido
+                                     preco_final=preco_final,
+                                     quantidade=quantidade,
+                                     user=user,
+                                     data=data,
+                                     hora=hora,
+                                     pedido=pedido
         )
         saida_produto.save()
-
 
     def salvar_entrada_produto(self, variacao, preco_final, quantidade, user):
         model_variacao = Variacao.objects.filter(id=variacao).first()
         data = datetime.today()
         hora = timezone.now()
         entrada_produto = EntradaProduto(variacao=model_variacao,
-                                    preco_final=preco_final,
-                                    quantidade=quantidade,
-                                    user=user,
-                                    data=data,
-                                    hora=hora)
+                                         preco_final=preco_final,
+                                         quantidade=quantidade,
+                                         user=user,
+                                         data=data,
+                                         hora=hora)
         entrada_produto.save()
-
 
     def getEstoqueAtual(self, variacao_id):
 
