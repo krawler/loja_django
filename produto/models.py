@@ -1,14 +1,13 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
-from datetime import datetime
 from PIL import Image
-from django.utils import timezone
 from django.utils.text import slugify 
 from django.utils.functional import cached_property
 from urllib.parse import urljoin
 import os
 import django
+
 
 class Categoria(models.Model):
     nome = models.TextField(max_length=50, null=False)
@@ -18,6 +17,7 @@ class Categoria(models.Model):
     
     def __str__(self):
         return self.nome
+
 
 class Produto(models.Model):
     nome = models.CharField(max_length=200)
@@ -123,6 +123,7 @@ class Produto(models.Model):
     def __str__(self):
         return self.nome   
 
+
 class ProdutoSimples(models.Model):
     nome_produto = models.CharField(max_length=100)
     nome_variacao = models.CharField(max_length=100)
@@ -134,6 +135,7 @@ class ProdutoSimples(models.Model):
     class Meta:
         managed = False 
         abstract = True
+
 
 class Variacao(models.Model):
     
@@ -155,6 +157,7 @@ class Variacao(models.Model):
         verbose_name = 'Variação'
         verbose_name_plural = 'variações'        
 
+
 class SessaoCarrinho(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
     Variacao = models.ForeignKey(Variacao, on_delete=models.CASCADE, null=False)
@@ -175,7 +178,7 @@ class EntradaProduto(models.Model):
     quantidade = models.PositiveIntegerField(null=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
     preco_final = models.FloatField()
-    data = models.DateField(default=datetime.now().date())
+    data = models.DateField(django.utils.timezone.now)
     hora = models.TimeField(django.utils.timezone.now)
     desativado = models.BooleanField(default=False)
 
@@ -185,7 +188,7 @@ class SaidaProduto(models.Model):
     quantidade = models.PositiveIntegerField(null=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
     preco_final = models.FloatField()
-    data = models.DateField(default=datetime.now().date())
+    data = models.DateField(default=django.utils.timezone.now)
     hora = models.TimeField(default=django.utils.timezone.now)
     desativado = models.BooleanField(default=False)
     pedido = models.ForeignKey('pedido.Pedido', null=True, on_delete=models.SET_NULL)
