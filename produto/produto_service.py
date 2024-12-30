@@ -168,7 +168,7 @@ class ProdutoService():
                         WHERE ap.user_id = %s
                         GROUP BY p.id
                         ORDER BY total_acessos DESC
-                        LIMIT 9
+                        LIMIT 8
                         """
             cursor.execute(str_sql, [user.id])
 
@@ -191,8 +191,8 @@ class ProdutoService():
                         FROM produto_acessoproduto ap
                         INNER JOIN produto_produto p ON ap.produto_id = p.id
                         GROUP BY p.id
-                        ORDER BY total_acessos DESC
-                        LIMIT 4;
+                        ORDER BY random()
+                        LIMIT 8;
                         """
             cursor.execute(str_sql)
 
