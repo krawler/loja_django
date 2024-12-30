@@ -1,15 +1,6 @@
 {% load omfilters %}
 
 
-    {% for imagem in produto.variacao_set.last.imagemproduto_set.all %}
-        
-            <a data-fancybox="gallery" href="{{imagem.imagem.url}}">
-                <img class="img-fluid rounded imagem_variacao"
-                            data-zoom-image="{{imagem.imagem.url}}" 
-                            src="{{imagem.miniatura_minuscula}}">
-            </a>     
-    {% endfor %} 
-</div>       
 
 {% if not area_sem_produtos %}
 <div class="container mt-4 mb-4">
