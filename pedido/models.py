@@ -3,12 +3,13 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from produto.models import Variacao, Produto
+import django
 
 class Pedido(models.Model):
     
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
-    data_emissao = models.DateField(default=datetime.now().date())
-    hora_emissao = models.TimeField(default=timezone.now().time())
+    data_emissao = models.DateField(default=django.utils.timezone.now)
+    hora_emissao = models.TimeField(default=django.utils.timezone.now)
     total = models.DecimalField(max_digits=10, decimal_places=2, null=False)
     qtd_total = models.FloatField(default=0)
     status = models.CharField(
