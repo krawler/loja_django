@@ -1,8 +1,10 @@
 {% extends 'base.html' %}
-{% load omfilters %}
-{% load static %}
-{% block conteudo %}
 
+{% load omfilters %}
+
+{% load static %}
+
+{% block conteudo %}
 <div class="row">
     <div class="col">
         <h3>{{pedido}}</h3>
@@ -56,4 +58,7 @@
         </div>
     </div>
 </div>
+
+{% include 'parciais/_vitrine_produtos_rodape.html' %}
+
 {% endblock %}
