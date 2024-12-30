@@ -372,8 +372,7 @@ class ResumoDaCompra(DispachProdutosMaisVendidos, View):
             'perfil': perfil,
             'fretes': fretes,
             'produtos_mais_vendidos': self.produtos_mais_vendidos,
-            'categorias': self.categorias,
-            'preference' : preference
+            'categorias': self.categorias
         }
         return render(self.request, 'produto/resumodacompra.html', contexto)
 
