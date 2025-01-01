@@ -14,9 +14,9 @@ from .models import Pedido, ItemPedido
 from perfil.models import PerfilUsuario
 from .email.py_email import PyEmail 
 from datetime import datetime, timezone, timedelta
-import stripe
 import mercadopago
 import requests     
+import json 
 
 
 class DispachLoginRequired(View):
@@ -37,34 +37,11 @@ class DispachLoginRequired(View):
 
 class Pagar(DispachLoginRequired, View):
     
-    stripe.api_key = 'sk_test_51PRDqWFqNwY82ww5DnAS83DgAsvwPRLbVCTtcHDoWXU8G8I4UGy13f5LHXYsQsl3wDlgFSBdRRMzXeILk8Blenhd00BmZJK1Me'
-    
-    def create_checkout_session(self, variacoes, carrinho):
-        
-        line_items = []       
-
-        carrinho = self.request.session.get('carrinho')
-        for item in carrinho.items():
-            line_items.append({
-                'price': Variacao.objects.get(id=item[0]).id_preco_stripe,
-                'quantity': item[1]['quantidade']
-            })
-        try:
-            checkout_session = stripe.checkout.Session.create(
-                line_items=line_items,
-                mode='payment',
-                success_url='http://localhost:8000/pedido/salvarpedido',
-                cancel_url='http://localhost:8000/produto/resumodacompra',
-                stripe_account='acct_1PRDqWFqNwY82ww5'
-            )
-        except Exception as e:
-            return str(e)
-
-        return redirect(checkout_session.url, code=303)
-
+   
     def get(self, *args, **kwargs):
 
         carrinho = self.request.session.get('carrinho')
+        
         if carrinho is None:
             return redirect('pedido:compraconcluida') 
         
@@ -147,20 +124,7 @@ class SalvarPedido(View):
         carrinho = self.request.session.get('carrinho')
         if carrinho is None:
             return redirect('pedido:compraconcluida') 
-        
-        #carrinho_variacao_ids = [v for v in carrinho]
-        # bd_variacoes = list(
-        #     Variacao.objects.select_related('produto').filter(id__in=carrinho_variacao_ids)
-        # )
-        
-        # for variacao in bd_variacoes:
-        #     vid = variacao.id
-        #     svid = str(vid)
-        #     estoque = ProdutoService().getEstoqueAtual(vid)
-        #     qtd_carrinho = int(carrinho[svid]['quantidade'])
-        #     preco_unt = carrinho[svid]['preco_quantitativo']
-        #     preco_unt_promo = carrinho[svid]['preco_quantitativo_promocional']
-              
+             
         qtd_total_carrinho = sum([int(item['quantidade']) for item in carrinho.values()])
         valor_total_carrinho = sum(
                                     [
@@ -201,87 +165,25 @@ class SalvarPedido(View):
                                                   hora=datetime.now(),
                                                   pedido=pedido)
         
-        del self.request.session['carrinho']
-        ProdutoService().limpa_session_carrinho_user(self.request.user)
         self.request.session['pedido_id'] = pedido.id 
+        
+        ProdutoService().limpa_session_carrinho_user(self.request.user)
+        
+        url_payment = pedido_service.Pedido_Service().checkout_pagseguro(self.request, pedido.id)
+                
+        if url_payment is not None and url_payment != '':
+            return redirect(url_payment)
 
-        pedido_service.Pedido_Service().checkout_pagseguro(self.request, carrinho, pedido.id)
-
-        return redirect('pedido:compraconcluida')        
+        #return redirect('pedido:compraconcluida')        
        
 
 class CompraConcluida(DispachLoginRequired, View):
     
     def get(self, *args, **kwargs):
         
-        now = datetime.now(timezone(timedelta(hours=-3)))
-        iso_format = now.isoformat()
-        url = "https://sandbox.api.pagseguro.com/checkouts"
-        headers = {
-            "accept": "*/*",
-            "Authorization": "Bearer 9d724eb2-b076-4ec6-a3f6-2eb62e3be240f701023145f0bcf5fcf389ad5ee0602f587c-7946-4635-be65-30827c01c169",
-            "Content-type": "application/json"
-        }
-        payload = {
-            "customer": {
-                "phone": {
-                    "country": "+55",
-                    "area": "14",
-                    "number": "996064031"
-                },
-                "Name": "Rafael Augusto Ramos",
-                "email": "august.rafael@gmail.com",
-                "tax_id": "35982316873"
-            },
-            "shipping": {   
-                "address": {
-                    "street": "Rua Romeu José Batista",
-                    "number": "372",
-                    "city": "SANTA CRUZ DO RIO PARDO",
-                    "region_code": "São Paulo",
-                    "country": "Brasil",
-                    "postal_code": "18910-066",
-                    "locality": "Jardim Brasilia"
-                },
-                "box": {
-                    "dimensions": {
-                        "length": 0.8,
-                        "width": 0.4,
-                        "height": 0.2
-                    },
-                    "weight": 0.5
-                },
-                "type": "CALCULATE",
-                "service_type": "PAC",
-                "address_modifiable": True,
-                "amount": "12"
-            },
-            "reference_id": "123",
-            "expiration_date": iso_format,
-            "customer_modifiable": True,
-            "items": [
-                {
-                    "reference_id": "12",
-                    "name": "nome da variacao",
-                    "description": "descricao do produto",
-                    "quantity": 2,
-                    "unit_amount": 10000,
-                    "image_url": "image_url"
-                }
-            ],
-            "additional_amount": 0,
-            "discount_amount": 0,
-            "payment_methods": [{"type": "PIX"}, {"type": "CREDIT_CARD"}],
-            "payment_methods_configs": [{"config_options": [{"option": "INSTALLMENTS_LIMIT"}]}],
-            "redirect_url": "http://localhost:8000/pedido/compraconcluida/"
-        }
-
-        response = requests.post(url, json=payload, headers=headers)
-
-        print(response.text)    
-
-        pedido_id =  self.request.session.get('pedido_id')   
-        pedido = Pedido.objects.filter(id=pedido_id).first()
+        del self.request.session['carrinho']  
+        id_pedido =  self.request.session.get('pedido_id')   
+        pedido = Pedido.objects.get(id=id_pedido)          
         produtos_mais_vendidos = ProdutoService().get_produtos_mais_acessados_por_geral()
         contexto = {                   
                     'pedido': pedido, 
@@ -290,7 +192,7 @@ class CompraConcluida(DispachLoginRequired, View):
                     }       
         if not self.request.session.get("email_enviado"):
             py_email = PyEmail(pedido.usuario.email)
-            py_email.set_body(username=self.request.user, nro_pedido=pedido_id, request=self.request)
+            py_email.set_body(username=self.request.user, nro_pedido=id_pedido, request=self.request)
             py_email.enviar()
             self.request.session["email_enviado"] = True
 
