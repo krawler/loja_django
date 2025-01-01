@@ -41,7 +41,7 @@
             nomeproduto_selecionado = row.children('td.nome_produto').html();
             nomevariacao_selecionado = row.children('td.nome_variacao').html();
             $("#id_variacao").val(row.attr('variacao_id'));
-            $('#preco_atual').val(row.children('td.preco_final').html().trimLeft());
+            $('#preco_atual').val(row.children('td.preco_final').html().trimLeft().replace('R$', ''));
             $("#nome_produto_variacao").html(nomeproduto_selecionado + ' - ' + nomevariacao_selecionado);
             $("#preco_selecionado").val(preco_selecionado);
         }); 
