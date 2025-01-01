@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_list_or_404, reverse, redirect, get_object_or_404
 from django.core import serializers
 from django.core.paginator import Paginator
+import django.urls
 from django.views.generic.list import ListView
 from django.views import View
 from django.views.generic.detail import DetailView
@@ -68,7 +69,7 @@ class ListaProdutos(DispachProdutosMaisVendidos, ListView):
         elif termo is not None and termo != '':
             produtos = Produto.objects.filter(imagem__isnull=False).filter(Q(nome__icontains=termo) | Q(descricao__icontains=termo) | Q(descricao_longa__icontains=termo)).order_by('?')[:9]
         else:
-            produtos = Produto.objects.filter(imagem__isnull=False).order_by('?')[:9]
+            produtos = Produto.objects.filter(imagem__isnull=False).order_by('?')[:12]
         
         paginator = Paginator(produtos, per_page=4,allow_empty_first_page=True)
         page_object = paginator.get_page(page)
@@ -349,6 +350,7 @@ class ResumoDaCompra(DispachProdutosMaisVendidos, View):
                     'Algum item no carrinho tem quantidade abaixo de 1'
                 )
                 return redirect('produto:carrinho')
+       
         if not self.request.user.is_authenticated:
             return redirect('perfil:login')
         
@@ -409,12 +411,14 @@ class EntradaProdutoView(DispachLoginRequired, View):
     def post(self, *args, **kwargs):
         
         quantidade = self.request.POST.get('quantidade')
-        preco_final = self.request.POST.get('quantidade')
+        preco_final = self.request.POST.get('preco_atual')
         id_variacao = self.request.POST.get('id_variacao')
         user = self.request.user
+        preco_final = preco_final.replace(',', '.').strip()
         ProdutoService().salvar_entrada_produto(id_variacao, preco_final, quantidade, user)
 
         return redirect('produto:tabela_entrada')
+
 
 class TabelaEntradaProduto(DispachLoginRequired, View):
     model = EntradaProduto
@@ -422,7 +426,7 @@ class TabelaEntradaProduto(DispachLoginRequired, View):
     context_object_name = 'entradas'
 
     def get(self, *args, **kwargs):
-        entradas = EntradaProduto.objects.all()
+        entradas = EntradaProduto.objects.order_by('data')
         context = {
             'entradas': entradas,
             'pagina_tabela' : True
