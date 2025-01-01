@@ -1,6 +1,14 @@
+import datetime
+from django.contrib import messages
 from produto.models import ProdutoSimples
+from perfil.models import PerfilUsuario
+import requests
+from .models import ItemPedido
 from .models import Pedido
 from django.db import connection
+from django.shortcuts import render, redirect
+from datetime import datetime, timezone, timedelta
+import json
 
 
 class Pedido_Service():
@@ -64,57 +72,118 @@ class Pedido_Service():
         pedido.save()
         return pedido
 
-    def checkout_pagseguro(self, request, carrinho, id_pedido):
-
-        user = request.user
-        perfil = user.perfilusuario
+    def checkout_pagseguro(self, request, id_pedido):
         
-        '''
-        pg = PagSeguro(email="august.rafael@gmail.com", token="9d724eb2-b076-4ec6-a3f6-2eb62e3be240f701023145f0bcf5fcf389ad5ee0602f587c-7946-4635-be65-30827c01c169", config=config)        
-        try:
-            pg.reference = id_pedido
-            pg.sender = {
-                "name": "Iza Marina Viccino",
-                "area_code": "14",
-                "phone": "996064031",
-                "email": "iviccino@gmail.com",
+        url_payment = "" 
+        total_length = 0
+        total_width = 0
+        total_height = 0
+        total_weight = 0
+        try: 
+            pedido = Pedido.objects.get(id=id_pedido)
+            now = datetime.now(timezone(timedelta(hours=-3))) 
+            iso_format = now.strftime("%Y-%m-%dT%H:%M:%S%Z")
+            parts = iso_format.split("UTC")
+            #expiration_date = parts[0] + parts[1]
+            url = "https://sandbox.api.pagseguro.com/checkouts"
+            user = request.user
+            perfil = PerfilUsuario.objects.get(usuario=user)
+            itens_pedido = ItemPedido.objects.filter(pedido=pedido)
+            
+            items = []
+            total_dimensions = {}
+            for item in itens_pedido:
+                items.append(
+                    {
+                        "reference_id": str(item.variacao.id),
+                        "name": item.variacao.produto.nome + ' - '  + item.variacao.nome,
+                        "description": item.variacao.produto.descricao,
+                        "quantity": item.quantidade,
+                        "unit_amount": int((item.preco if item.preco_promocional is None else item.preco_promocional) * 100),
+                        "image_url": "https://raradmco.tx1.fcomet.com/media/produto_imagens/2024/06/camiseta-supernatural-nova-01.jpg"
+                    }
+                )
+                total_length = item.variacao.comprimento if item.variacao.comprimento > total_length else total_length
+                total_width  = item.variacao.largura if item.variacao.largura > total_width else total_width
+                total_height = item.variacao.altura if item.variacao.altura > total_height else total_height
+                total_weight += item.variacao.peso
+                      
+            box = {
+                    "dimensions": {
+                        "length": total_length * 100,
+                        "width": total_width * 100,
+                        "height": total_height * 100
+                    },
+                    "weight":  "300"  #str(int(total_weight * 1000))
+                }
+                               
+            headers = {
+                "accept": "*/*",
+                "Authorization": "Bearer 9d724eb2-b076-4ec6-a3f6-2eb62e3be240f701023145f0bcf5fcf389ad5ee0602f587c-7946-4635-be65-30827c01c169",
+                "Content-type": "application/json"
             }
-            pg.shipping = {
-                "type": pg.SEDEX,
-                "street": perfil.endereco,
-                "number": perfil.numero,
-                "complement": perfil.complemento,
-                "district": perfil.bairro,
-                "postal_code": perfil.cep,
-                "city": perfil.cidade,
-                "state": perfil.estado,
-                "country": "BRA"
+            payload = {
+                "customer": {
+                    "phone": {
+                        "country": "+55",
+                        "area": "14",
+                        "number": perfil.telefone
+                    },
+                    "Name": perfil.nome_completo,
+                    "email": user.email,
+                    "tax_id": perfil.cpf
+                },
+                "shipping": {   
+                    "address": {
+                        "street": perfil.endereco,
+                        "number": perfil.numero,
+                        "city": perfil.cidade,
+                        "region_code": perfil.estado,
+                        "country": "BRA",
+                        "postal_code": perfil.cep,
+                        "locality": perfil.bairro
+                    },
+                    "box": box,
+                    "type": "FIXED",
+                    "service_type": "PAC",
+                    "address_modifiable": False,
+                    "amount": "1200"
+                },
+                "reference_id": id_pedido,
+                "expiration_date": "2025-01-14T19:09:10-03:00", #expiration_date,
+                "customer_modifiable": True,
+                "items": items,  
+                "additional_amount": 0,
+                "discount_amount": 0,
+                "payment_methods": [{"type": "pix"}, {"type": "CREDIT_CARD"}],
+                "payment_methods_configs": [
+                    {
+                        "type": "CREDIT_CARD",
+                        "config_options": [{"option": "INSTALLMENTS_LIMIT", "value": 4}],         
+                    }
+                ],            
+                "redirect_url": "https://raradmco.tx1.fcomet.com/loja-django"
             }
-            for item in carrinho:
-                variacao = Variacao.objects.get(id=item) 
-                pg.items.append(
-                    {"id": str(variacao.id), 
-                        "description": variacao.produto.nome + ' - ' + variacao.nome, 
-                        "amount": variacao.preco if variacao.preco_promocional is None else variacao.preco_promocional, 
-                        "quantity": 2, 
-                        "weight": float(variacao.peso),
-                        "shipping_cost": 10.00
-                })
-            pg.extra_amount = 5.70    
-            pg.redirect_url = request.build_absolute_uri(
-                                        reverse('pedido:compraconcluida')
-            )
-            pg.notification_url = request.build_absolute_uri(
-                                        reverse('pedido:compraconcluida')  #notification
-            )
-            response = pg.checkout()
-            return response.payment_url
+        
+            response = requests.post(url, json=payload, headers=headers)   
+            print(response.text)
+            response_dict = json.loads(response.text)
+            if response.status_code == 400: 
+                messages.error( request, str(response_dict))  
+                return redirect('produto:resumodacompra')                
+            elif response.status_code == 201: 
+                pedido.id_checkout = response_dict["id"]
+                pedido.save()   
+                url_payment = response_dict["links"][1]['href']
         except TypeError as e:
             print("Erro de tipo:", e)
             print("Verifique se todos os valores estão sendo passados corretamente.")
         except AttributeError as e:
             print("Erro de atributo:", e)
             print("Verifique se os atributos estão sendo acessados corretamente.")    
+        except NameError as e:
+            print("Erro no reconhecimento de alguma dependencia:", e)    
         except Exception as e:
             print(e)
-        '''
+
+        return url_payment
