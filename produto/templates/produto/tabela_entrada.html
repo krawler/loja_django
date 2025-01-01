@@ -19,6 +19,7 @@
             <th class="text-center" style="width: 10%">Número</th>
             <th>Data de emissão</th>
             <th>Usuário</th>
+            <th>Produto</th>
             <th>Quantidade</th>
             <th>Preço</th>
         </tr>
@@ -29,6 +30,7 @@
             <td class="text-center">{{entrada.variacao_id}}</td>
             <td>{{entrada.data|formata_br_date}}   às   {{entrada.hora|formata_br_hora}}</td>
             <td>{{entrada.user.email}}</td>
+            <td>{{entrada.variacao.produto.nome}} - {{entrada.variacao.nome}}</td>
             <td style="width: 10%">{{entrada.quantidade}}</td>
             <td>{{entrada.preco_final|formata_preco}}</td>
         </tr>
