@@ -21,7 +21,7 @@
                         {% endif %}    
                     </td>
                     <td>{{frete.name}} <td>                       
-                    <td>{{frete.price|formata_preco}}</td>                        
+                    <td class="preco">{{frete.price|formata_preco}}</td>                        
                     <td class="text-center">{{frete.delivery_time}} dias</td> 
                 </tr>
             {% endif %}
@@ -43,6 +43,14 @@
                 $(this).addClass('selected');
                 let total_compra = calcula_total_geral(this);
                 $("#total_compra").html(formata_preco(total_compra));
+
+                let preco_selecionado = $(this).children('td.preco').html()
+                                                                    .replace('R$ ','')
+                                                                    .replace(',','.');
+                link = $("#url_salvar_pedido").val();
+                link = link + '?frete=' + preco_selecionado; 
+                $("#realiza_pedido").attr("href", link);
+
             }
         );
 
