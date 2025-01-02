@@ -66,4 +66,38 @@ $(document).ready(function(){
                 },                
         );
     });
+        
+    $('#perfil_endereco').change(function() {
+        if ($(this).is(':checked')) {
+            habilitaCamposPerfil();
+        } else {
+            desabilitaCamposPerfil();
+        }
+    });
+
 });
+
+function desabilitaCamposPerfil() {
+    $("#id_numero").prop("disabled", true);
+    $("#id_bairro").prop("disabled", true);
+    $("#id_endereco").prop("disabled", true);
+    $("#id_cep").prop("disabled", true);
+    $("#id_complemento").prop("disabled", true); 
+    $("#id_cidade").prop("disabled", true); 
+    $("#id_estado").prop("disabled", true);
+    $("#btn_cep").addClass("disabled");
+    $("#id_nome_completo").focus();
+}
+
+function habilitaCamposPerfil() {
+    $("#id_numero").prop("disabled", false);
+    $("#id_bairro").prop("disabled", false);
+    $("#id_endereco").prop("disabled", false);
+    $("#id_cep").prop("disabled", false);
+    $("#id_complemento").prop("disabled", false); 
+    $("#id_cidade").prop("disabled", false); 
+    $("#id_estado").prop("disabled", false);
+    $("#id_nome_completo").prop("disabled", false);
+    $("#btn_cep").removeClass("disabled");
+    $("#id_cep").focus();
+}
