@@ -89,7 +89,11 @@ class Pedido_Service():
             user = request.user
             perfil = PerfilUsuario.objects.get(usuario=user)
             itens_pedido = ItemPedido.objects.filter(pedido=pedido)
-            preco_frete = float(preco_frete) * 100
+            
+            if perfil.perfil_endereco:
+                preco_frete = float(preco_frete) * 100
+            else:
+                preco_frete = 0    
                         
             items = []
             for item in itens_pedido:
@@ -130,7 +134,7 @@ class Pedido_Service():
                         "area": "14",
                         "number": perfil.telefone
                     },
-                    "Name": perfil.nome_completo,
+                    "name": perfil.nome_completo,
                     "email": user.email,
                     "tax_id": perfil.cpf
                 },
@@ -147,12 +151,12 @@ class Pedido_Service():
                     "box": box,
                     "type": "FIXED",
                     "service_type": "PAC",
-                    "address_modifiable": False,
+                    "address_modifiable": True,
                     "amount": preco_frete   
                 },
                 "reference_id": id_pedido,
                 "expiration_date": "2025-01-14T19:09:10-03:00", #expiration_date,
-                "customer_modifiable": True,
+                "customer_modifiable": False,
                 "items": items,  
                 "additional_amount": 0,
                 "discount_amount": 0,
