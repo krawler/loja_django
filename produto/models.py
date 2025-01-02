@@ -56,7 +56,8 @@ class Produto(models.Model):
         img_path = self.imagem.path
         path_img = Produto.get_directory_path(img_path)
         file_name = Produto.get_file_name(img_path)
-        thumbnail_path = path_img + '\\' + str(size) + '\\' + file_name
+        thumbnail_path = os.path.join(path_img, str(size), file_name)
+        os.makedirs(os.path.dirname(thumbnail_path), exist_ok=True)
 
         # Criar o nome do arquivo da miniatura
         base, ext = os.path.splitext(thumbnail_path)
