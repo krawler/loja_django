@@ -11,6 +11,7 @@ $("#imagem_produto").ezPlus({
     
 Fancybox.bind('[data-fancybox="gallery"]', {}); 
     
+    /*
     $(".imagem_variacao").hover(function(){
         $("#imagem_produto").removeData('elevateZoom');
         $("#imagem_produto").attr("src", $(this).attr("data-zoom-image"));
@@ -23,7 +24,7 @@ Fancybox.bind('[data-fancybox="gallery"]', {});
         }); 
         
     });
-    
+    */
     estoques = JSON.parse($('#estoques_variacoes').val());
     saldo_estoque = estoques[$("#select-variacoes").val()];
     $("#saldo_estoque").html(saldo_estoque);
@@ -58,4 +59,28 @@ Fancybox.bind('[data-fancybox="gallery"]', {});
         }
     });
 
+    $("#sim_produto_disponivel").click(function(){
+
+        id_variacao = $(this).data("variacaoid");
+    
+        url = $(this).data("url");
+    
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: url,
+            data: {
+                "id_variacao" : id_variacao,
+                "csrfmiddlewaretoken": $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(jsonData) { 
+                if(jsonData=="True")
+                    return console.log("returned: " + jsonData);
+            }
+        });
+    
+        $("#pergunta_aviso_produto_disponivel").html("Você receberá um email quando esse produto estiver disponível em estoque")
+    
+    });
+    
 });
