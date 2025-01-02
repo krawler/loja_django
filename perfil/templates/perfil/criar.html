@@ -16,8 +16,14 @@
             <p>Utilize o formulário abaixo para realizar seu cadastro</p>
         {% endblock %}
 
-        <form method="POST" action="">            
-            {% csrf_token %}          
+        <form method="POST" action="">   
+            <input type="checkbox" 
+                   class="form-check-inline mb-4 mt-4" 
+                   name="perfil_endereco" 
+                   id="perfil_endereco"
+                   checked="checked" />
+                   Desejo informar meus dados de localização para entrega de suas compras                  
+            {% csrf_token %}        
             {{perfilform|crispy}}
             {{userform|crispy}}
             <input type="hidden" name="uf" id="uf" value="{{perfilform.data.estado}}">
