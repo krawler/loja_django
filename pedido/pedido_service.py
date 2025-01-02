@@ -92,7 +92,6 @@ class Pedido_Service():
             preco_frete = float(preco_frete) * 100
                         
             items = []
-            total_dimensions = {}
             for item in itens_pedido:
                 items.append(
                     {
@@ -169,12 +168,12 @@ class Pedido_Service():
             }
         
             response = requests.post(url, json=payload, headers=headers)   
-            #print(response.text)
             response_dict = json.loads(response.text)
             if response.status_code == 400:
                 messages.error(request, str(response_dict))  
                 url_payment = reverse('produto:resumodacompra')                
             elif response.status_code == 201: 
+                pedido.json_request_checkout = response.text
                 pedido.id_checkout = response_dict["id"]
                 pedido.save()   
                 url_payment = response_dict["links"][1]['href']
