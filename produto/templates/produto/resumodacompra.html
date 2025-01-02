@@ -68,6 +68,10 @@
     <div class="col">
         <p class="lead">Opções de fretes</p>
         <p>Selecione uma opção de envio para {{perfil.endereco}}, {{perfil.numero}}, em {{perfil.cidade}}, CEP: {{perfil.cep}}</p>
+        
+        <input type="hidden" name="preco_frete_selecionado" id="preco_frete_selecionado" value="0"> 
+        <input type="hidden" name="url_salvar_pedido" id="url_salvar_pedido" value="{% url 'pedido:pagar' %}">
+        
         {% include 'parciais/_fretes.html' %}
     </div>
 </div>
@@ -82,11 +86,9 @@
     </div>
 </div>
 
-<a href="{% url 'pedido:salvarpedido' %}" class="btn btn-primary btn-block btn-lg">
+<a href="" class="btn btn-primary btn-block btn-lg" id="realiza_pedido">
     Realizar pedido e pagar
 </a>
-
-<div id="wallet_container" data-id="{{preference.id}}"></div>
 
 {% include 'parciais/_mais_acessados.html' %}
 
