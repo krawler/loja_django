@@ -22,14 +22,15 @@
                 {% endif %}
         
                 <div class="grid grid-cols-3 gap-4 max-w-xl mx-auto p-10 mt-2">
-                    {% for imagem in produto.variacao_set.last.imagemproduto_set.all %}
-                        
-                            <a data-fancybox="gallery" href="{{imagem.imagem.url}}">
-                                <img class="img-fluid rounded imagem_variacao"
-                                            data-zoom-image="{{imagem.imagem.url}}" 
-                                            src="{{imagem.miniatura_minuscula}}">
-                            </a>     
-                    {% endfor %} 
+                    {% for variacao in produto.variacao_set.all %}
+                        {% for imagem in variacao.imagemproduto_set.all %}                            
+                                <a data-fancybox="gallery" href="{{imagem.imagem.url}}">
+                                    <img class="img-fluid rounded imagem_variacao"
+                                                data-zoom-image="{{imagem.imagem.url}}" 
+                                                src="{{imagem.miniatura_minuscula}}">
+                                </a>     
+                        {% endfor %} 
+                    {% endfor %}
                 </div>       
 
             </div>
@@ -141,6 +142,7 @@
     </div>
 </div>
 
+{% if produto.descricao_longa < 500 %}
 <div class="row">
     <div class="col-lg-6">
         <div class="mt-5 mb-5" id="descricao_longa">
@@ -175,6 +177,40 @@
         </div>
     </div>
 </div>
+{% else %}
+
+<div class="col">
+    <div class="row">
+        <div class="mt-5 mb-5" id="descricao_longa">
+            <h3>Descrição de {{produto.nome}}</h3>
+            {{produto.descricao_longa | linebreaks}}         
+        </div>
+    </div>
+    <div class="row">
+        <div class="mt-5 mb-5">
+            <h3 >Dimensões</h3>
+            <div class="row">
+                <div class="col-lg-3">
+                    <h6>Peso</h6>
+                    <p id="desc_peso" class="lead">{{produto.variacao_set.first.peso}}</p>
+                </div>
+                <div class="col-lg-3">
+                    <h6>Largura</h6>
+                    <p id="desc_largura" class="lead">{{produto.variacao_set.first.largura}}</p>
+                </div>
+                <div class="col-lg-3">
+                    <h6>Altura</h6>
+                    <p id="desc_altura" class="lead">{{produto.variacao_set.first.altura}}</p>
+                </div>
+                <div class="col-lg-3">
+                    <h6>Comprimento</h6>
+                    <p id="desc_comprimento" class="lead">{{produto.variacao_set.first.comprimento}}</p>
+                </div>                
+            </div>
+    </div>
+</div>
+
+{% endif %}
 
 {% include 'parciais/_vitrine_produtos_rodape.html' %}
 
@@ -227,29 +263,6 @@
         }
     });
 
-$("#sim_produto_disponivel").click(function(){
-
-    id_variacao = $(this).data("variacaoid");
-
-    url = $(this).data("url");
-
-    $.ajax({
-        type: "POST",
-        dataType: "json",
-        url: url,
-        data: {
-            "id_variacao" : id_variacao,
-            "csrfmiddlewaretoken": $('meta[name="csrf-token"]').attr('content')
-        },
-        success: function(jsonData) { 
-            if(jsonData=="True")
-                return console.log("returned: " + jsonData);
-        }
-    });
-
-    $("#pergunta_aviso_produto_disponivel").html("Você receberá um email quando esse produto estiver disponível em estoque")
-
-});
 </script>
 
 {% endblock %}
