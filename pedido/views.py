@@ -41,6 +41,8 @@ class Pagar(DispachLoginRequired, View):
     def get(self, *args, **kwargs):
 
         carrinho = self.request.session.get('carrinho')
+        preco_frete = self.request.GET.get('frete')
+        self.request.session["preco_frete"] = preco_frete
         
         if carrinho is None:
             return redirect('pedido:compraconcluida') 
@@ -85,7 +87,7 @@ class Pagar(DispachLoginRequired, View):
                 self.request.session.save()
                 return redirect('produto:carrinho')
         
-        return self.create_checkout_session(carrinho, bd_variacoes)
+        return redirect("pedido:salvarpedido")
 
     def post(self, *args, **kwargs):
        
@@ -121,6 +123,8 @@ class Pagar(DispachLoginRequired, View):
 class SalvarPedido(View):    
     
     def get(self, *args, **kwargs):
+        
+        preco_frete = self.request.session.get("preco_frete")
         carrinho = self.request.session.get('carrinho')
         if carrinho is None:
             return redirect('pedido:compraconcluida') 
@@ -169,13 +173,11 @@ class SalvarPedido(View):
         
         ProdutoService().limpa_session_carrinho_user(self.request.user)
         
-        url_payment = pedido_service.Pedido_Service().checkout_pagseguro(self.request, pedido.id)
+        url_payment = pedido_service.Pedido_Service().checkout_pagseguro(self.request, pedido.id, preco_frete)
                 
         if url_payment is not None and url_payment != '':
             return redirect(url_payment)
-
-        #return redirect('pedido:compraconcluida')        
-       
+               
 
 class CompraConcluida(DispachLoginRequired, View):
     
@@ -185,10 +187,12 @@ class CompraConcluida(DispachLoginRequired, View):
         id_pedido =  self.request.session.get('pedido_id')   
         pedido = Pedido.objects.get(id=id_pedido)          
         produtos_mais_vendidos = ProdutoService().get_produtos_mais_acessados_por_geral()
+        categorias = ProdutoService().get_all_categorias()
         contexto = {                   
                     'pedido': pedido, 
                     'produtos_mais_vendidos': produtos_mais_vendidos,
-                    'produtos_autocomplete' : self.produtos_autocomplete
+                    'produtos_autocomplete' : self.produtos_autocomplete,
+                    'categorias' : categorias 
                     }       
         if not self.request.session.get("email_enviado"):
             py_email = PyEmail(pedido.usuario.email)
@@ -247,7 +251,7 @@ class Tabela(DispachLoginRequired, ListView):
         pedidos = context['pedidos']
         pedidos = Pedido.objects.filter(desativado=False).order_by('id').reverse()
         for pedido in pedidos:            
-            perfil = pedido.usuario.perfilusuario
+            perfil = pedido.usuario.perfilusuario_set.first
             pedido.perfil_data = perfil
             data_ultima_compra = pedido_service.Pedido_Service().get_data_ultimo_pedido(user=pedido.usuario)
             pedido.data_ultima_compra = data_ultima_compra
