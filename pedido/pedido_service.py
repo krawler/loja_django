@@ -6,7 +6,7 @@ import requests
 from .models import ItemPedido
 from .models import Pedido
 from django.db import connection
-from django.shortcuts import render, redirect
+from django.shortcuts import reverse
 from datetime import datetime, timezone, timedelta
 import json
 
@@ -72,7 +72,7 @@ class Pedido_Service():
         pedido.save()
         return pedido
 
-    def checkout_pagseguro(self, request, id_pedido):
+    def checkout_pagseguro(self, request, id_pedido, preco_frete):
         
         url_payment = "" 
         total_length = 0
@@ -89,7 +89,8 @@ class Pedido_Service():
             user = request.user
             perfil = PerfilUsuario.objects.get(usuario=user)
             itens_pedido = ItemPedido.objects.filter(pedido=pedido)
-            
+            preco_frete = float(preco_frete) * 100
+                        
             items = []
             total_dimensions = {}
             for item in itens_pedido:
@@ -107,14 +108,15 @@ class Pedido_Service():
                 total_width  = item.variacao.largura if item.variacao.largura > total_width else total_width
                 total_height = item.variacao.altura if item.variacao.altura > total_height else total_height
                 total_weight += item.variacao.peso
-                      
+            
+            total_weight = total_weight * 1000          
             box = {
                     "dimensions": {
                         "length": total_length * 100,
                         "width": total_width * 100,
                         "height": total_height * 100
                     },
-                    "weight":  "300"  #str(int(total_weight * 1000))
+                    "weight":  total_weight
                 }
                                
             headers = {
@@ -147,7 +149,7 @@ class Pedido_Service():
                     "type": "FIXED",
                     "service_type": "PAC",
                     "address_modifiable": False,
-                    "amount": "1200"
+                    "amount": preco_frete   
                 },
                 "reference_id": id_pedido,
                 "expiration_date": "2025-01-14T19:09:10-03:00", #expiration_date,
@@ -161,16 +163,17 @@ class Pedido_Service():
                         "type": "CREDIT_CARD",
                         "config_options": [{"option": "INSTALLMENTS_LIMIT", "value": 4}],         
                     }
-                ],            
+                ],     
+                "payment_notification_urls": ["https://raradmco.tx1.fcomet.com/loja-django/compraconcluida"], 
                 "redirect_url": "https://raradmco.tx1.fcomet.com/loja-django"
             }
         
             response = requests.post(url, json=payload, headers=headers)   
-            print(response.text)
+            #print(response.text)
             response_dict = json.loads(response.text)
-            if response.status_code == 400: 
-                messages.error( request, str(response_dict))  
-                return redirect('produto:resumodacompra')                
+            if response.status_code == 400:
+                messages.error(request, str(response_dict))  
+                url_payment = reverse('produto:resumodacompra')                
             elif response.status_code == 201: 
                 pedido.id_checkout = response_dict["id"]
                 pedido.save()   
