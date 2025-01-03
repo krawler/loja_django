@@ -86,6 +86,7 @@ class Criar(BasePerfil):
         first_name = nomes[0]
         tamanho_lista = len(nomes)
         last_name = nomes[tamanho_lista - 1]
+        perfil_endereco = self.request.POST.get('perfil_endereco')
 
         username = str(email).split('@')[0]
 
@@ -103,6 +104,7 @@ class Criar(BasePerfil):
             if not self.perfil:
                 self.perfilform.cleaned_data['usuario'] = usuario
                 perfil = PerfilUsuario(**self.perfilform.cleaned_data)
+                perfil.perfil_endereco = perfil_endereco
                 perfil.save()
             else:
                 perfil = self.perfilform.save(commit=False)
