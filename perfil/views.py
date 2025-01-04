@@ -112,6 +112,10 @@ class Criar(BasePerfil):
                 perfil.save(force_update=True)
         else:
             usuario = self.userform.save(commit=False)
+            usuario.username = username
+            usuario.email = email 
+            usuario.first_name = first_name
+            usuario.last_name = last_name
             usuario.set_password(password)
             usuario.save()
             
