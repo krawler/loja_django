@@ -39,8 +39,13 @@
 
         $('#table_fretes tbody tr').click(
             function(){
-                $('.selected').removeClass('selected');
-                $(this).addClass('selected');
+                if($(this).hasClass('selected')){
+                    $(this).removeClass('selected')  
+                }else{
+                    $('.selected').removeClass('selected');
+                    $(this).addClass('selected');  
+                }
+                
                 let total_compra = calcula_total_geral(this);
                 $("#total_compra").html(formata_preco(total_compra));
 
