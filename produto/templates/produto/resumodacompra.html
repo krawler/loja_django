@@ -2,7 +2,34 @@
 
 {% load omfilters %}
 
+{% load static %}
+
 {% block conteudo %}
+
+<meta name="csrf-token" content="{{ csrf_token }}">
+
+<div class="modal" id="dialogModal" tabindex="-1" aria-labelledby="dialogModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Confirmação</h5>
+                <button type="button" 
+                        class="btn-close" 
+                        data-bs-dismiss="modal" 
+                        aria-label="Close"
+                        id="btnFecharDialog">
+                        <i class="fa fa-times" aria-hidden="true"></i>  
+                </button>
+            </div>
+            <div class="modal-body">
+                Seleciona uma forma de envio na lista de fretes
+            </div>
+            <div class="modal-footer">
+                <a href="#"  class="btn btn-secondary" id="closeDialogModal" >OK</a>
+            </div>
+        </div> 
+    </div>
+</div>
 
 <div class="row mb-5">
     <div class="col-lg">
@@ -12,22 +39,11 @@
         <p>Caso precise editar, <a href="{% url 'perfil:criar' %}">clique aqui</a></p>
         <dl class="row">
             <dt class="col-lg-2">Nome:</dt>
-            <dd class="col-lg-4">{{usuario.first_name}}</dd>
-            <dt class="col-lg-2">Sobrenome:</dt>
-            <dd class="col-lg-4">{{usuario.last_name}}</dd>
+            <dd class="col-lg-4">{{perfil.nome_completo}}</dd>
 
-            <dt class="col-lg-2">Idade:</dt>
-            <dd class="col-lg-4">{{perfil.idade}}</dd>
-            <dt class="col-lg-2">Nascimento:</dt>
-            <dd class="col-lg-4">{{perfil.data_nascimento|formata_br_date}}</dd>
-
-            <dt class="col-lg-2">CPF:</dt>
-            <dd class="col-lg-4">{{perfil.cpf}}</dd>
             <dt class="col-lg-2">E-mail:</dt>
             <dd class="col-lg-4">{{usuario.email}}</dd>
         </dl>
-
-        <p class="lead">Dados de endereço</p>
         <dl class="row">
             <dt class="col-lg-2">Endereço:</dt>
             <dd class="col-lg-4">{{perfil.endereco}}</dd>
@@ -46,13 +62,16 @@
 
             <dt class="col-lg-2">CEP:</dt>
             <dd class="col-lg-4">{{perfil.cep}}</dd>
+
+            <dt class="col-lg-2">Telefone:</dt>
+            <dd class="col-lg-4">{{perfil.telefone}}</dd>
         </dl>
     </div>
 </div>
 
 <div class="row mt-3">
     <div class="col">
-        <p class="lead">Resumo do carrinho</p>
+        <h5>Resumo do carrinho</h5>
         <p>O produtos, quantidades e preços que você escolheu</p>
         {% include 'parciais/_carrinho.html' %}
     </div>
@@ -67,10 +86,15 @@
         </p>
     </div>
 </div>
+
 <div class="row mt-3">
     <div class="col">
         <p class="lead">Opções de fretes</p>
         <p>Selecione uma opção de envio para {{perfil.endereco}}, {{perfil.numero}}, em {{perfil.cidade}}, CEP: {{perfil.cep}}</p>
+        
+        <input type="hidden" name="preco_frete_selecionado" id="preco_frete_selecionado" value="0"> 
+        <input type="hidden" name="url_salvar_pedido" id="url_salvar_pedido" value="{% url 'pedido:pagar' %}">
+        
         {% include 'parciais/_fretes.html' %}
     </div>
 </div>
@@ -84,8 +108,33 @@
         </p>
     </div>
 </div>
-<a href="{% url 'pedido:pagar' %}">
-    <button type="submit" class="btn btn-primary btn-block btn-lg">Realizar pedido e pagar</button>
+
+<a href="" class="btn btn-primary btn-block btn-lg" id="realiza_pedido">
+    Realizar pedido e pagar
 </a>
+
+{% include 'parciais/_mais_acessados.html' %}
+
+{% if not perfil.perfil_endereco %}
+<script>
+  if($("#realiza_pedido").attr("href") == ""){
+     link = $("#url_salvar_pedido").val();
+     $("#realiza_pedido").attr("href", link);
+  }
+</script>
+{% else %}
+<script>
+    $("#realiza_pedido").click(function(e){
+        if($("#realiza_pedido").attr("href") == ""){
+            $("#dialogModal").show();
+            e.preventDefault();
+         } 
+    });
+    
+</script>
+{% endif %}
+
+<script src="{% static 'assets/custom/js/resumo_compra.js' %}"></script>
+<script src="{% static 'assets/waltzer/js/waltzerjs.js' %} "></script>
 
 {% endblock %}

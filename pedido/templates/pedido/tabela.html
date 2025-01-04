@@ -6,6 +6,11 @@
 
 {% block conteudo %}
 
+<<<<<<< HEAD
+=======
+<meta name="csrf-token" content="{{ csrf_token }}">
+
+>>>>>>> main
 <h1 class="text-center">Listagem de pedidos</h1>
 
 <br />
@@ -15,14 +20,22 @@
         <tr>
             <th></th>
             <th class="text-center" style="width: 10%">Número</th>
+<<<<<<< HEAD
             <th>Usuário</th>
             <th>Data de emissão</th>
             <th>Quantidade total</th>
+=======
+            <th>Situação</th>
+            <th>Data de emissão</th>
+            <th>Usuário</th>
+            <th>Quantidade</th>
+>>>>>>> main
             <th>Valor total</th>
         </tr>
     </thead>
     <tbody>
         {% for pedido in pedidos %}
+<<<<<<< HEAD
         <tr>
             <td class="dt-control" id="{{pedido.id}}"></td> 
             <td class="text-center">{{pedido.id}}</td>
@@ -34,15 +47,60 @@
         {% endfor %}
     </tbody>
 </table>
+=======
+        <tr data-endereco="{{pedido.perfil_data.endereco}},{{pedido.perfil_data.numero}}, {{pedido.perfil_data.bairro}}, {{pedido.perfil_data.cep}}"
+            data-cidade="{{pedido.perfil_data.cidade}},{{pedido.perfil_data.estado}}"
+            data-codigo-rastreio="{{pedido.codigo_rastreio_correio}}"
+            data-token="'{{csrf_token}}'"
+            data-href="{% url 'pedido:admin_detalhe' pedido.id %}">
+            <td class="dt-control" id="{{pedido.id}}"></td> 
+            <td class="text-center">{{pedido.id}}</td>
+            <td class="text-center">{{pedido.status|get_status_extenso}}</td>
+            <td>{{pedido.data_emissao|formata_br_date}}   às   {{pedido.hora_emissao|formata_br_hora}}</td>
+            <td>{{pedido.usuario.email}}</td>
+            <td style="width: 10%">{{pedido.qtd_total}}</td>
+            <td>{{pedido.total|formata_preco}}</td>
+        </tr>
+        
+        {% endfor %}
+    </tbody>
+</table>
+<input type="hidden" name="url_delete" id="url_delete" value="{{url_delete}}">
+<div id="dialog-confirm-status" class="hide" title="Alteração da situação do pedido">
+    <p>
+        <span class="ui-icon ui-icon-alert" 
+            style="float:left; margin:12px 12px 20px 0;">
+        </span>
+        <span id="msg-de-para">Isso irá alterar o status do pedido. Você tem certeza?</span>
+    </p>
+</div>  
+<div id="dialog-confirm-deactivate" class="hide" title="Desativação do pedido">
+    <p>
+        <span class="ui-icon ui-icon-alert" 
+            style="float:left; margin:12px 12px 20px 0;">
+        </span>
+        Isso irá desativar o pedido e você não poderá usá-lo no sistema da loja . Você tem certeza?
+    </p>
+</div>  
+
+>>>>>>> main
 
 <script>
     $(document).ready(function(){
         
+<<<<<<< HEAD
         $.noConflict();
+=======
+        $ = jQuery;
+>>>>>>> main
 
         const table = $('#table_id').DataTable({
             colReorder: true,
             keys: true,
+<<<<<<< HEAD
+=======
+            pageLength:20,
+>>>>>>> main
             layout: {
                 topStart: {
                     buttons: ['print', 'excel', 'pdf', 'csv', 'colvis' ]
@@ -50,6 +108,22 @@
             }
         });
 
+<<<<<<< HEAD
+=======
+
+        $('.buttons-colvis').children('span').html('Colunas');
+        $('.dt-search').children('label').html('Procurar')
+        var showing = $("#table_id_info").html()
+        showing = showing.replace('Showing','Exibindo').replace('entries', 'registros')
+                                             .replace('to','a')
+                                             .replace('of','de');
+        $("#table_id_info").html(showing);
+
+        $(".dt-paging-button").on('click', function(){
+            $("#table_id_info").html(showing);
+        });
+
+>>>>>>> main
         table.on('requestChild.dt', function (e, row) {
             row.child(format(row.data())).show();
         });        
@@ -67,6 +141,7 @@
                 $(".linha_detalhe").remove();
             }
             else {
+<<<<<<< HEAD
                 row.child(format(row.data(), id_pedido, $(this).parent().attr("data-image"))).show();
                 showTabelaItens(id_pedido);
             }
@@ -89,6 +164,63 @@
             '<dd>'+ d[2] +'</dd>' +
             '</dl>' +
             '</div>' +
+=======
+                row.child(format(row.data(), id_pedido, $(tr).attr('data-endereco'), 
+                                $(tr).attr('data-cidade'), $(tr).attr('codigo_rastreio'),
+                                $(tr).attr('data-token'), $(tr).attr('data-href'))).show();
+                showTabelaItens(id_pedido);
+            }
+        }); 
+        
+    });
+
+    function format(d, id_pedido,dados_endereco,dados_cidade,codigo_rastreio,token, href) {
+        if(codigo_rastreio == undefined){
+            codigo_rastreio = "Não informado"
+        }
+        let status = d[2].substr(0,1)
+        return (
+            '<div class="row">' +
+                '<div class="col" >' +
+                '<dl>' +
+                '<dt>Numero:</dt>' +
+                '<dd>' +
+                d[1] +
+                '</dd>' +
+                '<dt>Data e hora:</dt>' +
+                '<dd>' +
+                d[3] +
+                '</dd>' +
+                '<dt>Situação:</dt>' +
+                '<dd id="status_'+ id_pedido +'">'+ d[2] +'</dd>' +
+                '</dl>' +
+                '</div>' +
+                '<div class="col" style=""">' +
+                    '<dl>' +
+                    '<dt>Endereço:</dt>' +
+                    '<dd>' +
+                    dados_endereco +
+                    '</dd>' +
+                    '<dt>Cidade:</dt>' +
+                    '<dd>' +
+                    dados_cidade +
+                    '</dd>' +
+                    '<dt>Código rastreio:</dt>' +
+                    '<dd>'+ codigo_rastreio +'</dd>' +
+                    '</dl>' +
+                '</div>' +    
+                '<div class="col" style=""">' +
+                '<button data-status="' + d[2] + '" data-token="' + token + '" class="btn btn-secondary btn-block btn-lg btnChangeStatus"' +
+                                'onclick="showDialogModalStatus('+ id_pedido +',' + token + ')">' +
+                'Mudar para ' + getNextStep(status) + '</button>'+ 
+                '<a class="btn btn-primary btn-block btn-lg" href="'+ href +'">' +
+                ' Ver detalhes do pedido </a>'+ 
+                '<button class="btn btn-danger btn-block btn-lg btn-delete"' +
+                ' url="' + $("#url_delete").val() + '"' +
+                ' onclick="showDialogModalDeactivate('+ id_pedido +')">' +    
+                ' Desativar pedido </button>'+ 
+            '</div>' +    
+>>>>>>> main
             '</br>'
         );
     }
@@ -114,11 +246,15 @@
                 });
     }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
     function getTableFromDataArray(dataText, id_pedido){
         const dataObj = JSON.parse(dataText);
         let title = ''
         let tableHeader =   '<tr class="linha_detalhe">'+
+<<<<<<< HEAD
                             '<td colspan=\"6\">'+
                             '<h5 class="titulo_h5" style="text-align:center">Lista de itens do pedido '+ id_pedido +'</h4>' +   
                             '<table id=\"tabela_variacoes\" style=\"margin-left:10%; width:80%\">' +
@@ -126,6 +262,15 @@
                                 '<tr>' +
                                     '<th style="width:35%">Nome do produto</th>'+
                                     '<th>Variação</th>'+
+=======
+                            '<td colspan=\"7\">'+
+                            '<table id=\"tabela_variacoes\" style=\"width:100%\">' +
+                            '<thead>' +
+                                '<tr>' +
+                                    '<th style="width:35%">Nome do produto</th>'+
+                                    '<th>Nome da Variação</th>'+
+                                    '<th style="text-align:center">Estoque Médio</th>'+
+>>>>>>> main
                                     '<th style="text-align:center">Quantidade</th>'+
                                     '<th style="text-align:center">Preço</th>'+
                                     '<th style="text-align:center">Preço promocional</th>'
@@ -134,12 +279,22 @@
         let tableRows = '';
         dataObj.forEach(row => {
             tableRows  += '<tr>'+                       
+<<<<<<< HEAD
                 '<td>'+row.fields.produto+'</td>'+    
                 '<td>'+row.fields.variacao+'</td>'+                         
                 '<td style="text-align:center; width:20%">'+row.fields.quantidade+'</td>'+
                 '<td style="text-align:right; width:10%">'+formata_preco(row.fields.preco)+'</td>'+
                 '<td style="text-align:right; width:20%">'+formata_preco(row.fields.preco_promocional)+'</td>'+
             '</tr>'; 
+=======
+                '<td>'+row.fields.nome_produto+'</td>'+    
+                '<td>'+row.fields.nome_variacao+'</td>'+                         
+                '<td style="text-align:center; width:10%">' + row.fields.estoque + '</td>'+
+                '<td style="text-align:center; width:10%">' + row.fields.quantidade + '</td>'+
+                '<td style="text-align:right; width:10%">' + formata_preco(row.fields.preco) + '</td>'+
+                '<td style="text-align:right; width:15%">' + formata_preco(row.fields.preco_promocional)+'</td>' +
+                '</tr>'; 
+>>>>>>> main
         });             
         return ( title +
                  tableHeader +
@@ -152,6 +307,7 @@
                );     
     }
 
+<<<<<<< HEAD
     function formata_preco(numero)
     {
         return numero.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -164,6 +320,8 @@
     }
 
     
+=======
+>>>>>>> main
 </script> 
 
 {% endblock conteudo %}

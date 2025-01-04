@@ -2,15 +2,37 @@
 
 {% load omfilters %}
 
+{% load static %}
+
 {% block conteudo %}
+
+<meta name="csrf-token" content="{{ csrf_token }}">
 
 <div class="row">
     <div class="col-lg">
         <div class="row no-gutters">
             <div class="col-lg-12">
                 {% if produto.imagem %}
-                    <img class="img-fluid" src="{{ produto.imagem.url }}">
-                {% endif %}    
+                    <a data-fancybox="gallery" href="{{ produto.imagem.url }}">
+                        <img class="img-fluid"
+                                id="imagem_produto"
+                                data-zoom-image="{{ produto.imagem.url }}" 
+                                src="{{ produto.imagem.url }}">
+                    </a>        
+                {% endif %}
+        
+                <div class="grid grid-cols-3 gap-4 max-w-xl mx-auto p-10 mt-2">
+                    {% for variacao in produto.variacao_set.all %}
+                        {% for imagem in variacao.imagemproduto_set.all %}                            
+                                <a data-fancybox="gallery" href="{{imagem.imagem.url}}">
+                                    <img class="img-fluid rounded imagem_variacao"
+                                                data-zoom-image="{{imagem.imagem.url}}" 
+                                                src="{{imagem.miniatura_minuscula}}">
+                                </a>     
+                        {% endfor %} 
+                    {% endfor %}
+                </div>       
+
             </div>
         </div>
     </div>
@@ -19,33 +41,60 @@
             <h1 class="h2">{{produto.nome}}</h1>
             <p class="lead">{{produto.descricao}}</p>
             <p class="lead">
-                {% if produto.preco_marketing_promocional %}
-                    <span id="variation-preco-promocional" 
-                          class="lead product-price">
-                          {{produto.preco_marketing_promocional|formata_preco}}
-                    </span>
-                    <span id="variation-preco"
-                          class="lead product-old-price text-muted">
-                          {{produto.preco_marketing|formata_preco}}
-                    </span>
+                {% if produto.variacao_set.first.preco_promocional %}
+                <span id="variation-preco" class="lead product-old-price text-muted">
+                    {{produto.variacao_set.first.preco|formata_preco}} 
+                </span>
+                <span id="variation-preco-promocional" class="lead product-price">
+                    {{produto.variacao_set.first.preco_promocional|formata_preco}}
+                </span>
                 {% else %}
                     <span id="variation-preco-normal" 
-                    class="lead product-price">{{produto.preco_marketing|formata_preco}}</span>
+                    class="lead product-price">{{produto.variacao_set.first.preco|formata_preco}}</span>
                 {% endif %}          
             </p>
-
+            <p class="lead hide" id="pergunta_aviso_produto_disponivel">
+                Deseja ser avisado quando este produto estiver disponível?
+                <button class="btn btn-primary" 
+                        id="sim_produto_disponivel"
+                        data-url="{% url 'produto:detalhe' produto.slug %}"
+                        data-variacaoid="{{produto.variacao_set.first.id}}">
+                    Sim
+                </button>
+            </p>
+            <p class="lead">
+                <span id="saldo_estoque"></span> em estoque 
+                
+            </p>
+            <p class="lead" data-adicionado="{{is_lista_desejo}}">
+                <i id="star-r" 
+                    class="fa-regular far fa-star" 
+                    style="color: #19aabe; "
+                    data-url="{% url 'perfil:lista_desejos' %}"
+                    data-id_produto="{{produto.id}}">
+                </i>
+                <i id="star-s" 
+                    class="fa-solid fas fa-star" 
+                    style="color: #19aabe; display: none;"
+                    data-url="{% url 'perfil:lista_desejos' %}"
+                    data-id_produto="{{produto.id}}">
+                </i>
+                <span>Adicionar na minha lista de desejos</span>  
+            </p>
             <form action="{% url 'produto:adicionaraocarrinho' %}" id="form-add-to-cart">
                 {% if produto.variacao_set %}
-                    <div class="form-group">
-                        <input type="number" id="quantidade" name="quantidade" value="1" 
-                            class="form-control form-control-lg input_qtd">
+                    <input type="hidden" name="csrf_token" value="{{csrf_token}}">
+                    <input type="hidden" id="estoques_variacoes" value="{{saldo_estoque_variacoes}}" />
+                    <input type="hidden" name="dimensoes" id="dimensoes" value="{{dimensoes}}">
+                    <div class="form-group">        
                         <select id="select-variacoes" name="vid" 
-                        class="form-control form-control-lg input_variacao">
+                            class="form-control form-control-lg input_variacao">
+                            
                             {% for variacao in produto.variacao_set.all %}
                                 {% if variacao.preco_promocional %}
                                     <option data-preco="{{variacao.preco|formata_preco}}" 
                                             data-preco-promocional="{{variacao.preco_promocional}}" 
-                                            value="{{variacao.id}}">
+                                            value="{{variacao.id}}" selected="selected">
                                         {% if variacao.nome %}
                                             {{variacao.nome}}
                                         {% else %}
@@ -67,12 +116,25 @@
                     </div>
                 {% endif %}    
                 <div class="btn-add-cart">
-                    <button type="submit" class="btn btn-primary btn-lg btn-block">
-                        <i class="fa fa-shopping-cart" aria-hidden="true"></i>
-                        Adicionar ao carrinho
-                    </button>
-                </div>
+                    <div class="row">
+                        <div class="col-lg-2 ">
+                            <input type="number" id="quantidade" name="quantidade" value="1" 
+                                    class="form-control form-control-lg input_qtd" />
+                        </div>
+                        <div class="col-lg-7 col-distancia-curta">
+                            <button type="submit" 
+                                    class="btn btn-primary btn-lg btn-block" 
+                                    style="width:85%"
+                                    id="btnAdicionarCarrinho">
+                                <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                                Adicionar ao carrinho
+                            </button>
+                        </div>
+                        <div class="col-lg-3 col-distancia-curta">
 
+                        </div>
+                    </div>               
+                </div>
             </form>
 
 
@@ -80,13 +142,127 @@
     </div>
 </div>
 
+{% if produto.descricao_longa < 500 %}
 <div class="row">
-    <div class="col-lg-12">
+    <div class="col-lg-6">
+        <div class="mt-5 mb-5" id="descricao_longa">
+            <h3>Descrição de {{produto.nome}}</h3>
+            {{produto.descricao_longa | linebreaks}}         
+        </div>
+    </div>
+    <div class="col-lg-6">
         <div class="mt-5 mb-5">
-            <h2 class="text-center">{{produto.nome}}</h2>
-            {{produto.descricao_longa | linebreaks}}
+            <h3 >Dimensões</h3>
+            <div class="row">
+                <div class="col-lg-3">
+                    <h6>Peso</h6>
+                    <p id="desc_peso" class="lead">{{produto.variacao_set.first.peso}}</p>
+                </div>
+                <div class="col-lg-3">
+                    <h6>Largura</h6>
+                    <p id="desc_largura" class="lead">{{produto.variacao_set.first.largura}}</p>
+                </div>
+                <div class="col-lg-3">
+                    <h6>Comprimento</h6>
+                    <p id="desc_comprimento" class="lead">{{produto.variacao_set.first.comprimento}}</p>
+                </div>
+                <div class="col-lg-3">
+                    <h6>Altura</h6>
+                    <p id="desc_altura" class="lead">{{produto.variacao_set.first.altura}}</p>
+                </div>
+            </div>
+            <div class="row">
+
+            </div>
         </div>
     </div>
 </div>
+{% else %}
+
+<div class="col">
+    <div class="row">
+        <div class="mt-5 mb-5" id="descricao_longa">
+            <h3>Descrição de {{produto.nome}}</h3>
+            {{produto.descricao_longa | linebreaks}}         
+        </div>
+    </div>
+    <div class="row">
+        <div class="mt-5 mb-5">
+            <h3 >Dimensões</h3>
+            <div class="row">
+                <div class="col-lg-3">
+                    <h6>Peso</h6>
+                    <p id="desc_peso" class="lead">{{produto.variacao_set.first.peso}}</p>
+                </div>
+                <div class="col-lg-3">
+                    <h6>Largura</h6>
+                    <p id="desc_largura" class="lead">{{produto.variacao_set.first.largura}}</p>
+                </div>
+                <div class="col-lg-3">
+                    <h6>Altura</h6>
+                    <p id="desc_altura" class="lead">{{produto.variacao_set.first.altura}}</p>
+                </div>
+                <div class="col-lg-3">
+                    <h6>Comprimento</h6>
+                    <p id="desc_comprimento" class="lead">{{produto.variacao_set.first.comprimento}}</p>
+                </div>                
+            </div>
+    </div>
+</div>
+
+{% endif %}
+
+{% include 'parciais/_vitrine_produtos_rodape.html' %}
+
+<script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
+<script src="https://cdn.rawgit.com/igorlino/elevatezoom-plus/1.1.6/src/jquery.ez-plus.js" type="text/javascript"></script>
+<script src="{% static 'assets/custom/js/detalhe_produto.js' %} "></script>
+
+<script>
+
+    $(document).ready(function(){
+
+        adicionado = $("#star-r").parent("p").data("adicionado");
+        if("True" == adicionado){
+            $("#star-r").hide();  
+            $("#star-s").show();
+        }
+        
+        $("#star-r").click(function() { 
+            $(this).hide();
+            $("#star-s").show();  
+            url = $(this).data("url");
+            id_produto = $(this).data("id_produto");
+            adicionaOuRemoveItemListaDesejos(true, url, id_produto);
+            $(this).parent().children('span').html("Produto adicionado na lista de desejos");        
+        });
+
+        $("#star-s").click(function() { 
+            $(this).hide();
+            $("#star-r").show(); 
+            url = $(this).data("url");
+            id_produto = $(this).data("id_produto");
+            adicionaOuRemoveItemListaDesejos(false, url, id_produto);
+            $(this).parent().children('span').html("Produto removido da lista de desejos");           
+        });
+
+        function adicionaOuRemoveItemListaDesejos(adiciona, url, id_produto){
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: url,
+                data: {
+                    "adiciona" : adiciona,
+                    "id_produto" : id_produto,
+                    "csrfmiddlewaretoken": $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(jsonData) { 
+                    console.log(jsonData);    
+                }
+            });
+        }
+    });
+
+</script>
 
 {% endblock %}

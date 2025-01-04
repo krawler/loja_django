@@ -6,6 +6,8 @@
 
 {% block conteudo %}
 
+<meta name="csrf-token" content="{{ csrf_token }}">
+
 <div class="row mt-3">
     <div class="col">
         <h3>Carrinho de compras</h3>
@@ -17,30 +19,42 @@
                     <th class="d-none d-lg-block">Imagem</th>
                     <th>Nome e variação</th>
                     <th></th>
+                    <th>Preço unitário</th>
                     <th class="text-center">Quantidade</th>
                     <th class="text-center">Total</th>
                 </tr>
 
                 {% if carrinho.values %}                 
                     {% for item in carrinho.values %}
-                        <tr>
+                        <tr data-variacaoid="{{item.variacao_id}}" data-quant="{{item.quantidade}}">
                             <td class="d-none d-lg-block">
                                 {% if item.imagem %}
                                     <img class="cart-img" src={% get_media_prefix %}{{item.imagem|remove_aspas}}>
                                 {% endif %}    
                             </td>
-                            <td>
+                            <td class="nome_produto">
                                 <a href="{% url 'produto:detalhe' item.slug %}">
                                 {{ item.produto_nome }} - {{ item.variacao_nome }}
                                 </a>
-                            <td>                       
-                            <td class="text-center">{{ item.quantidade }}</td>                        
-                            <td class="text-right">
-                                {% if item.preco_quantitativo_promocional %}
-                                    R$  {{ item.preco_quantitativo_promocional }}
+                            <td>   
+                            <td class="text-right preco_unitario">
+                                {% if item.preco_unitario_promocional %}
+                                    {{ item.preco_unitario_promocional | formata_preco }}
                                 {% else %}
-                                    R$  {{ item.preco_quantitativo }}
+                                    {{ item.preco_unitario | formata_preco }}
                                 {% endif %}    
+                            </td>                        
+                            <td class="text-center">
+                                <input type="number" class="quantidade" style="width: 20%;" value="{{item.quantidade }}" />
+                            </td>                        
+                            <td class="text-right total_parcial">
+                                <span>
+                                    {% if item.preco_quantitativo_promocional %}
+                                        {{ item.preco_quantitativo_promocional | formata_preco }}
+                                    {% else %}
+                                        {{ item.preco_quantitativo | formata_preco }}
+                                    {% endif %}
+                                </span>    
                                 <a class="ml-3" href="{% url 'produto:removerdocarrinho' %}?vid={{item.variacao_id}}">
                                     <i class="fas fa-times-circle text-danger" aria-hidden="true"></i>
                                 </a>
@@ -63,15 +77,40 @@
 
 {% if carrinho.values %}
     <div class="row mt-3">
-        <div class="col-lg">
-            <p class='lead'>Total no carrinho</p>
+        <input type="hidden" 
+                name="url-post-carrinho" 
+                id="url-post-carrinho" 
+                value="{% url 'produto:carrinho' %}">
+        <div class="col-lg mt-auto bottom_40pixel">
+            <button class="btn btn-lg btn-block btn-primary"
+                    id="continuar_comprando" 
+                    data-urldestino="{% url 'produto:lista' %}">
+                Continuar comprando
+            </button>    
+        </div>  
+        <div class="col-lg mt-auto bottom_40pixel">
+            {% if request.user.is_authenticated %}
+            <button class="btn btn-lg btn-block btn-primary" 
+                id="finaliza_compra" 
+                data-urldestino="{% url 'produto:resumodacompra' %}">
+                Finalizar compra
+            </button>
+            {% else %}
+            <a class="btn btn-lg btn-block btn-primary" href="{% url 'perfil:login' %}">
+                Entrar com seu usuário
+            </a>
+            {% endif %}
+        </div>
 
-            <div class='table-responsive'>
+        <div class="col-lg">
+            <p class="lead" style="font-size:1.75em">Total no carrinho</p>
+
+            <div class="table-responsive">
                 <table class="table">
                     <tr>
                         <td class="text-right">
                         {% if request.session.carrinho %}  
-                            <p class="lead">
+                            <p class="lead total_carrinho" style="font-size:1.75em">
                             {{request.session.carrinho|cart_total_preco|formata_preco}}
                             </p>
                         {% endif %}
@@ -80,23 +119,69 @@
                 </table>
             </div>
         </div>
-        <div class="col-lg mt-auto bottom_40pixel">
-            <a class="btn btn-lg btn-block btn-primary" href="{% url 'produto:lista' %}">
-                Continuar comprando
-            </a>    
-        </div>    
-        <div class="col-lg mt-auto bottom_40pixel">
-            {% if request.user.is_authenticated %}
-            <a class="btn btn-lg btn-block btn-primary" href="{% url 'produto:resumodacompra' %}">
-                Finalizar compra
-            </a>
-            {% else %}
-            <a class="btn btn-lg btn-block btn-primary" href="{% url 'perfil:criar' %}">
-                Entrar com seu usuário
-            </a>
-            {% endif %}
+        
+    </div>
+
+    <div class="modal" id="dialogModal" tabindex="-1" aria-labelledby="dialogModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Confirmação</h5>
+                    <button type="button" 
+                            class="btn-close" 
+                            data-bs-dismiss="modal" 
+                            aria-label="Close"
+                            id="btnFecharDialog">
+                            <i class="fa fa-times" aria-hidden="true"></i>  
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Tem certeza que deseja alterar a quantidade?
+                </div>
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-secondary" 
+                            id="closeDialogModal" >
+                            Fechar
+                    </button>
+                    <button type="button" 
+                            class="btn btn-primary" 
+                            data-urldestino="{% url 'produto:lista' %}"
+                            id="changeCartQuantity">
+                            Alterar
+                    </button>
+                </div>
+            </div> 
+        </div>
+    </div>
+
+    <div class="modal" id="dialogModal2" tabindex="-1" aria-labelledby="dialogModal2" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel2">Confirmação</h5>
+                    <button type="button" 
+                            class="btn-close" 
+                            data-bs-dismiss="modal" 
+                            aria-label="Close"
+                            id="btnFecharDialog2">
+                            <i class="fa fa-times" aria-hidden="true"></i>  
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Quantidade alterada, o que deseja?
+                </div>
+                <div class="modal-footer">
+                    <a href="#"  class="btn btn-secondary" id="closeDialogModal2" >Continuar na página</a>
+                    <a href="{% url 'produto:lista' %}" class="btn btn-primary" id="goToStore" >Navegar na loja</a>
+                </div>
+            </div> 
         </div>
     </div>
 {% endif %}
+
+<script src="{% static 'assets/custom/js/carrinho.js' %}"></script>
+
+{% include 'parciais/_mais_acessados.html' %}
 
 {% endblock %}

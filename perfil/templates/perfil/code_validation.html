@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block conteudo %}
+
+<div class="container d-flex justify-content-center align-items-center vh-100"> 
+
+    {% if not request.user.is_authenticated %}
+    <div class="card borderless">
+        <h3>Alteração de senha</h3>
+        <p class="mt-4">Digite o código que foi enviado para seu email:</p>
+
+        <div class="card-body">
+            <form method="POST" action="{% url 'perfil:code_verification' %}">
+                {% csrf_token %}
+                <input type="hidden" id="uidb64" name="uidb64" value="{{uidb64}}">
+                <input type="hidden" id="token" name="token" value="{{token}}">
+                <div class="form-group">
+                    <input type="text" name="codigo" id="codigo" placeholder="Código para ativação"
+                           class="form-control codigo-validacao" aria-describedby="usuarioHelp">
+                </div>
+                <button type="submit" id="btn_login_perfil" class="btn btn-primary btn-block btn-lg btn_login">
+                    Validar
+                </button>  
+           
+            </form>  
+        </div>
+    </div>
+{% endif %}
+
+</div>
+{% endblock %} 

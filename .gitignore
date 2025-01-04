@@ -1,3 +1,4 @@
+/imgs
 /venv
 /pedido/__pycache__
 /produto/__pycache__
@@ -8,16 +9,24 @@
 /produto/migrations/__pycache__
 /perfil/migrations/__pycache__
 /produto/templatetags/__pycache__
+/perfil/templates/email/__pycache__
 
 loja_django/__pycache__
 
+.env
+data_db_sqlite3.json
 db.sqlite3
+passenger.log
 produto_produto.sql
 stripe_backup_code.txt
 
+produto_imagens/2024/06/300
+produto_imagens/2024/12/300
 produto/migrations/
 .produto_produto.sql.kate-swp
 pedido/migrations/
+perfil/migrations/
+perfil/templates/email/__pycache__
 loja_django/__pycache__/settings.cpython-311.pyc
 perfil/migrations/0001_initial.py
 perfil/migrations/0002_alter_perfilusuario_bairro_alter_perfilusuario_cep_and_more.py

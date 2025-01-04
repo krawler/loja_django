@@ -3,13 +3,15 @@
 
 <head>
     {% include 'parciais/_head.html' %} 
-    <title>{% block titulo %}{% endblock %}Loja Django</title>
+    <title>{% block titulo %}{% endblock %}Loja Base</title>
 </head>
 
 <body>
     
     {% include 'parciais/_nav.html' %}
 
+    {% include 'parciais/_breadcrumb.html' %}
+    
     <main class="container mt-4 mb-4">
         {% include 'parciais/_messages.html' %}
         {% block conteudo %}{% endblock conteudo %}

@@ -1,0 +1,25 @@
+<div class="container mt-4 mb-4">
+{% if produto %}
+<div class="row" >
+    <div class="col-lg-6">
+        <a href="{% url 'produto:lista' %}">
+            <span class="lead">
+                Inicial
+            </span>
+        </a>  
+        <strong> &nbsp; / &nbsp; </strong> 
+        <a href="{% url 'produto:lista' %}?categ={{produto.categoria.id}}">     
+        <span class="lead">
+            {{produto.categoria.nome}} 
+        </span>
+        </a>  
+        <strong> &nbsp; / &nbsp; </strong> 
+        <a href="{% url 'produto:detalhe' produto.slug  %}}">
+            <span class="lead">
+                {{produto.nome}} 
+            </span>
+        </a>
+    </div>
+</div>        
+{% endif %}
+</div>

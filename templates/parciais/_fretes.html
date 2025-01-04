@@ -21,7 +21,7 @@
                         {% endif %}    
                     </td>
                     <td>{{frete.name}} <td>                       
-                    <td>{{frete.price|formata_preco}}</td>                        
+                    <td class="preco">{{frete.price|formata_preco}}</td>                        
                     <td class="text-center">{{frete.delivery_time}} dias</td> 
                 </tr>
             {% endif %}
@@ -32,29 +32,42 @@
 
 <script>
     $(document).ready(function(){
-       
-       $.noConflict();
+        
+        $ = jQuery;
 
-       $("#total_compra").html($("#total_carrinho").text().trim());
+        $("#total_compra").html($("#total_carrinho").text().trim());
 
-       $('#table_fretes tbody tr').click(
-         function(){
-            $('.selected').removeClass('selected');
-            $(this).addClass('selected');
-            let total_compra = calcula_total_geral(this);
-            $("#total_compra").html(formata_preco(total_compra));
-         }
-       );
+        $('#table_fretes tbody tr').click(
+            function(){
+                if($(this).hasClass('selected')){
+                    $(this).removeClass('selected')  
+                }else{
+                    $('.selected').removeClass('selected');
+                    $(this).addClass('selected');  
+                }
+                
+                let total_compra = calcula_total_geral(this);
+                $("#total_compra").html(formata_preco(total_compra));
 
-       function formata_strval_conv_float(strval){
-            return strval.replace('R$ ', '').replace(',','.');
-       }
+                let preco_selecionado = $(this).children('td.preco').html()
+                                                                    .replace('R$ ','')
+                                                                    .replace(',','.');
+                link = $("#url_salvar_pedido").val();
+                link = link + '?frete=' + preco_selecionado; 
+                $("#realiza_pedido").attr("href", link);
 
-       function formata_preco(numero){
-           return numero.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-       }
+            }
+        );
 
-       function calcula_total_geral(row){
+        function formata_strval_conv_float(strval){
+                return strval.replace('R$ ', '').replace(',','.');
+        }
+
+        function formata_preco(numero){
+            return numero.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function calcula_total_geral(row){
             
             const celula_valor = $(row).children('td')[3];
             const valor_selecionado = parseFloat(formata_strval_conv_float(celula_valor.textContent)); 
@@ -63,7 +76,6 @@
             const total_carrinho = parseFloat(str_total_carrinho);
             
             return valor_selecionado + total_carrinho;
-       }
+        }
     });   
 </script>
-<script src="{% static 'assets/bootstrap/js/jquery-3.2.1.slim.min.js' %} "></script>

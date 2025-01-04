@@ -1,0 +1,51 @@
+{% load omfilters %}
+
+{% if not area_sem_produtos %}
+<div class="container mt-4 mb-4">
+    <div class="row outerWrapper" id="carousel_slider_rodape">
+
+                {% for produto in produtos_mais_vendidos %}   
+
+                <div class="col item">
+                    {% if produto.miniatura_pequena %}
+                    <a href="{% url 'produto:detalhe' produto.slug %}">  
+                        <img class="card-img-top " src="{{ produto.miniatura_pequena }}" alt="Card image cap">
+                    </a>
+                    {% endif %} 
+
+                        <h5 class="mt-2">{{ produto.nome }}</h5>
+                        <p class="descricao_produto_rodape">
+                            {{produto.descricao|resumir_texto}}
+                        </p>
+                        <div class="container product-price-block ">
+                        {% if produto.preco_promocional %}
+                            <span id="variation-preco" class="lead product-old-price_footer text-muted">
+                                {{produto.preco|formata_preco}} 
+                            </span>
+                            <span id="variation-preco-promocional" class="lead product-price_footer">
+                                {{produto.preco_promocional|formata_preco}}
+                            </span>
+                            {% else %}
+                                <span id="variation-preco-normal" 
+                                class="lead product-price">{{produto.preco|formata_preco}}</span>
+                            {% endif %}         
+                        </div>
+
+                
+                </div>
+                {% endfor  %}
+    </div>
+
+</div>
+{%  endif %}
+<script>
+    $ = jQuery;
+    $(document).ready(function(){
+        $("#carousel_slider_rodape").waltzer({
+            auto:true,
+            autoPause: 7000,
+            scroll:1,
+            speed:100, 
+        });
+    });
+</script>

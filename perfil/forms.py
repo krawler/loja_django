@@ -5,15 +5,26 @@ from . import models
 
 class PerfilForm(forms.ModelForm):
     
+    '''
     data_nascimento = forms.DateField(
         widget=forms.DateTimeInput(format='%d/%m/%Y'),
         input_formats=['%d/%m/%Y'],
         label='Data de nascimento'
     )
+    '''
 
-    cpf = forms.CharField(
+    complemento = forms.CharField(
         widget=forms.TextInput(),
-        label='Documento CPF'
+        label='Complemento',
+        required=False,
+        help_text='Esse campo não é obrigatório'
+    )
+
+    bairro = forms.CharField(
+        widget=forms.TextInput(),
+        label='Bairro',
+        required=False,
+        help_text='Esse campo não é obrigatório'
     )
 
     cep = forms.CharField(
@@ -27,46 +38,29 @@ class PerfilForm(forms.ModelForm):
     
     class Meta:
         model = models.PerfilUsuario
-        fields = ('idade', 'data_nascimento', 'cpf', 'cep', 'endereco', 'numero', 'complemento', 
-                'bairro', 'cidade', 'estado')
+        fields = ('nome_completo','cep', 'endereco', 'numero', 'complemento', 
+                'bairro', 'cidade', 'estado', 'telefone')
 
 class UserForm(forms.ModelForm):
     
     password = forms.CharField(
         required=False,
         widget=forms.PasswordInput(),
-        label='Senha*',
-        help_text='Usuario logados podem deixar esse campo em branco para manter a senha'
+        label='Senha',
+        help_text='Use uma letra maiuscula e um numero'
     )
     password2 = forms.CharField(
         required=False,
         widget=forms.PasswordInput(),
-        label='Confirmação de senha*',
-        help_text='Digite a senha igual ao campo acima'
-    )
-
-    first_name = forms.CharField(
-        required=True,
-        widget=forms.TextInput(),
-        label="Primeiro nome"
-    )
-
-    last_name = forms.CharField(
-        required=True,
-        widget=forms.TextInput(),
-        label='Ultimo nome'
-    )
-
-    username = forms.CharField(
-        required=True,
-        widget=forms.TextInput(),
-        label='nome de usuário'
+        label='Confirmação de senha',
+        help_text='Digite a senha igual a senha informada no campo acima'
     )
 
     email = forms.CharField(
         required=True,
         widget=forms.TextInput(),
-        label='Email'
+        label='Email',
+        help_text='Enviaremos a confirmação de cadastro e outros emails para esse endereço'
     )
 
     def __init__(self, usuario=None, *args, **kwargs):
@@ -75,7 +69,7 @@ class UserForm(forms.ModelForm):
         
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'username', 'password', 'password2', 'email')
+        fields = ('email','password', 'password2')
     
     def clean(self, *args, **kwargs):
         data = self.data

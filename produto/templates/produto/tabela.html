@@ -16,20 +16,17 @@
             <th></th>
             <th>nome</th>
             <th>descricao</th>
-            <th>slug</th>
-            <th>Preço</th>
-            <th>Preço promocional</th>
+            <th>Categoria</th>
         </tr>
     </thead>
     <tbody>
         {% for produto in produtos %}
-        <tr data-image="{% get_media_prefix %}{{produto.imagem|remove_aspas}}">
+        <tr data-image="{% get_media_prefix %}{{produto.imagem|remove_aspas}}"
+            data-slug="{{produto.slug}}">
             <td class="dt-control" id="{{produto.id}}"></td> 
             <td>{{produto.nome}}</td>
             <td>{{produto.descricao}}</td>
-            <td>{{produto.slug}}</td>
-            <td style="width: 10%">{{produto.preco_marketing|formata_preco}}</td>
-            <td>{{produto.preco_marketing_promocional|formata_preco}}</td>
+            <td style="width:20%">{{produto.categoria.nome}}</td>
         </tr>
         {% endfor %}
     </tbody>
@@ -38,7 +35,7 @@
 <script>
     $(document).ready(function(){
         
-        $.noConflict();
+        $ = jQuery;
 
         const table = $('#table_id').DataTable({
             colReorder: true,
@@ -49,6 +46,15 @@
                 }
             }
         });
+
+        $("#dt-search-0").css('width','80%');
+        $(".card-body").css('padding','0.75rem');
+        $('.buttons-colvis').children('span').html('Colunas');
+        $('.dt-search').children('label').html('Procurar')
+        var showing = $("#table_id_info").html()
+        showing = showing.replace('Showing','Exibindo').replace('entries', 'registros')
+                                             .replace('to','a')
+                                             .replace('of','de');
 
         table.on('requestChild.dt', function (e, row) {
             row.child(format(row.data())).show();
@@ -67,13 +73,18 @@
                 $(".linha_detalhe").remove();
             }
             else {
-                row.child(format(row.data(), id_produto, $(this).parent().attr("data-image"))).show();
+                row.child(format(row.data(), 
+                                id_produto, 
+                                $(this).parent().attr("data-image"),
+                                $(this).parent().attr("data-slug")
+                                )
+                        ).show();
                 showTabelaVariacoes(id_produto);
             }
         });        
     });
 
-    function format(d, id_produto, imagem) {
+    function format(d, id_produto, imagem, slug) {
         return (
             '<div class="col" style="float:left; width:70%">' +
             '<dl>' +
@@ -83,7 +94,7 @@
             '</dd>' +
             '<dt>Slug:</dt>' +
             '<dd>' +
-            d[3] +
+            slug +
             '</dd>' +
             '<dt>Descrição:</dt>' +
             '<dd>'+ d[2] +'</dd>' +
@@ -130,16 +141,18 @@
                                     '<th style="width:35%">Nome da variação</th>'+
                                     '<th style="text-align:center">Preço</th>'+
                                     '<th style="text-align:center">Preço promocional</th>'+
-                                    '<th style="text-align:center">Estoque</th>'
+                                    '<th style="text-align:center">Estoque médio</th>'+
+                                    '<th style="text-align:center">Estoque atual</th>'
                                 '</tr>'+
                             '</thead>'; 
         let tableRows = '';
         dataObj.forEach(row => {
             tableRows  += '<tr>'+                       
-                '<td>'+row.fields.nome+'</td>'+                            
-                '<td style="text-align:right; width:10%">'+formata_preco(row.fields.preco)+'</td>'+
-                '<td style="text-align:right; width:20%">'+formata_preco(row.fields.preco_promocional)+'</td>'+
-                '<td style="text-align:center; width:20%">'+row.fields.estoque+'</td>'+
+                '<td>'+row.nome+'</td>'+                            
+                '<td style="text-align:right; width:10%">'+formata_preco(row.preco)+'</td>'+
+                '<td style="text-align:right; width:20%">'+formata_preco(row.preco_promocional)+'</td>'+
+                '<td style="text-align:center; width:20%">'+ row.estoque +'</td>'+
+                '<td style="text-align:center; width:20%">'+ row.saldo_estoque +'</td>'+
             '</tr>'; 
         });             
         return ( title +

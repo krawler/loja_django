@@ -3,12 +3,21 @@
 }
 
 .product-price {
-    font-size: 1.5rem;
+    font-size: 2rem;
 }
 
 .product-old-price {
     text-decoration: line-through;
-    font-size: 1rem;
+    font-size: 1.5rem;
+}
+
+.product-old-price_footer {
+    text-decoration: line-through;
+    font-size: 1.3rem;
+}
+
+.product-price_footer{
+    font-size: 1.5rem;
 }
 
 .border-top-light-custom{
@@ -150,27 +159,26 @@ ul.errorlist li {
 
 .btn-add-cart{
     text-align: left;
-    padding-top: 60px;
+    padding-top: 10px;
 }
 
 .input_qtd{
-    float: left; 
-    width: 15%;
+    width: 100%;
     padding: 0.2rem 0.5rem;
 }
 
 .input_variacao{
-    float:right; 
-    width:75%
+    width:65%
 }
 
 .text-red-validation{
     color: darkred;
 }
 
-tbody > tr.selected > * {
+.selected {
+    background-color: rgba(13, 110, 253, 0.9);
     box-shadow: inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.9);
-    color : rgb(var(--dt-row-selected-text));
+    color: rgb(255, 255, 255);
 }
 
 #exampleInputPassword, #username, #btn_login_perfil{
@@ -189,11 +197,113 @@ tbody > tr.selected > * {
     max-width: 90px;
 }
 
-#id_bairro, #id_cidade, #id_estado, #id_password, #id_password2, #id_username, #id_first_name, #id_last_name{
+#id_bairro, #id_cidade, #id_estado, #id_password, #id_password2, #id_username, 
+#id_first_name, #nome, #id_telefone{
     max-width: 350px;
 }
 
-#id_email, #id_endereco, #id_complemento {
+#id_email, #id_endereco, #id_complemento, #id_nome_completo {
     max-width: 600px;
 }
 
+.relative-field {
+    position: relative; 
+}
+
+.button_cep {
+    position: absolute;
+    right: 78%; 
+    top: 22%;
+}
+.borderless{
+    border:none;
+}
+
+.hide{
+    display:none;
+}
+
+.input-number{
+    width:120px;   
+}
+
+.card-img-top {
+    height:240px;
+}
+
+.codigo-validacao {
+    font-size: 2rem;
+}
+
+#termo{
+    width:500px;
+}
+
+.table td{
+    border-bottom: 1px solid #dee2e6;
+}
+
+.col-distancia-curta{
+    padding-left: 5px;
+}
+
+.card-columns .card{
+    width:90%;
+} 
+
+/*Waltzerjs*/
+.outerWrapper {
+	text-align: center;
+	position:relative;
+	margin:40px 0 40px 0;
+	width:1100px;
+}
+
+.item {
+	float:left;
+	margin-right:18px;
+    margin-left:18px;
+	width:232px;
+	padding:0px;
+	height:420px;
+}
+
+.item div {
+	width:99%;
+	height:89%;
+	text-align:center;
+	line-height: 12px;
+	font-size:50px;
+}
+
+.left-nav-btn, .right-nav-btn {
+	position:absolute;
+	width:37px;
+	height:37px;
+	top:80px;
+	cursor:pointer;
+	opacity: 0.8;
+	background:transparent url('../images/arrows.png') top left no-repeat;
+	-webkit-transition:opacity 0.2s linear;
+  	-moz-transition:opacity 0.2s linear;
+  	-o-transition:opacity 0.2s linear;
+  	transition:opacity 0.2s linear;
+}
+
+.left-nav-btn {
+	left:-80px;
+}
+
+.right-nav-btn {
+	right:-80px;
+	background-position: top right;
+}
+
+.left-nav-btn:hover, .right-nav-btn:hover {
+	opacity: 1;
+}
+
+.descricao_produto_rodape{
+    font-size:1rem;
+    font-weight:300;
+}
