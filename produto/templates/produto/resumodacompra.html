@@ -8,6 +8,29 @@
 
 <meta name="csrf-token" content="{{ csrf_token }}">
 
+<div class="modal" id="dialogModal" tabindex="-1" aria-labelledby="dialogModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Confirmação</h5>
+                <button type="button" 
+                        class="btn-close" 
+                        data-bs-dismiss="modal" 
+                        aria-label="Close"
+                        id="btnFecharDialog">
+                        <i class="fa fa-times" aria-hidden="true"></i>  
+                </button>
+            </div>
+            <div class="modal-body">
+                Seleciona uma forma de envio na lista de fretes
+            </div>
+            <div class="modal-footer">
+                <a href="#"  class="btn btn-secondary" id="closeDialogModal" >OK</a>
+            </div>
+        </div> 
+    </div>
+</div>
+
 <div class="row mb-5">
     <div class="col-lg">
         <h2>Resumo da sua compra</h2>
@@ -91,12 +114,25 @@
 </a>
 
 {% include 'parciais/_mais_acessados.html' %}
+
+{% if not perfil.perfil_endereco %}
 <script>
   if($("#realiza_pedido").attr("href") == ""){
      link = $("#url_salvar_pedido").val();
      $("#realiza_pedido").attr("href", link);
   }
 </script>
+{% else %}
+<script>
+    $("#realiza_pedido").click(function(e){
+        if($("#realiza_pedido").attr("href") == ""){
+            $("#dialogModal").show();
+            e.preventDefault();
+         } 
+    });
+    
+</script>
+{% endif %}
 
 <script src="{% static 'assets/custom/js/resumo_compra.js' %}"></script>
 <script src="{% static 'assets/waltzer/js/waltzerjs.js' %} "></script>
