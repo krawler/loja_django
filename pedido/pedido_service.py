@@ -6,7 +6,7 @@ import requests
 from .models import ItemPedido
 from .models import Pedido
 from django.db import connection
-from django.shortcuts import reverse
+from django.shortcuts import reverse, redirect
 from datetime import datetime, timezone, timedelta
 import json
 
@@ -79,22 +79,28 @@ class Pedido_Service():
         total_width = 0
         total_height = 0
         total_weight = 0
+        
+        user = request.user
+        perfil = PerfilUsuario.objects.get(usuario=user)
+        if perfil.perfil_endereco:
+            if preco_frete is None or preco_frete == 0:
+                messages.error(request, "Você precisa selecionar uma forma de envio")
+                url_return = reverse("produto:resumodacompra")
+                return url_return
+            preco_frete = float(preco_frete) * 100
+        else:
+            preco_frete = 0        
+        
         try: 
             pedido = Pedido.objects.get(id=id_pedido)
             now = datetime.now(timezone(timedelta(hours=-3))) 
-            iso_format = now.strftime("%Y-%m-%dT%H:%M:%S%Z")
+            new_date = now + timedelta(days=1)
+            iso_format = new_date.strftime("%Y-%m-%dT%H:%M:%S%Z")
             parts = iso_format.split("UTC")
-            #expiration_date = parts[0] + parts[1]
+            expiration_date = parts[0] + parts[1]
             url = "https://sandbox.api.pagseguro.com/checkouts"
-            user = request.user
-            perfil = PerfilUsuario.objects.get(usuario=user)
             itens_pedido = ItemPedido.objects.filter(pedido=pedido)
-            
-            if perfil.perfil_endereco:
-                preco_frete = float(preco_frete) * 100
-            else:
-                preco_frete = 0    
-                        
+                         
             items = []
             for item in itens_pedido:
                 items.append(
@@ -121,6 +127,33 @@ class Pedido_Service():
                     },
                     "weight":  total_weight
                 }
+         
+            shipping = {}
+            if perfil.perfil_endereco: 
+                shipping =   {
+                                "address" : {
+                                    "street": perfil.endereco,
+                                    "number": perfil.numero,
+                                    "city": perfil.cidade,
+                                    "region_code": perfil.estado,
+                                    "country": "BRA",
+                                    "postal_code": perfil.cep,
+                                    "locality": perfil.bairro
+                                },
+                                "box": box,
+                                "type": "FIXED",
+                                "service_type": "PAC",
+                                "address_modifiable": not perfil.perfil_endereco,
+                                "amount": preco_frete   
+                            }
+            else:
+                shipping =  {
+                                "box": box,
+                                "type": "CALCULATE",
+                                "service_type": "PAC",
+                                "address_modifiable": not perfil.perfil_endereco,
+                                "amount": preco_frete   
+                            }
                                
             headers = {
                 "accept": "*/*",
@@ -128,35 +161,10 @@ class Pedido_Service():
                 "Content-type": "application/json"
             }
             payload = {
-                "customer": {
-                    "phone": {
-                        "country": "+55",
-                        "area": "14",
-                        "number": perfil.telefone
-                    },
-                    "name": perfil.nome_completo,
-                    "email": user.email,
-                    "tax_id": perfil.cpf
-                },
-                "shipping": {   
-                    "address": {
-                        "street": perfil.endereco,
-                        "number": perfil.numero,
-                        "city": perfil.cidade,
-                        "region_code": perfil.estado,
-                        "country": "BRA",
-                        "postal_code": perfil.cep,
-                        "locality": perfil.bairro
-                    },
-                    "box": box,
-                    "type": "FIXED",
-                    "service_type": "PAC",
-                    "address_modifiable": True,
-                    "amount": preco_frete   
-                },
+                 "shipping" : shipping,
                 "reference_id": id_pedido,
-                "expiration_date": "2025-01-14T19:09:10-03:00", #expiration_date,
-                "customer_modifiable": False,
+                "expiration_date": expiration_date, #"2025-01-14T19:09:10-03:00",
+                "customer_modifiable": True,
                 "items": items,  
                 "additional_amount": 0,
                 "discount_amount": 0,
