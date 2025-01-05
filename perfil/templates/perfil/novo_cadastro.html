@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block conteudo %}
+
+<div class="container justify-content-center align-items-center vh-100"> 
+
+    {% if not request.user.is_authenticated %}
+        <div class="card borderless mt-5">
+            <h3 class="text-center mt-4">Como deseja cadastrar seu endereço?</h3>
+            <p class="mt-4">Se já fez o cadastro, basta entrar com seu usuário e senha abaixo:</p>
+
+            <div class="row">
+                <div class="col">
+                    <a href="{% url 'perfil:criar' %}?perfil_endereco=true" 
+                            class="btn btn-primary btn-lg btn-block" 
+                            style="padding:20px"
+                            id="btnComprarAgora">
+                            <i class="fas fa-truck" style="color: #f5f7fa;"></i>
+                            &nbsp; Cadastrar agora meu endereço para entrega
+                    </a>
+                       
+                </div>     
+                <div class="col">
+                    <a href="{% url 'perfil:criar' %}?perfil_endereco=false" 
+                            class="btn btn-primary btn-lg btn-block" 
+                            id="btnComprarAgora">
+                            <i class="fa fa-cash-register" style="color: #f5f7f9;"></i>
+                            &nbsp; Informar meu endereço na tela de pagamento no Pagseguro
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    {% endif %}
+
+</div>
+
+{% endblock conteudo %}
