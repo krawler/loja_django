@@ -12,8 +12,11 @@
 /perfil/templates/email/__pycache__
 
 loja_django/__pycache__
+dotenv
 
 .env
+.flake8
+launch.json
 data_db_sqlite3.json
 db.sqlite3
 passenger.log
