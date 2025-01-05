@@ -10,12 +10,9 @@ urlpatterns = [
    path('meuspedidos', views.MeusPedidos.as_view(), name="meuspedidos"),
    path('detalhe/<int:pk>', views.Detalhe.as_view(), name="detalhe"),
    path('tabela', views.Tabela.as_view(), name="tabela"),
-<<<<<<< HEAD
-=======
    path('itens-pedido', views.ItensPedido_json.as_view(), name="itens_pedido"),
    path('atualizapedido/', views.Atualizar_Pedido.as_view(), name="atualizapedido"),
    path('desativar/', views.Desativar_Pedido.as_view(), name="desativar"),
    path('admin-detalhe/<int:pk>', views.Admin_detalhe_pedido.as_view(), name="admin_detalhe"),
    path('post-payment', views.Pagar.as_view(), name="post_payment"),
->>>>>>> main
 ]  
