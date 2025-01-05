@@ -147,6 +147,7 @@ class AdicionarCarrinho(View):
         http_referer = self.request.META.get('HTTP_REFERER', reverse('produto:lista'))
         variacao_id = self.request.GET.get('vid')
         qtd_form_param = self.request.GET.get('quantidade')
+        resumo_compra = self.request.GET.get('resumo_compra')
         
         if not variacao_id:
             messages.error(
@@ -154,7 +155,7 @@ class AdicionarCarrinho(View):
                 'Produto não existe'
             )
             return redirect(http_referer)
-        
+                
         variacao = get_object_or_404(Variacao, id=variacao_id)
         variacao_estoque = ProdutoService().getEstoqueAtual(variacao_id)
         produto = variacao.produto
@@ -230,6 +231,8 @@ class AdicionarCarrinho(View):
             self.request,
             f'Produto {produto_nome} {variacao_nome} adicionado no seu carrinho'
         )
+        if resumo_compra:
+            return redirect('produto:resumodacompra')    
         
         return redirect('produto:carrinho')
 
