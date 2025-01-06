@@ -182,6 +182,11 @@ class EntradaProduto(models.Model):
     data = models.DateField(django.utils.timezone.now)
     hora = models.TimeField(django.utils.timezone.now)
     desativado = models.BooleanField(default=False)
+    
+    @cached_property
+    def total(self):
+        if self.quantidade > 0:
+            return self.quantidade * self.preco_final
 
 
 class SaidaProduto(models.Model):
@@ -236,17 +241,10 @@ class ProdutoMaisAcessado(models.Model):
 
     class Meta:
         managed = False
-
-class ProdutoCheckout(models.Model):
-    id_preco_stripe = models.CharField(max_length=50, blank=True, null=True)
-    quantidade = models.IntegerField()
-
-    class Meta:
-        managed = False
-        abstract = True
+        
+        
+class ImagemProduto(models.Model):  
     
-
-class ImagemProduto(models.Model):
     variacao = models.ForeignKey(Variacao, on_delete=models.CASCADE)
     imagem = models.ImageField(upload_to='produto_imagens/variacoes/%Y/%m/', blank=False, null=False)
 
@@ -255,3 +253,11 @@ class ImagemProduto(models.Model):
         if self.imagem:
             return Produto.get_thumbnail_url(self, 150)
         return None
+    
+    
+class MotivoSaidaProduto(models.Model):
+    descricao = models.TextField(max_length=300)
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=False)
+    data = models.DateField(default=django.utils.timezone.now)
+    hora = models.TimeField(default=django.utils.timezone.now)
+    desativado = models.BooleanField(default=False)
