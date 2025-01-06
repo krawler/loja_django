@@ -13,5 +13,6 @@ urlpatterns = [
     path('code-verification/', views.Code_Verification.as_view(), name="code_verification"),
     path('reset-password/', views.Reset_password.as_view(), name='reset_password'),
     path('reset-password/<uidb64>/<token>/', views.Reset_password.as_view(), name='password_reset_confirm'),
-    path('lista-desejos/', views.ListaDesejoProduto.as_view(), name="lista_desejos")
+    path('lista-desejos/', views.ListaDesejoProduto.as_view(), name="lista_desejos"),
+    path('novo-cadastro/', views.NovoCadastro.as_view(), name="novo_cadastro")
 ]

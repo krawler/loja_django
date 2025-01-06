@@ -1,17 +1,21 @@
 from django import forms
-from django.db.models import DateField
 from django.contrib.auth.models import User
 from . import models
 
+
 class PerfilForm(forms.ModelForm):
+     
+    def __init__(self, perfil=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.perfil = perfil
     
-    '''
-    data_nascimento = forms.DateField(
-        widget=forms.DateTimeInput(format='%d/%m/%Y'),
-        input_formats=['%d/%m/%Y'],
-        label='Data de nascimento'
-    )
-    '''
+    class Meta:
+        model = models.PerfilUsuario
+        fields = ('nome_completo','cep', 'endereco', 'numero', 'complemento', 
+                  'bairro', 'cidade', 'estado', 'telefone')
+
+
+class PerfilComEnderecoForm(PerfilForm):
 
     complemento = forms.CharField(
         widget=forms.TextInput(),
@@ -31,15 +35,14 @@ class PerfilForm(forms.ModelForm):
         widget=forms.TextInput(),
         label='CEP'
     )
-
-    def __init__(self, perfil=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.perfil = perfil
     
+    
+class PerfilSemEnderecoForm(PerfilForm):
+
     class Meta:
         model = models.PerfilUsuario
-        fields = ('nome_completo','cep', 'endereco', 'numero', 'complemento', 
-                'bairro', 'cidade', 'estado', 'telefone')
+        fields = ('nome_completo', 'telefone')
+    
 
 class UserForm(forms.ModelForm):
     
@@ -116,4 +119,4 @@ class UserForm(forms.ModelForm):
                 validation_error_msgs['password2'] = error_msg_password_empty            
         
         if validation_error_msgs:
-            raise(forms.ValidationError(validation_error_msgs))
+            raise (forms.ValidationError(validation_error_msgs))

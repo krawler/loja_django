@@ -16,4 +16,5 @@ urlpatterns = [
     path('entrada/', views.EntradaProdutoView.as_view(), name="entrada"),
     path('categoria/', views.CategoriaView.as_view(), name="categoria"),
     path('tabela-entrada/', views.TabelaEntradaProduto.as_view(), name="tabela_entrada"),
+    path('motivo-saida/', views.MotivoSaidaView.as_view(), name="motivo_saida"),
 ]

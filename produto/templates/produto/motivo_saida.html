@@ -36,14 +36,14 @@
 
         table.on('click', 'td', function (e) {
             row = $(this).parent('tr');
-            nomecategoria_selecionado = row.children('td.nome_categoria').html();
-            if (nomecategoria_selecionado.startsWith('<div')){
-                ind_fim_div = nomecategoria_selecionado.lastIndexOf('>');
-                tamanho_total = nomecategoria_selecionado.length;    
-                nomecategoria_selecionado = nomecategoria_selecionado.substr(ind_fim_div + 1, tamanho_total);
+            motivo_selecionado = row.children('td.desc_motivo').html();
+            if (motivo_selecionado.startsWith('<div')){
+                ind_fim_div = motivo_selecionado.lastIndexOf('>');
+                tamanho_total = motivo_selecionado.length;    
+                motivo_selecionado = motivo_selecionado.substr(ind_fim_div + 1, tamanho_total);
             }
-            $("#id_categoria").val(row.attr('categoria_id'));
-            $('#nome').val(nomecategoria_selecionado);
+            $("#id_motivo").val(row.attr('motivo_id'));
+            $('#nome').val(motivo_selecionado);
             menu_ativo = ''+row.attr("ativo_menu")+'';
             if(menu_ativo == "True")
                 $("#ativo_menu").attr('checked', true);
@@ -61,13 +61,15 @@
             <table id="table_id" class="display">
                 <thead>
                     <tr>
-                        <th>nome da categoria</th>
+                        <th>nome do motivo</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for categoria in categorias %}
-                    <tr categoria_id="{{categoria.id}}" ativo_menu="{{categoria.ativo_menu}}">
-                        <td class="nome_categoria">{{categoria.nome}}</td>             
+                    {% for motivo in motivos %}
+                    <tr motivo_id="{{motivo.id}}">
+                        <td class="desc_motivo">
+                            {{motivo.descricao}}
+                        </td>             
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -76,17 +78,13 @@
         </div>
         <div class="card-body">
             
-            <form method="POST" action="{% url 'produto:categoria' %}">
+            <form method="POST" action="{% url 'produto:motivo_saida' %}">
                 {% csrf_token %}
-                <input type="hidden" id="id_categoria" name="id_categoria" />
+                <input type="hidden" id="id_motivo" name="id_motivo" />
                 <div class="form-group">
-                    <label for="nome">Nome</label>
-                    <input type="text" name="nome" id="nome" 
-                            placeholder="Nome da categoria" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label for="ativo_menu">Aparece no menu?</label>
-                    <input type="checkbox" name="ativo_menu" id="ativo_menu">
+                    <label for="nome">Descrição</label>
+                    <input type="text" name="descricao" id="descricao" 
+                            placeholder="Descrição do motivo" class="form-control">
                 </div>
                 <button type="submit" class="btn btn-primary btn-block btn-lg">
                     Cadastrar

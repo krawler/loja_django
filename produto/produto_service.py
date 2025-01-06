@@ -7,7 +7,7 @@ from django.core import serializers
 from decimal import Decimal
 from datetime import datetime
 from django.utils import timezone
-from .models import Produto, SessaoCarrinho, Variacao, SaidaProduto, AvisoProdutoDisponivel 
+from .models import MotivoSaidaProduto, Produto, SessaoCarrinho, Variacao, SaidaProduto, AvisoProdutoDisponivel 
 from .models import EntradaProduto, AcessoProduto, ProdutoMaisAcessado, Categoria
 import json
 
@@ -216,17 +216,10 @@ class ProdutoService():
         categorias = Categoria.objects.all()
         return categorias
 
-
-    def create_preference_mercadopago(self, carrinho):
-        items= []
-        for item in carrinho.values():
-            nome = item["produto_nome"] + ' - ' + item["variacao_nome"]
-            preco = item["preco_unitario"] if item["preco_unitario_promocional"] is None else item["preco_unitario_promocional"] 
-            items.append({"title": nome, "quantity": item["quantidade"], "unit_price": preco})
-        
-        preference_data = {         
-
-            "items": items
-        }
-
-        return preference_data
+    def salvar_motivo_saida_produto(self, id_motivo, descricao, user):
+        if id_motivo != None and id_motivo != '':
+            motivo = MotivoSaidaProduto.objects.get(id=id_motivo)
+            motivo.descricao = descricao
+        else:    
+            motivo = MotivoSaidaProduto(descricao=descricao, user=user)
+        motivo.save()    

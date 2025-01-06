@@ -86,6 +86,7 @@
                     <input type="hidden" name="csrf_token" value="{{csrf_token}}">
                     <input type="hidden" id="estoques_variacoes" value="{{saldo_estoque_variacoes}}" />
                     <input type="hidden" name="dimensoes" id="dimensoes" value="{{dimensoes}}">
+                    <input type="hidden" name="resumo_compra" id="resumo_compra" value="false">
                     <div class="form-group">        
                         <select id="select-variacoes" name="vid" 
                             class="form-control form-control-lg input_variacao">
@@ -127,13 +128,25 @@
                                     style="width:85%"
                                     id="btnAdicionarCarrinho">
                                 <i class="fa fa-shopping-cart" aria-hidden="true"></i>
-                                Adicionar ao carrinho
+                                &nbsp; Adicionar ao carrinho
                             </button>
                         </div>
                         <div class="col-lg-3 col-distancia-curta">
 
                         </div>
-                    </div>               
+                    </div> 
+                    <div class="row">
+                        <div class="col-lg-10 mt-4">
+                            <button type="submit" 
+                                    class="btn btn-primary btn-lg btn-block" 
+                                    style="width:80%"
+                                    id="btnComprarAgora">
+                                    <i class="fa fa-cash-register" style="color: #f5f7f9;"></i>
+                                    &nbsp; Comprar agora
+                            </button>
+                        </div>    
+                        <div class="col-lg-2"></div> 
+                    </div>              
                 </div>
             </form>
 
@@ -178,7 +191,6 @@
     </div>
 </div>
 {% else %}
-
 <div class="col">
     <div class="row">
         <div class="mt-5 mb-5" id="descricao_longa">
@@ -209,7 +221,6 @@
             </div>
     </div>
 </div>
-
 {% endif %}
 
 {% include 'parciais/_vitrine_produtos_rodape.html' %}
@@ -261,6 +272,11 @@
                 }
             });
         }
+
+        $("#btnComprarAgora").click(function(){
+            $("#resumo_compra").val("true");
+        });
+
     });
 
 </script>

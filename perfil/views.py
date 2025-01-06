@@ -37,7 +37,19 @@ class BasePerfil(View):
         if self.request.user.is_authenticated:
             self.perfil = PerfilUsuario.objects.filter(usuario=self.request.user).first()
             self.usuario = User.objects.filter(username=self.request.user).first()
-        
+
+            
+            if self.perfil.perfil_endereco:
+                perfilForm = forms.PerfilComEnderecoForm(
+                                        data=self.request.POST or None,
+                                        instance=self.perfil, 
+                                        perfil=self.perfil)
+            else:
+                perfilForm = forms.PerfilSemEnderecoForm(
+                                    data=self.request.POST or None,
+                                    instance=self.perfil, 
+                                    perfil=self.perfil) 
+            
             self.context = {
                 'userform': 
                             forms.UserForm(
@@ -45,20 +57,26 @@ class BasePerfil(View):
                                 usuario=self.request.user,
                                 instance=self.request.user,    
                             ),
-                'perfilform': 
-                            forms.PerfilForm(
-                                data=self.request.POST or None,
-                                instance=self.perfil, 
-                                perfil=self.perfil),
-                'produtos_mais_vendidos' : ProdutoService().get_produtos_mais_acessados_por_geral(),
+                'perfilform': perfilForm,
+                'produtos_mais_vendidos': ProdutoService().get_produtos_mais_acessados_por_geral(),
                 'pagina_cadastro': True 
             }
         else:
+            perfil_endereco_url_get = self.request.GET.get('perfil_endereco')
+            perfil_form = None
+            if perfil_endereco_url_get == 'true':
+                perfil_endereco = True
+                perfil_form = forms.PerfilComEnderecoForm(data=self.request.POST or None)
+            elif perfil_endereco_url_get == 'false':
+                perfil_endereco = False
+                perfil_form = forms.PerfilSemEnderecoForm(data=self.request.POST or None)    
+            
             self.context = {
                 'userform': forms.UserForm(data=self.request.POST or None),
-                'perfilform': forms.PerfilForm(data=self.request.POST or None),
+                'perfilform': perfil_form,
                 'produtos_mais_vendidos' : ProdutoService().get_produtos_mais_acessados_por_geral(),
-                'pagina_cadastro': True 
+                'pagina_cadastro': True,
+                'novo_cadastro': True
             }
             
         self.userform = self.context['userform']
@@ -411,3 +429,9 @@ class ListaDesejoProduto(View):
             "is_paginated": True
         }
         return render(self.request, template_name, context)
+
+
+class NovoCadastro(View):
+    
+    def get(self, *args, **kwargs):
+        return render(self.request, 'perfil/novo_cadastro.html')
