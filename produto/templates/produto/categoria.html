@@ -40,7 +40,7 @@
             if (nomecategoria_selecionado.startsWith('<div')){
                 ind_fim_div = nomecategoria_selecionado.lastIndexOf('>');
                 tamanho_total = nomecategoria_selecionado.length;    
-                nomecategoria_selecionado.substr(ind_fim_div, tamanho_total);
+                nomecategoria_selecionado = nomecategoria_selecionado.substr(ind_fim_div + 1, tamanho_total);
             }
             $("#id_categoria").val(row.attr('categoria_id'));
             $('#nome').val(nomecategoria_selecionado);
