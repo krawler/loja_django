@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% load crispy_forms_tags %}
+
+{% load omfilters %}
+
+{% block conteudo %}
+
+<script>
+    $(document).ready(function(){
+        
+        $ = jQuery;
+
+        const table = $('#table_id').DataTable({
+            colReorder: true,
+            keys: true,
+        });
+
+        table.on('click', 'tbody tr', (e) => {
+            let classList = e.currentTarget.classList;
+        
+            if (classList.contains('selected')) {
+                classList.remove('selected');
+            }
+            else {
+                table.rows('.selected').nodes().each((row) => row.classList.remove('selected'));
+                classList.add('selected');
+            }
+        });
+        
+
+        $(".dt-layout-cell").first().hide();
+        $("#dt-search-0").css('width','80%');
+        $(".dt-search").css('text-align', 'left');
+        $(".card-body").css('padding','0.75rem');
+
+        table.on('click', 'td', function (e) {
+            row = $(this).parent('tr');
+            motivo_selecionado = row.children('td.desc_motivo').html();
+            if (motivo_selecionado.startsWith('<div')){
+                ind_fim_div = motivo_selecionado.lastIndexOf('>');
+                tamanho_total = motivo_selecionado.length;    
+                motivo_selecionado = motivo_selecionado.substr(ind_fim_div + 1, tamanho_total);
+            }
+            $("#id_motivo").val(row.attr('motivo_id'));
+            $('#nome').val(motivo_selecionado);
+            menu_ativo = ''+row.attr("ativo_menu")+'';
+            if(menu_ativo == "True")
+                $("#ativo_menu").attr('checked', true);
+            else
+                $("#ativo_menu").attr('checked', false);
+        });  
+
+    } );  
+</script>
+
+<div class="container d-flex vh-100"> 
+
+    <div class="card borderless">
+        <div class="card-body">
+            <table id="table_id" class="display">
+                <thead>
+                    <tr>
+                        <th>nome do motivo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for motivo in motivos %}
+                    <tr motivo_id="{{motivo.id}}">
+                        <td class="desc_motivo">
+                            {{motivo.descricao}}
+                        </td>             
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table> 
+
+        </div>
+        <div class="card-body">
+            
+            <form method="POST" action="{% url 'produto:motivo_saida' %}">
+                {% csrf_token %}
+                <input type="hidden" id="id_motivo" name="id_motivo" />
+                <div class="form-group">
+                    <label for="nome">Descrição</label>
+                    <input type="text" name="descricao" id="descricao" 
+                            placeholder="Descrição do motivo" class="form-control">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block btn-lg">
+                    Cadastrar
+                </button>  
+            </form> 
+        </div>
+         
+
+    </div>
+
+</div>
+{% endblock %}
