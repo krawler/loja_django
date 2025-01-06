@@ -8,7 +8,7 @@ from django.views.generic.detail import DetailView
 from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 from django.db.models import Q, Count, QuerySet
-from produto.models import Produto, Variacao, Categoria, EntradaProduto 
+from produto.models import MotivoSaidaProduto, Produto, Variacao, Categoria, EntradaProduto 
 from produto.produto_service import ProdutoService
 from perfil.perfil_service import PerfilService
 from perfil.models import ListaDesejoProduto
@@ -470,6 +470,7 @@ class Busca(ListaProdutos):
         self.request.session.save()
         return qs
 
+
 class CategoriaView(DispachLoginRequired, View):
     
     def get(self, *args, **kwargs):
@@ -490,3 +491,25 @@ class CategoriaView(DispachLoginRequired, View):
         ProdutoService().salvar_categoria(nome, id_categoria, ativo_menu)
 
         return redirect('produto:categoria')
+    
+    
+class MotivoSaidaView(DispachLoginRequired, View):
+    
+    def get(self, *args, **kwargs):
+        
+        context = {
+            'area_sem_produtos' : True,  
+            'motivos' : MotivoSaidaProduto.objects.all(), 
+            'pagina_tabela' : True
+        }
+
+        return render(self.request, 'produto/motivo_saida.html', context)
+    
+    def post(self, *args, **kwargs):
+        
+        descricao = self.request.POST.get('descricao')
+        id_motivo = self.request.POST.get('id_motivo')
+        user = self.request.user
+        ProdutoService().salvar_motivo_saida_produto(id_motivo, descricao, user)
+
+        return redirect('produto:motivo_saida')
