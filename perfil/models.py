@@ -52,7 +52,6 @@ class PerfilUsuario(models.Model):
     )
     telefone = models.CharField(null=True, max_length=50)
     perfil_endereco = models.BooleanField(default=True)
-    codigo_regiao_ddd = models.CharField(max_length=3, null=True)
     
     def __str__(self) :
         return f'{self.usuario}'
