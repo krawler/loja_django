@@ -12,10 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 from django.contrib.messages import constants
-import dj_database_url
 import os
-from dotenv import load_dotenv
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -85,26 +82,20 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'loja_django.wsgi.application'
 
+
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-load_dotenv()
-
 DATABASES = {
-     'default': dj_database_url.config(
-                    default=os.environ.get('DATABASE_URL'),
-                    conn_max_age=600
-                                       )
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'raradmco_loja_django',
+        'USER': 'raradmco_loja_django2',
+        'PASSWORD': '4g5b84k4',
+        'HOST': 'tx1.fcomet.com',
+        'PORT': '3306',
+    }
 }
-
-'''
- 'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'loja_django',
-        'USER': 'postgres',
-        'PASSWORD': '1234',
-        'HOST': 'localhost',
-        'PORT': '5432',
-'''
 
 
 # Password validation
@@ -173,15 +164,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
-
-CORS_REPLACE_HTTPS_REFERER      = False
-HOST_SCHEME                     = "http://"
-SECURE_PROXY_SSL_HEADER         = None
-SECURE_SSL_REDIRECT             = False
-SESSION_COOKIE_SECURE           = False
-CSRF_COOKIE_SECURE              = False
-SECURE_HSTS_SECONDS             = None
-SECURE_HSTS_INCLUDE_SUBDOMAINS  = False
-SECURE_FRAME_DENY               = False
-
 
