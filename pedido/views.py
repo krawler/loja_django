@@ -1,14 +1,11 @@
+from datetime import datetime
 from django.shortcuts import render, redirect
 from django.core import serializers
 from django.views import View
 from django.urls import reverse
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-<<<<<<< HEAD
-from django.http import HttpResponse, JsonResponse
-=======
 from django.http import JsonResponse
->>>>>>> main
 from django.contrib import messages
 from django.core import serializers
 from django.core.paginator import Paginator
@@ -18,11 +15,6 @@ from . import pedido_service
 from .models import Pedido, ItemPedido
 from perfil.models import PerfilUsuario
 from .email.py_email import PyEmail 
-from datetime import datetime, timezone, timedelta
-import mercadopago
-import requests     
-import json 
-
 
 class DispachLoginRequired(View):
     
@@ -42,36 +34,7 @@ class DispachLoginRequired(View):
 
 class Pagar(DispachLoginRequired, View):
     
-<<<<<<< HEAD
-    stripe.api_key = 'sk_test_51PRDqWFqNwY82ww5DnAS83DgAsvwPRLbVCTtcHDoWXU8G8I4UGy13f5LHXYsQsl3wDlgFSBdRRMzXeILk8Blenhd00BmZJK1Me'
-    
-    def create_checkout_session(self, variacoes):
-        
-        #TODO: Falta passar a quantidade do carrinho
-            
-        line_items = []       
-        for variacao in variacoes:
-            line_items.append({
-                'price': variacao.id_preco_stripe,
-                'quantity': 1
-            })
-            
-        try:
-            checkout_session = stripe.checkout.Session.create(
-                line_items=line_items,
-                mode='payment',
-                success_url='https://raradmco.tx1.fcomet.com/loja-django/pedido/salvarpedido',
-                cancel_url='https://raradmco.tx1.fcomet.com/loja-django/produto/resumodacompra',
-                stripe_account='acct_1PRDqWFqNwY82ww5'
-            )
-        except Exception as e:
-            return str(e)
-
-        return redirect(checkout_session.url, code=303)
- 
-=======
    
->>>>>>> main
     def get(self, *args, **kwargs):
 
         carrinho = self.request.session.get('carrinho')
@@ -122,36 +85,6 @@ class Pagar(DispachLoginRequired, View):
                 return redirect('produto:carrinho')
         
         return redirect("pedido:salvarpedido")
-
-    def post(self, *args, **kwargs):
-       
-        sdk = mercadopago.SDK('TEST-6359455923298195-121717-ef84e13d4890009bae8c56d3904036df-68852210')
-
-        request_options = mercadopago.config.RequestOptions()
-        request_options.custom_headers = {
-            'x-idempotency-key': '<SOME_UNIQUE_VALUE>'
-        }
-
-        payment_data = {
-            "transaction_amount": 4, #self.request.POST.get("transaction_amount"),
-           # "token": 'TEST-6359455923298195-121717-ef84e13d4890009bae8c56d3904036df-68852210',
-            "description": "testando pagamento em sandbox",
-            "installments": 1, #self.request.POST.get("installments"),
-            "payment_method_id": "visa", #self.request.POST.get("payment_method_id"),
-            "payer": { 
-                    "email":   "august.rafael@gmail.com",        #self.request.POST.get("cardholderEmail"),
-                    "identification": {
-                        "type":  "CPF", #self.request.POST.get("identificationType"),
-                        "number": "35982316873" #request.POST.get("identificationNumber")
-                    },
-                    "first_name": "Rafael A Ramos" #request.POST.get("cardholderName")
-            }
-        }
-
-        payment_response = sdk.payment().create(payment_data)
-        payment = payment_response["response"]
-
-        print(payment)
 
 
 class SalvarPedido(View):    
@@ -272,19 +205,13 @@ class Detalhe(DispachLoginRequired, DetailView):
         context['produtos_mais_vendidos'] = self.produtos_mais_vendidos     
         return context
 
-<<<<<<< HEAD
-class Tabela(ListView):
-=======
 
 class Tabela(DispachLoginRequired, ListView):
->>>>>>> main
     model = Pedido
     template_name = 'pedido/tabela.html'
     context_object_name = 'pedidos'
     ordering = ['-id']
 
-<<<<<<< HEAD
-=======
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['pagina_tabela'] = True
@@ -322,16 +249,10 @@ class Desativar_Pedido(View):
         return JsonResponse(json_data, safe=False)
 
 
->>>>>>> main
 class ItensPedido_json(ListView):
     
     def get(self, *args, **kwargs):
         pedido_id = self.request.GET.get('pedidoid')
-<<<<<<< HEAD
-        qs_data =  ItemPedido.objects.filter(id=pedido_id)
-        json_data = serializers.serialize('json', qs_data)
-        return JsonResponse(json_data, safe=False)
-=======
         produtos = pedido_service.Pedido_Service().getItemsProdutos(pedido_id=pedido_id)
         json_data = serializers.serialize('json', produtos)
         return JsonResponse(json_data, safe=False)
@@ -366,4 +287,3 @@ class Admin_detalhe_pedido(DispachLoginRequired, View):
             pedido.save()
         
         return redirect('pedido:admin_detalhe', id_pedido)
->>>>>>> main
