@@ -117,6 +117,8 @@ class Produto(models.Model):
         if not self.slug:
             slug = f'{slugify(self.nome)}-{self.pk}'
             self.slug = slug
+            
+       # self.imagem = Produto.resize(self.imagem, new_width=800)
 
         super().save(*args, **kwargs)
 
@@ -232,7 +234,7 @@ class ProdutoMaisAcessado(models.Model):
 
     def convert_path_to_url(path): 
         # Defina a URL base do seu servidor 
-        base_url = "http://localhost:8000/produto_imagens/" 
+        base_url = "https://raradmco.tx1.fcomet.com/" 
         # Extraia o caminho relativo da imagem 
         relative_path = os.path.relpath(path, start="C:\\Users\\Usuario\\projects\\python\\loja_django\\produto_imagens") 
         # Converta o caminho relativo para uma URL 
