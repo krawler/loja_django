@@ -27,10 +27,10 @@
                             <span id="variation-preco-promocional" class="lead product-price_footer">
                                 {{produto.preco_promocional|formata_preco}}
                             </span>
-                            {% else %}
-                                <span id="variation-preco-normal" 
-                                class="lead product-price">{{produto.preco|formata_preco}}</span>
-                            {% endif %}         
+                        {% else %}
+                            <span id="variation-preco-normal" 
+                            class="lead product-price">{{produto.preco|formata_preco}}</span>
+                        {% endif %}         
                         </div>
 
                 
