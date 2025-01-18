@@ -19,9 +19,11 @@
                 <div class="col-lg-4 divleft">{{pedido.total|formata_preco}}</div>
     
                 <div class="col-lg-2 font-weight-bold divleft">Qtd. Itens:</div>
-                <div class="col-lg-4 divleft">{{pedido.qtd_total}}</div>
+                <div class="col-lg-4 divleft">{{pedido.qtd_total|formata_int}}</div>
                 <div class="col-lg-2 font-weight-bold divleft">Status:</div>
                 <div class="col-lg-4 divleft">{{pedido.get_status_display}}</div>
+                <div class="col-lg-2 font-weight-bold divleft">Código da transação:</div>
+                <div class="col-lg-4 divleft">{{pagamento.codigo_transacao}}</div>
             </div>
         </div>  
         <div class="row mt-4">
