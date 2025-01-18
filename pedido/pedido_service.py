@@ -175,8 +175,8 @@ class Pedido_Service():
                         "config_options": [{"option": "INSTALLMENTS_LIMIT", "value": 4}],         
                     }
                 ],     
-                "payment_notification_urls": ["https://raradmco.tx1.fcomet.com/loja-django/compraconcluida"], 
-                "redirect_url": "https://raradmco.tx1.fcomet.com/loja-django"
+                "payment_notification_urls": ["https://raradmco.tx1.fcomet.com/loja-django/pedido/notificacao-pagseguro"], 
+                "redirect_url": "https://raradmco.tx1.fcomet.com/loja-django/pedido/compraconcluida/"
             }
         
             response = requests.post(url, json=payload, headers=headers)   
