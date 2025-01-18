@@ -76,7 +76,8 @@ class BasePerfil(View):
                 'perfilform': perfil_form,
                 'produtos_mais_vendidos' : ProdutoService().get_produtos_mais_acessados_por_geral(),
                 'pagina_cadastro': True,
-                'novo_cadastro': True
+                'novo_cadastro': True,
+                'perfil_endereco': perfil_endereco
             }
             
         self.userform = self.context['userform']
@@ -104,7 +105,7 @@ class Criar(BasePerfil):
         first_name = nomes[0]
         tamanho_lista = len(nomes)
         last_name = nomes[tamanho_lista - 1]
-        perfil_endereco = self.request.POST.get('perfil_endereco')
+        perfil_endereco = eval(self.request.POST.get('perfil_endereco'))
 
         username = str(email).split('@')[0]
 
@@ -127,6 +128,7 @@ class Criar(BasePerfil):
             else:
                 perfil = self.perfilform.save(commit=False)
                 perfil.usuario = usuario
+                perfil.perfil_endereco = perfil_endereco
                 perfil.save(force_update=True)
         else:
             usuario = self.userform.save(commit=False)
@@ -139,6 +141,7 @@ class Criar(BasePerfil):
             
             perfil = self.perfilform.save(commit=False)
             perfil.usuario = usuario
+            perfil.perfil_endereco = perfil_endereco
             perfil.save()
         
             if password:
@@ -152,13 +155,13 @@ class Criar(BasePerfil):
         
         self.request.session['carrinho'] = self.carrinho
         self.request.session.save()      
-        msg = 'Seu cadastro foi atualizado com sucesso'  
+        msg = 'Seu cadastro foi atualizado com sucesso e você já pode comprar'  
         messages.success(self.request, msg)  
 
         if self.request.session.get('url_destino') is not None:
             return redirect(self.request.session['url_destino'])
 
-        return redirect('perfil:atualizar')
+        return redirect('produto:lista')
            
 
 class Cadastro_concluido(View):
