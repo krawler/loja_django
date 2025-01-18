@@ -138,7 +138,6 @@ class ProdutoService():
             categoria = Categoria(nome=nome, datahora_criacao=datahora_criacao, ativo_menu=ativo_menu)
         categoria.save()
 
-
     def salvar_acesso_produto(self, user, slug):
     
         produto = Produto.objects.filter(slug=slug).first()
@@ -146,13 +145,11 @@ class ProdutoService():
             acesso = AcessoProduto(produto=produto, user=user)
             acesso.save()
 
-
     def salvar_aviso_produto_disponivel(self, user, id_variacao):
         variacao = Variacao.objects.get(id=id_variacao)
         aviso_produto = AvisoProdutoDisponivel(variacao=variacao, user=user)
         aviso_produto.save()
         return True;
-
 
     def get_produtos_mais_acessados_por_usuario(self, user):
         user = User.objects.filter(username=user).first()
@@ -160,13 +157,14 @@ class ProdutoService():
             return
         with connection.cursor() as cursor:
             str_sql = """
-                       SELECT distinct p.nome, p.descricao, p.imagem, p.slug,COUNT(ap.id) AS total_acessos,
+                        SELECT distinct p.nome, p.descricao, p.imagem, p.slug, 
                        (SELECT v.preco from produto_variacao v where v.produto_id = p.id order by v.preco asc limit 1) as preco,
-                       (SELECT v.preco_promocional from produto_variacao v where v.produto_id = p.id order by v.preco_promocional asc limit 1) as preco_promocional
+                       (SELECT v.preco_promocional from produto_variacao v where v.produto_id = p.id order by v.preco_promocional asc limit 1) as preco_promocional,
+                        COUNT(ap.id) AS total_acessos
                         FROM produto_acessoproduto ap
                         INNER JOIN produto_produto p ON ap.produto_id = p.id
                         WHERE ap.user_id = %s
-                        GROUP BY p.id
+                        GROUP BY rand()
                         ORDER BY total_acessos DESC
                         LIMIT 8
                         """
@@ -186,12 +184,14 @@ class ProdutoService():
         
         with connection.cursor() as cursor:
             str_sql = """
-                        SELECT p.nome, p.descricao, p.imagem, p.slug, p.preco_marketing, 
-                        p.preco_marketing_promocional, COUNT(ap.id) AS total_acessos
+                        SELECT distinct p.nome, p.descricao, p.imagem, p.slug, 
+                       (SELECT v.preco from produto_variacao v where v.produto_id = p.id order by v.preco asc limit 1) as preco,
+                       (SELECT v.preco_promocional from produto_variacao v where v.produto_id = p.id order by v.preco_promocional asc limit 1) as preco_promocional,
+                        COUNT(ap.id) AS total_acessos
                         FROM produto_acessoproduto ap
                         INNER JOIN produto_produto p ON ap.produto_id = p.id
                         GROUP BY p.id
-                        ORDER BY random()
+                        ORDER BY rand()
                         LIMIT 8;
                         """
             cursor.execute(str_sql)
