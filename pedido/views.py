@@ -1,18 +1,22 @@
 from datetime import datetime
+import json
+import os
 from django.shortcuts import render, redirect
 from django.core import serializers
 from django.views import View
 from django.urls import reverse
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 from django.core import serializers
 from django.core.paginator import Paginator
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
+from django.utils.decorators import method_decorator
 from produto.models import Variacao, Produto
 from produto.produto_service import ProdutoService
 from . import pedido_service 
-from .models import Pedido, ItemPedido
+from .models import Pagamento, Pedido, ItemPedido
 from perfil.models import PerfilUsuario
 from .email.py_email import PyEmail 
 
@@ -144,23 +148,28 @@ class SalvarPedido(View):
                 
         if url_payment is not None and url_payment != '':
             return redirect(url_payment)
+          
                
-
 class CompraConcluida(DispachLoginRequired, View):
     
     def get(self, *args, **kwargs):
         
-        del self.request.session['carrinho']  
-        id_pedido =  self.request.session.get('pedido_id')   
+        if self.request.session.get('carrinho'):
+            del self.request.session['carrinho']  
+        
+        id_pedido = self.request.session.get('pedido_id')   
         pedido = Pedido.objects.get(id=id_pedido)          
         produtos_mais_vendidos = ProdutoService().get_produtos_mais_acessados_por_geral()
         categorias = ProdutoService().get_all_categorias()
+        pagamento = Pagamento.objects.get(pedido=pedido)
         contexto = {                   
                     'pedido': pedido, 
                     'produtos_mais_vendidos': produtos_mais_vendidos,
                     'produtos_autocomplete' : self.produtos_autocomplete,
-                    'categorias' : categorias 
+                    'categorias' : categorias,
+                    'pagamento': pagamento 
                     }       
+        
         if not self.request.session.get("email_enviado"):
             py_email = PyEmail(pedido.usuario.email)
             py_email.set_body(username=self.request.user, nro_pedido=id_pedido, request=self.request)
@@ -168,6 +177,43 @@ class CompraConcluida(DispachLoginRequired, View):
             self.request.session["email_enviado"] = True
 
         return render(self.request, 'pedido/compraconcluida.html', contexto)
+
+
+class NotificacaoPagSeguroView(View):
+      
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(NotificacaoPagSeguroView, self).dispatch(request, *args, **kwargs)
+     
+    def post(self, *args, **kwargs):
+        
+        post_data = self.request.body
+        body_dict = json.loads(post_data)
+        pedido_id = body_dict["reference_id"]
+        for item_charge in body_dict["charges"]:
+            charge_status = item_charge["status"]
+            paid_at = item_charge["paid_at"]
+            id_charge = item_charge["id"]
+            total_pagamento = item_charge["amount"]["value"]
+            payment_method = item_charge["payment_method"]["type"]
+    
+        pedido = Pedido.objects.get(id=pedido_id)
+        if charge_status == "PAID":
+            pedido.status = 'A'
+        elif charge_status == "DECLINED":
+            pedido.status = 'R'
+        pedido.save()
+            
+        pagamento = Pagamento()
+        pagamento.pedido = pedido
+        pagamento.id_cobranca_pagseguro = id_charge
+        pagamento.datahora_pagamento = paid_at
+        pagamento.status = 'A'
+        pagamento.total = total_pagamento
+        pagamento.metodo_pagamento = payment_method
+        pagamento.save()
+        
+        return HttpResponse("Dados salvos com sucesso!")        
 
 
 class MeusPedidos(DispachLoginRequired, ListView):  
