@@ -15,10 +15,9 @@ from perfil.models import ListaDesejoProduto
 from perfil.models import PerfilUsuario
 from pedido.models import ItemPedido
 from django.contrib.auth.models import User
-from .serializers import VariacaoSerializer
+from django.core import serializers
 import json
 import requests
-import mercadopago
 
 class DispachLoginRequired(View):
     
@@ -301,8 +300,6 @@ class ResumoDaCompra(DispachProdutosMaisVendidos, View):
     #verificar validate do token, transferir para arquivo
     bearer_token = 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiZWU4OWMyMmE1ZTIyNjlmNWQyOTA1MzJiMzVjYzY2ZjMyY2FlMDIyZDM1OGEwMDFmMTNhZGViZTNjN2VjYzBmY2IxNDM1NzAzMDI4MjgxMTMiLCJpYXQiOjE3MTkwMTAzMTIuOTA1NjI3LCJuYmYiOjE3MTkwMTAzMTIuOTA1NjI5LCJleHAiOjE3NTA1NDYzMTIuODkxMDIzLCJzdWIiOiI5YzU3YzA5NS0wZTVhLTRmODEtYjlhOC0yYmM4ZTAzZDI4NzciLCJzY29wZXMiOlsic2hpcHBpbmctY2FsY3VsYXRlIiwiZWNvbW1lcmNlLXNoaXBwaW5nIl19.ZlVxabpqdJe8K_PYL9bo0MaElGo9YwxCCCEaPsA5GLOW_q82syoirhkLUsHg82DZUvLVeJH5W8jGAWyqAp8VxOc22YL-3rLLKiFTLQvsapO1vS9j6C9YXXQx0PXzkvBIknIri--1L5lpaRR9nPj3bp_OQULIOsnYkzI2aJ8H8OQ5XA3HT-b7lEqMOoyrpZbHGNtHXaOYL0NWyFb9Bft2Nbez10oRy5uEPm9svUj6RruLjbRMFIIBkGkdqjpSMtcAwCJCQm8OyDgdLxA16YseXkx6Gc32FkiuB_gaORxw_LckOIgO6z4f15PMkytB_MGsHDT7sIv6pXyd9d11qu_aXjHEXxcWuJ_4QszDmKnfXRQ8JJ4JYmw6F2W18sJSynuaSId2te8Sh3gBIkb-wCUC2e89uYXf33eI40SZ0cIgIHqJ4xd11qWtS-I7TzdDjWWPOILf2wdRwXNwiHr5QVsBIm0eoqmud65I9ttIKL9JTQ_JlT0E0f-4iLV392_LabJ8R9ikQq03AC5JwlhEcg3fogIITWLs3K6MNlxcPooVpSmr97u-1fmuDk_naE2mzCwS_4nI8N3QyufO4q-Vzfi6xEYsvsVhtyufU0sJRq3X9DgwJtupip2VGwmfoLoXmrAEXnCNKwdfdNj9T1ePzVMkWSWWM2wnYsrpLbQLkpNVIOg'
     
-    sdk = mercadopago.SDK('TEST-6359455923298195-121717-ef84e13d4890009bae8c56d3904036df-68852210')
-
     #TODO: Mover para produto_service
     def get_lista_frete_melhorenvio(self, perfil):
         
@@ -448,8 +445,8 @@ class Variacoes_json(ListView):
         for variacao in qs_variacoes:
             saldo_estoque = ProdutoService().getEstoqueAtual(variacao.id)
             variacao.saldo_estoque = saldo_estoque
-            serializer = VariacaoSerializer(qs_variacoes, many=True)
-            json_data = json.dumps(serializer.data)
+        
+        json_data = serializers.serialize('json', qs_variacoes)
         
         return JsonResponse(json_data, safe=False)
 
