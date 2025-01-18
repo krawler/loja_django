@@ -94,3 +94,9 @@ def get_next_step(val):
         case 'P': return 'Enviado'
         case 'E': return 'Finalizado'
         case 'F': return 'Criado'
+        
+@register.filter
+def formata_int(val):
+    if val != '':
+        return int(val)
+    return ''
