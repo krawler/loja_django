@@ -10,7 +10,6 @@ class PerfilUsuario(models.Model):
 
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
     nome_completo = models.CharField(null=True, max_length=100) 
-    cpf = models.CharField(max_length=14,null=True, blank=True)
     endereco = models.CharField(null=False, max_length=100)
     numero = models.CharField(max_length=15)
     complemento = models.CharField(max_length=50, null=True, blank=True)
@@ -51,8 +50,7 @@ class PerfilUsuario(models.Model):
         )
     )
     telefone = models.CharField(null=True, max_length=50)
-    perfil_endereco = models.BooleanField(default=True)
-    codigo_regiao_ddd = models.CharField(max_length=3, null=True)
+    perfil_endereco = models.BooleanField(default=False)
     
     def __str__(self) :
         return f'{self.usuario}'
