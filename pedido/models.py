@@ -1,3 +1,4 @@
+from functools import cached_property
 from django.db import models
 from django.contrib.auth.models import User
 from produto.models import Variacao, Produto
@@ -48,3 +49,29 @@ class ItemPedido(models.Model):
     class Meta:
         verbose_name = 'Item do pedido'
         verbose_name_plural = 'Itens do pedido'    
+        
+        
+class Pagamento(models.Model):
+    
+    pedido = models.ForeignKey(Pedido, on_delete=models.DO_NOTHING)
+    id_cobranca_pagseguro = models.CharField(max_length=50, null=True)
+    datahora_pagamento = models.DateTimeField(default=django.utils.timezone.now)
+    status = models.CharField(
+        default='A',
+        max_length=1,
+        choices=(
+            ('A', 'Aprovado'),
+            ('P', 'Pendente'),
+            ('R', 'Reprovado'),
+            ('C', 'Cancelado'),
+        )
+    )        
+    total = models.DecimalField(max_digits=10, decimal_places=2)
+    metodo_pagamento = models.CharField(max_length=50)
+
+    @cached_property
+    def codigo_transacao(self): 
+        return self.id_cobranca_pagseguro.replace('CHAR_', '')
+
+    def __str__(self):
+        return f'Pagamento N. {self.pk}'    
