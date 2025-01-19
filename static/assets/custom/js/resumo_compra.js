@@ -6,6 +6,11 @@ $(document).ready(function(){
         { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
     });
 
+    if($("#realiza_pedido").attr("href") == ""){
+        link = $("#url_salvar_pedido").val();
+        $("#realiza_pedido").attr("href", link);
+    }
+
     $("#closeDialogModal").click(function(){
         $("#dialogModal").hide();
     });
