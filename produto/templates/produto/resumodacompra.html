@@ -8,7 +8,7 @@
 
 <meta name="csrf-token" content="{{ csrf_token }}">
 
-<div class="modal" id="dialogModal" tabindex="-1" aria-labelledby="dialogModal" aria-hidden="true">
+<div class="modal" id="dialogModalFrete" tabindex="-1" aria-labelledby="dialogModalFrete" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -25,7 +25,7 @@
                 Seleciona uma forma de envio na lista de fretes
             </div>
             <div class="modal-footer">
-                <a href="#"  class="btn btn-secondary" id="closeDialogModal" >OK</a>
+                <a href="#"  class="btn btn-secondary" id="closeDialogModalFrete" >OK</a>
             </div>
         </div> 
     </div>
@@ -36,7 +36,12 @@
         <h2>Resumo da sua compra</h2>
 
         <p class="lead">Dados do usuário</p>
-        <p>Caso precise editar, <a href="{% url 'perfil:criar' %}">clique aqui</a></p>
+        <p>
+            Caso precise editar, <a href="{% url 'perfil:criar' %}">clique aqui</a>
+        </p>
+        
+        <input type="hidden" name="url_salvar_pedido" id="url_salvar_pedido" value="{% url 'pedido:pagar' %}">
+        
         <dl class="row">
             <dt class="col-lg-2">Nome:</dt>
             <dd class="col-lg-4">{{perfil.nome_completo}}</dd>
@@ -93,8 +98,7 @@
         <p class="lead">Opções de fretes</p>
         <p>Selecione uma opção de envio para {{perfil.endereco}}, {{perfil.numero}}, em {{perfil.cidade}}, CEP: {{perfil.cep}}</p>
         
-        <input type="hidden" name="preco_frete_selecionado" id="preco_frete_selecionado" value="0"> 
-        <input type="hidden" name="url_salvar_pedido" id="url_salvar_pedido" value="{% url 'pedido:pagar' %}">
+        <input type="hidden" name="preco_frete_selecionado" id="preco_frete_selecionado" value="0">
         
         {% include 'parciais/_fretes.html' %}
     </div>
@@ -118,20 +122,24 @@
 
 {% if not perfil.perfil_endereco %}
 <script>
-  if($("#realiza_pedido").attr("href") == ""){
-     link = $("#url_salvar_pedido").val();
-     $("#realiza_pedido").attr("href", link);
-  }
+  
 </script>
 {% else %}
 <script>
     $("#realiza_pedido").click(function(e){
-        if($("#realiza_pedido").attr("href") == ""){
-            $("#dialogModal").show();
+        if(($("#realiza_pedido").attr("href") == "") || ($("#realiza_pedido").attr("href") == "/pedido/")){
+            $("#dialogModalFrete").show();
             e.preventDefault();
          } 
     });
-    
+
+    $("#closeDialogModalFrete").click(function(e){
+        $("#dialogModalFrete").hide();
+    });
+       
+    $("#btnFecharDialog").click(function(e){
+        $("#dialogModalFrete").hide();
+    });
 </script>
 {% endif %}
 
