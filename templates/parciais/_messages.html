@@ -3,6 +3,7 @@
     {% for message in messages %}
         <div class="alert {{ message.tags }}" role="alert">
             {{ message }}
+            <div style="float: right"><a href="#" class="x-close"> x </a></div>
         </div>
     {% endfor %}
 {% endif %}
