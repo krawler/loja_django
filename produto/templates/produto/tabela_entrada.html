@@ -22,6 +22,7 @@
             <th>Produto</th>
             <th>Quantidade</th>
             <th>Preço</th>
+            <th>Total</th>
         </tr>
     </thead>
     <tbody>
@@ -33,6 +34,7 @@
             <td>{{entrada.variacao.produto.nome}} - {{entrada.variacao.nome}}</td>
             <td style="width: 10%">{{entrada.quantidade}}</td>
             <td>{{entrada.preco_final|formata_preco}}</td>
+            <td>{{entrada.total|formata_preco}}</td>
         </tr>
         
         {% endfor %}
