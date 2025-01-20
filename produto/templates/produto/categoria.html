@@ -44,12 +44,19 @@
             }
             $("#id_categoria").val(row.attr('categoria_id'));
             $('#nome').val(nomecategoria_selecionado);
-            menu_ativo = ''+row.attr("ativo_menu")+'';
+            menu_ativo = '' + row.attr("ativo_menu") + '';
             if(menu_ativo == "True")
                 $("#ativo_menu").attr('checked', true);
             else
                 $("#ativo_menu").attr('checked', false);
-        });  
+        }); 
+        
+        $("#novo_cadastro").click(function(){
+            $("#id_categoria").val(undefined);
+            $('#nome').val('');
+            table.rows('.selected').nodes().each((row) => row.classList.remove('selected'));
+            $("#nome").focus(); 
+        });
 
     } );  
 </script>
@@ -89,7 +96,10 @@
                     <input type="checkbox" name="ativo_menu" id="ativo_menu">
                 </div>
                 <button type="submit" class="btn btn-primary btn-block btn-lg">
-                    Cadastrar
+                    Salvar
+                </button>  
+                <button type="button" id="novo_cadastro" class="btn btn-primary btn-block btn-lg">
+                    Novo cadastro
                 </button>  
             </form> 
         </div>

@@ -37,19 +37,27 @@
         table.on('click', 'td', function (e) {
             row = $(this).parent('tr');
             motivo_selecionado = row.children('td.desc_motivo').html();
+            motivo_selecionado = motivo_selecionado.trim();
             if (motivo_selecionado.startsWith('<div')){
                 ind_fim_div = motivo_selecionado.lastIndexOf('>');
                 tamanho_total = motivo_selecionado.length;    
                 motivo_selecionado = motivo_selecionado.substr(ind_fim_div + 1, tamanho_total);
             }
             $("#id_motivo").val(row.attr('motivo_id'));
-            $('#nome').val(motivo_selecionado);
+            $('#descricao').val(motivo_selecionado);
             menu_ativo = ''+row.attr("ativo_menu")+'';
             if(menu_ativo == "True")
                 $("#ativo_menu").attr('checked', true);
             else
                 $("#ativo_menu").attr('checked', false);
-        });  
+        }); 
+        
+        $("#novo_cadastro").click(function(){
+            $("#id_motivo").val(undefined);
+            $("#descricao").val('');
+            table.rows('.selected').nodes().each((row) => row.classList.remove('selected'));
+            $("#descricao").focus();
+        })
 
     } );  
 </script>
@@ -87,7 +95,10 @@
                             placeholder="Descrição do motivo" class="form-control">
                 </div>
                 <button type="submit" class="btn btn-primary btn-block btn-lg">
-                    Cadastrar
+                    Salvar
+                </button>  
+                <button type="button" id="novo_cadastro" class="btn btn-primary btn-block btn-lg">
+                    Novo Cadastro
                 </button>  
             </form> 
         </div>
