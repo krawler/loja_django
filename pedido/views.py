@@ -250,11 +250,14 @@ class Tabela(DispachLoginRequired, ListView):
         context['url_delete'] = reverse('pedido:desativar')
         pedidos = context['pedidos']
         pedidos = Pedido.objects.filter(desativado=False).order_by('id').reverse()
-        for pedido in pedidos:            
-            perfil = pedido.usuario.perfilusuario_set.first
-            pedido.perfil_data = perfil
-            data_ultima_compra = pedido_service.Pedido_Service().get_data_ultimo_pedido(user=pedido.usuario)
-            pedido.data_ultima_compra = data_ultima_compra
+        for pedido in pedidos:  
+            try:          
+                perfil = PerfilUsuario.objects.get(usuario=pedido.usuario)
+                pedido.perfil_data = perfil
+                data_ultima_compra = pedido_service.Pedido_Service().get_data_ultimo_pedido(user=pedido.usuario)
+                pedido.data_ultima_compra = data_ultima_compra
+            except PerfilUsuario.DoesNotExist:
+                pass    
         context['pedidos'] = pedidos
         return context
 

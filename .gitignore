@@ -11,7 +11,7 @@
 /produto/templatetags/__pycache__
 /perfil/templates/email/__pycache__
 
-loja_django/__pycache__
+templo_arcturiano/__pycache__
 
 .env
 data_db_sqlite3.json
@@ -27,6 +27,6 @@ produto/migrations/
 pedido/migrations/
 perfil/migrations/
 perfil/templates/email/__pycache__
-loja_django/__pycache__/settings.cpython-311.pyc
+templo_arcturiano/__pycache__/settings.cpython-311.pyc
 perfil/migrations/0001_initial.py
 perfil/migrations/0002_alter_perfilusuario_bairro_alter_perfilusuario_cep_and_more.py

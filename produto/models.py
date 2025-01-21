@@ -234,7 +234,7 @@ class ProdutoMaisAcessado(models.Model):
         # Defina a URL base do seu servidor 
         base_url = "http://localhost:8000/produto_imagens/" 
         # Extraia o caminho relativo da imagem 
-        relative_path = os.path.relpath(path, start="C:\\Users\\Usuario\\projects\\python\\loja_django\\produto_imagens") 
+        relative_path = os.path.relpath(path, start="C:\\Users\\Usuario\\projects\\templo_arcturiano\\produto_imagens") 
         # Converta o caminho relativo para uma URL 
         url = urljoin(base_url, relative_path.replace("\\", "/")) 
         return url

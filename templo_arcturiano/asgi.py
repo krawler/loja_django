@@ -1,5 +1,5 @@
 """
-ASGI config for loja_django project.
+ASGI config for templo_arcturiano project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'loja_django.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'templo_arcturiano.settings')
 
 application = get_asgi_application()
