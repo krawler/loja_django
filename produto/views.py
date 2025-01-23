@@ -148,6 +148,7 @@ class AdicionarCarrinho(View):
         variacao_id = self.request.GET.get('vid')
         qtd_form_param = self.request.GET.get('quantidade')
         resumo_compra = self.request.GET.get('resumo_compra')
+        resumo_compra = eval(resumo_compra.capitalize())
         
         if not variacao_id:
             messages.error(
