@@ -1,7 +1,5 @@
 {% load omfilters %}
 
-
-
 {% if not area_sem_produtos %}
 <div class="mt-4 mb-4">
     <div class="grid grid-cols-3 gap-3 max-w-xl mt-2">
@@ -11,7 +9,7 @@
                 <div class="col item">
                     {% if produto.miniatura_pequena %}
                     <a href="{% url 'produto:detalhe' produto.slug %}">  
-                        <img class="card-img-top " src="{{ produto.miniatura_pequena }}" alt="Card image cap">
+                        <img class="card-img-top rounded" src="{{ produto.miniatura_pequena }}" alt="Card image cap">
                     </a>
                     {% endif %} 
 
