@@ -11,10 +11,10 @@
 
             {% for produto in produtos %}   
                 {% if produto.variacao_set.first is not None %}
-                    <div class="card mt-4">
+                    <div class="card mt-4 rounded">
                         {% if produto.imagem %}
                         <a href="{% url 'produto:detalhe'  produto.slug %}">  
-                            <img class="card-img-top" src="{{ produto.miniatura_media }}" alt="Card image cap">
+                            <img class="card-img-top rounded" src="{{ produto.miniatura_media }}" alt="Card image cap">
                         </a>
                         {% endif %} 
 
