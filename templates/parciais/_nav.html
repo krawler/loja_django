@@ -1,156 +1,203 @@
 {% load omfilters %}
 
-<nav class="navbar navbar-dark bg-primary navbar-expand-lg">
-    <a class="navbar-brand" href="/">Base</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-
-        <form class="form-inline my-2 my-lg-0" action="{% url 'produto:busca' %}">
-            <input class="form-control mr-sm-2 " type="search" id="termo" placeholder="o que procura?" aria-label="Search" name="termo">
-            <button class="btn btn-secondary my-2 my-sm-0" type="submit">Buscar</button>
-        </form>
-        {% if not request.user.is_authenticated %}
-        <a href="{% url 'perfil:login' %}" class="btn btn-secondary my-2 my-sm-0 ml-2">
-            Entrar
-        </a>
-        {% endif %}
-
-        <ul class="navbar-nav ml-auto">
-            {% for categoria in categorias %}
-                {% if categoria.ativo_menu %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle active" href="#" id="navbarRelatorio" role="button"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">             
-                                {{categoria.nome}}    
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            {% for produto in  categoria.produto_set.all  %}
-                                {% if produto.imagem %}
-                                    <a class="dropdown-item" href="{% url 'produto:detalhe' produto.slug %}">
-                                        {{produto.nome}}    
+<nav class="navbar navbar-dark navbar-expand-lg" style="border-bottom: 1px solid rgba(0, 0, 0, 0.125);">
+   
+                <div class="col" style="padding-right: 0px;">
+                <div class="row">
+                    <div class="col" style="text-align: right">
+                        <ul class="navbar-nav ml-auto a-direita">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    {% if request.user.is_authenticated %}
+                                        {{request.user}}
+                                    {% else %}
+                                        Conta  
+                                    {% endif %}    
+                                    <span class="ml-1">
+                                        <i class="fas fa-user" style="color: #aa9005"></i>
+                                    </span>
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    
+                                    {% if request.user.is_authenticated %} 
+                                    <a class="dropdown-item" href="{% url 'perfil:atualizar' %}?url={{request.path}}">
+                                        Ver ou alterar seu cadastro    
                                     </a>
-                                {% endif %}   
-                            {% endfor %}
+                                    <a class="dropdown-item" href="{% url 'perfil:lista_desejos' %}">
+                                        Sua lista de desejos    
+                                    </a>    
+                                    {% else %}
+                                    <a class="dropdown-item" href="{% url 'perfil:login'  %}?url={{request.path}}">
+                                        Entrar na conta
+                                    </a>    
+                                    <a class="dropdown-item" href="{% url 'perfil:novo_cadastro' %}">
+                                        Cadastrar nova conta
+                                    </a>    
+                                    {% endif %}    
+                                    
+                                    {% if request.user.is_authenticated %}
+                                        <a class="dropdown-item" href="{% url 'pedido:meuspedidos' %}">Meus Pedidos</a>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="{% url 'perfil:logout' %}">Sair</a>
+                                    {% endif %}
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link nav-cart-link active" href="{% url 'produto:carrinho' %}">
+                                    <span class="nav-cart-text mr-1">
+                                        Carrinho
+                                    </span>
+                                    <span class="nav-cart-count mr-1" id="qtd_carrinho_nav">
+                                        {% if request.session.carrinho %}
+                                            <strong>{{request.session.carrinho|cart_total_qtd}}x</strong>
+                                        {% endif %}
+                                    </span>
+                                    <span class="nav-cart-icon mr-2">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>    
+                </div>
+                <div class="row">
+                    <div class="col-lg-1" style="padding-right: 0px;">
+                        <img src="/imgs/logo-templo-arcturiano_2.jpg" class="img-fluid">
+                    </div>
+                    <div class="col-lg-2" style="padding-left:0px;"> 
+                        <img src="/imgs/assintura_logo.png" class="img-fluid">
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="wd-search-form wd-header-search-form wd-display-form whb-9x1ytaxq7aphtb3npidp"
+                             style="margin-top: 10px;">
+                            <form role="search" 
+                                method="get" 
+                                class="searchform wd-style-default wd-cat-style-bordered woodmart-ajax-search" 
+                                action="{% url 'produto:busca' %}" 
+                                data-thumbnail="1" 
+                                data-price="1" 
+                                data-post_type="product" 
+                                data-count="20" 
+                                data-sku="0" 
+                                data-symbols_count="3">
+                            <input type="search" 
+                                    class="search-input s wd-search-inited" 
+                                    placeholder="Buscar produtos" 
+                                    value="" 
+                                    name="termo" 
+                                    id="termo"
+                                    aria-label="Buscar" 
+                                    title="Buscar produtos" 
+                                    required="" 
+                                    autocomplete="off" />
+                            <button type="submit" class="searchsubmit">
+                                <i class="fa fa-search fa-lg" style="color: #91959c;"></i>
+                            </button>
+                            </form>
+                            <div class="search-results-wrapper">
+                            <div class="wd-dropdown-results wd-scroll wd-dropdown">
+                                <div class="wd-scroll-content">
+                                <div class="autocomplete-suggestions" sty le="position: absolute; display: none; max-height: 300px; z-index: 9999;"></div>
+                                </div>
+                            </div>
+                            </div>
                         </div>
-                    </li>
-                {% endif %}
-            {% endfor %}
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button"
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {% if request.user.is_authenticated %}
-                        {{request.user}}
-                    {% else %}
-                        Conta  
-                    {% endif %}    
-                    <span class="ml-1">
-                        <i class="fas fa-user" style="color: #fafafa"></i>
-                    </span>
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    
-                    {% if request.user.is_authenticated %} 
-                    <a class="dropdown-item" href="{% url 'perfil:atualizar' %}?url={{request.path}}">
-                        Ver ou alterar seu cadastro    
-                    </a>
-                    <a class="dropdown-item" href="{% url 'perfil:lista_desejos' %}">
-                        Sua lista de desejos    
-                    </a>    
-                    {% else %}
-                    <a class="dropdown-item" href="{% url 'perfil:login'  %}?url={{request.path}}">
-                        Entrar na conta
-                    </a>    
-                    <a class="dropdown-item" href="{% url 'perfil:novo_cadastro' %}">
-                        Cadastrar nova conta
-                    </a>    
-                    {% endif %}    
-                    
-                    {% if request.user.is_authenticated %}
-                        <a class="dropdown-item" href="{% url 'pedido:meuspedidos' %}">Meus Pedidos</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="{% url 'perfil:logout' %}">Sair</a>
-                    {% endif %}
-                </div>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link nav-cart-link active" href="{% url 'produto:carrinho' %}">
-                    <span class="nav-cart-text mr-1">
-                        Carrinho
-                    </span>
-                    <span class="nav-cart-count mr-1" id="qtd_carrinho_nav">
-                        {% if request.session.carrinho %}
-                            <strong>{{request.session.carrinho|cart_total_qtd}}x</strong>
-                        {% endif %}
-                    </span>
-                    <span class="nav-cart-icon mr-2">
-                        <i class="fas fa-shopping-cart"></i>
-                    </span>
-                </a>
-            </li>
-            {% if request.user.is_authenticated and request.user.is_staff %}
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle active" href="#" id="navbarRelatorio" role="button"
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">             
-                        Sistema    
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    
-                    <a class="dropdown-item" href="{% url 'pedido:tabela' %}">
-                        Pedidos    
-                    </a>   
-                    <a class="dropdown-item" href="{% url 'produto:tabela_entrada' %}">
-                        Entrada de Produtos
-                    </a>      
-                    <a class="dropdown-item" href="{% url 'produto:tabela' %}">
-                        Produtos
-                    </a> 
-                    <a class="dropdown-item" href="{% url 'produto:categoria' %}">
-                        Categorias
-                    </a> 
-                    <a class="dropdown-item" href="{% url 'produto:motivo_saida' %}">
-                        Motivos de Saida de Produtos
-                    </a>
-                    <a class="dropdown-item" href="{% url 'produto:tabela' %}">
-                        Saida de Produtos
-                    </a>  
-                </div>
-            </li>
-            {% endif %}
+                    </div>
+                    <div class="col-lg-2">
+                        
+                    </div>
+                </div>          
+                
+                <div class="row ">
+                    <div class="col-lg-2"></div>
+                    <div class="col-lg-8">
+                        <ul class="navbar-nav ml-auto centralizado">
+                            {% for categoria in categorias %}
+                                {% if categoria.ativo_menu %}
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle active" href="#" id="navbarRelatorio" role="button"
+                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">             
+                                                {{categoria.nome}}    
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                            {% for produto in  categoria.produto_set.all  %}
+                                                {% if produto.imagem %}
+                                                    <a class="dropdown-item" href="{% url 'produto:detalhe' produto.slug %}">
+                                                        {{produto.nome}}    
+                                                    </a>
+                                                {% endif %}   
+                                            {% endfor %}
+                                        </div>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        
+                            {% if request.user.is_authenticated and request.user.is_staff %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle active" href="#" id="navbarRelatorio" role="button"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">             
+                                        Sistema    
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    
+                                    <a class="dropdown-item" href="{% url 'pedido:tabela' %}">
+                                        Pedidos    
+                                    </a>   
+                                    <a class="dropdown-item" href="{% url 'produto:tabela_entrada' %}">
+                                        Entrada de Produtos
+                                    </a>      
+                                    <a class="dropdown-item" href="{% url 'produto:tabela' %}">
+                                        Produtos
+                                    </a> 
+                                    <a class="dropdown-item" href="{% url 'produto:categoria' %}">
+                                        Categorias
+                                    </a> 
+                                    <a class="dropdown-item" href="{% url 'produto:motivo_saida' %}">
+                                        Motivos de Saida de Produtos
+                                    </a>
+                                    <a class="dropdown-item" href="{% url 'produto:tabela' %}">
+                                        Saida de Produtos
+                                    </a>  
+                                </div>
+                            </li>
+                            {% endif %}
 
-            {% if request.user.is_authenticated and request.user.is_staff %}
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle active" href="#" id="navbarRelatorio" role="button"
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">             
-                        Relatórios    
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    
-                    <a class="dropdown-item" href="{% url 'perfil:atualizar' %}">
-                        Pedidos    
-                    </a>    
-                    <a class="dropdown-item" href="{% url 'perfil:login' %}">
-                        Usuários 
-                    </a>    
-                    <a class="dropdown-item" href="{% url 'perfil:criar' %}">
-                        Produtos
-                    </a>    
-                    <a class="dropdown-item" href="{% url 'perfil:criar' %}">
-                        Entrada de produtos
-                    </a>   
-                    <a class="dropdown-item" href="{% url 'perfil:criar' %}">
-                        Saída de produtos
-                    </a>     
-                    <a class="dropdown-item" href="{% url 'pedido:meuspedidos' %}">
-                        Acessos
-                    </a>
+                            {% if request.user.is_authenticated and request.user.is_staff %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle active" href="#" id="navbarRelatorio" role="button"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">             
+                                        Relatórios    
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    
+                                    <a class="dropdown-item" href="{% url 'perfil:atualizar' %}">
+                                        Pedidos    
+                                    </a>    
+                                    <a class="dropdown-item" href="{% url 'perfil:login' %}">
+                                        Usuários 
+                                    </a>    
+                                    <a class="dropdown-item" href="{% url 'perfil:criar' %}">
+                                        Produtos
+                                    </a>    
+                                    <a class="dropdown-item" href="{% url 'perfil:criar' %}">
+                                        Entrada de produtos
+                                    </a>   
+                                    <a class="dropdown-item" href="{% url 'perfil:criar' %}">
+                                        Saída de produtos
+                                    </a>     
+                                    <a class="dropdown-item" href="{% url 'pedido:meuspedidos' %}">
+                                        Acessos
+                                    </a>
+                                </div>
+                            </li>
+                            {% endif %}
+                            
+                        </ul>
+                    </div>
+                    <div class="col-lg-2"></div>
                 </div>
-            </li>
-            {% endif %}
-        </ul>
+            </div>    
         
-    </div>
+      
 </nav>
