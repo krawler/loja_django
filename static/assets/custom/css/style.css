@@ -235,10 +235,6 @@ ul.errorlist li {
     font-size: 2rem;
 }
 
-#termo{
-    width:500px;
-}
-
 .table td{
     border-bottom: 1px solid #dee2e6;
 }
@@ -306,4 +302,23 @@ ul.errorlist li {
 .descricao_produto_rodape{
     font-size:1rem;
     font-weight:300;
+}
+
+.navbar-dark .navbar-nav .nav-link.active {
+    color: #aa9005;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.centralizado {
+    align-items: center;
+    justify-content: center;
+}
+
+.a-direita {
+    justify-content: right;
+}
+
+.rounded {
+    border-radius: 0.5rem !important;
 }
