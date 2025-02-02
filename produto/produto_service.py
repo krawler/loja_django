@@ -1,4 +1,5 @@
 from django.views import View
+import requests
 from pedido.models import ItemPedido
 from django.contrib.auth.models import User
 from django.db import connection
@@ -7,6 +8,8 @@ from django.core import serializers
 from decimal import Decimal
 from datetime import datetime
 from django.utils import timezone
+
+from perfil.models import Configuracao, PerfilUsuario
 from .models import MotivoSaidaProduto, Produto, SessaoCarrinho, Variacao, SaidaProduto, AvisoProdutoDisponivel 
 from .models import EntradaProduto, AcessoProduto, ProdutoMaisAcessado, Categoria
 import json
@@ -223,3 +226,92 @@ class ProdutoService():
         else:    
             motivo = MotivoSaidaProduto(descricao=descricao, user=user)
         motivo.save()    
+        
+    def get_lista_frete_superfrete(self, perfil, request, config):
+        
+        url = config.url_superfrete
+        #bearer_token = config.token_superfrete
+        carrinho = request.session['carrinho']
+        
+        total_with, total_length, total_height, total_weight = 0, 0, 0, 0
+        for variacao_id in carrinho:
+            variacao = Variacao.objects.get(id=variacao_id)  
+            total_with += variacao.largura
+            total_length += variacao.comprimento
+            total_height += variacao.altura
+            total_weight += variacao.peso 
+            
+        product_package =  {
+                "width": total_with,
+                "height": total_height,
+                "length": total_length,
+                "weight": total_weight
+            }
+        
+        perfil = PerfilUsuario.objects.get(usuario=request.user)    
+        data = {
+            "from" : {
+                "postal_code": config.cep_loja,
+            },
+            "to" : {
+              "postal_code" : perfil.cep,  
+            }, 
+            "services": "1,2",
+            "options": {
+                "own_hand": False,
+                "receipt": False,
+                "insurance_value": 0,
+                "use_insurance_value": False
+            },
+            "package": product_package
+            
+        }
+        headers = { 
+                   # "Authorization" : bearer_token,
+                    "Content-Type" : "application/json",
+                    "Accept" : "application/json",
+                    "User-Agent": "Superfrete (integracao@superfrete.com)" 
+                }
+        try:
+            response = requests.post(url, headers=headers, json=data)
+            print(response.json())
+            return response.json()
+        except Exception as error:
+            print(error)
+
+    def get_lista_frete_melhorenvio(self, perfil, request, config):
+            
+            url = config.url_melhor_envio
+            carrinho = request.session['carrinho']
+            products = []
+            for variacao_id in carrinho:
+                variacao = Variacao.objects.get(id=variacao_id)
+                product_package =  {
+                    "width": variacao.largura,
+                    "height": variacao.altura,
+                    "length": variacao.comprimento,
+                    "weight": variacao.peso,
+                    "quantity": carrinho[variacao_id]['quantidade'] 
+                }
+                products.append(product_package)
+
+            perfil = PerfilUsuario.objects.get(usuario=request.user) 
+            data = {
+                "from" : {
+                    "postal_code": config.cep_loja,
+                },
+                "to" : {
+                "postal_code" : perfil.cep,  
+                }, 
+                "products" : products
+            }
+            headers = { 
+                        "Authorization" :  config.token_melhor_envio,
+                        "Content-Type" : "Application/json",
+                        "Accept" : "Application/json"
+                    }
+            try:
+                response = requests.post(url, headers=headers, json=data)
+                return response.json()
+            except Exception as error:
+                print(error)
