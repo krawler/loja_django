@@ -1700,8 +1700,8 @@ fieldset:disabled a.btn {
     box-shadow: 0 0 0 0.2rem rgba(58, 176, 195, 0.5); }
   .btn-primary.disabled, .btn-primary:disabled {
     color: #fff;
-    background-color: #FFD700;
-    border-color: #FFD700; }
+    background-color: #aa9105ac;
+    border-color: #aa9005ac; }
   .btn-primary:not(:disabled):not(.disabled):active, .btn-primary:not(:disabled):not(.disabled).active,
   .show > .btn-primary.dropdown-toggle {
     color: #fff;
