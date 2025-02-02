@@ -1,10 +1,7 @@
 from produto.models import Produto
 from django.db import models
 from django.contrib.auth.models import User
-from django.forms import ValidationError
 
-import re
-from utils.validacpf import valida_cpf
 
 class PerfilUsuario(models.Model):
 
@@ -62,14 +59,27 @@ class PerfilUsuario(models.Model):
         verbose_name = 'Perfil'
         verbose_name_plural = 'Perfis'
 
+
 class PasswordResetCode(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     codigo = models.CharField(max_length=50, unique=True)
     criado_em = models.DateTimeField(auto_now_add=True)
     token = models.CharField(max_length=50, unique=False)
 
+
 class ListaDesejoProduto(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     produto = models.ForeignKey(Produto, on_delete=models.SET_NULL, null=True)
     adicionado_em = models.DateTimeField(auto_now_add=True)
+    desativado = models.BooleanField(default=False)
+
+    
+class Configuracao(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    empresa_frete_online = models.CharField(max_length=100, null=True, blank=True)
+    token_superfrete = models.CharField(max_length=100, null=True, blank=True)
+    token_melhor_envio = models.CharField(max_length=100, null=True, blank=True)
+    url_superfrete = models.CharField(max_length=100, null=True, blank=True)
+    url_melhor_envio = models.CharField(max_length=100, null=True, blank=True)
+    cep_loja = models.CharField(max_length=20, null=True, blank=True)
     desativado = models.BooleanField(default=False)
