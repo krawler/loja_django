@@ -11,7 +11,7 @@ from django.db.models import Q, Count, QuerySet
 from produto.models import MotivoSaidaProduto, Produto, Variacao, Categoria, EntradaProduto 
 from produto.produto_service import ProdutoService
 from perfil.perfil_service import PerfilService
-from perfil.models import ListaDesejoProduto
+from perfil.models import Configuracao, ListaDesejoProduto
 from perfil.models import PerfilUsuario
 from pedido.models import ItemPedido
 from django.contrib.auth.models import User
@@ -299,50 +299,6 @@ class Carrinho(DispachProdutosMaisVendidos, View):
 
 class ResumoDaCompra(DispachProdutosMaisVendidos, View):
     
-    #verificar validate do token, transferir para arquivo
-    bearer_token = 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiZWU4OWMyMmE1ZTIyNjlmNWQyOTA1MzJiMzVjYzY2ZjMyY2FlMDIyZDM1OGEwMDFmMTNhZGViZTNjN2VjYzBmY2IxNDM1NzAzMDI4MjgxMTMiLCJpYXQiOjE3MTkwMTAzMTIuOTA1NjI3LCJuYmYiOjE3MTkwMTAzMTIuOTA1NjI5LCJleHAiOjE3NTA1NDYzMTIuODkxMDIzLCJzdWIiOiI5YzU3YzA5NS0wZTVhLTRmODEtYjlhOC0yYmM4ZTAzZDI4NzciLCJzY29wZXMiOlsic2hpcHBpbmctY2FsY3VsYXRlIiwiZWNvbW1lcmNlLXNoaXBwaW5nIl19.ZlVxabpqdJe8K_PYL9bo0MaElGo9YwxCCCEaPsA5GLOW_q82syoirhkLUsHg82DZUvLVeJH5W8jGAWyqAp8VxOc22YL-3rLLKiFTLQvsapO1vS9j6C9YXXQx0PXzkvBIknIri--1L5lpaRR9nPj3bp_OQULIOsnYkzI2aJ8H8OQ5XA3HT-b7lEqMOoyrpZbHGNtHXaOYL0NWyFb9Bft2Nbez10oRy5uEPm9svUj6RruLjbRMFIIBkGkdqjpSMtcAwCJCQm8OyDgdLxA16YseXkx6Gc32FkiuB_gaORxw_LckOIgO6z4f15PMkytB_MGsHDT7sIv6pXyd9d11qu_aXjHEXxcWuJ_4QszDmKnfXRQ8JJ4JYmw6F2W18sJSynuaSId2te8Sh3gBIkb-wCUC2e89uYXf33eI40SZ0cIgIHqJ4xd11qWtS-I7TzdDjWWPOILf2wdRwXNwiHr5QVsBIm0eoqmud65I9ttIKL9JTQ_JlT0E0f-4iLV392_LabJ8R9ikQq03AC5JwlhEcg3fogIITWLs3K6MNlxcPooVpSmr97u-1fmuDk_naE2mzCwS_4nI8N3QyufO4q-Vzfi6xEYsvsVhtyufU0sJRq3X9DgwJtupip2VGwmfoLoXmrAEXnCNKwdfdNj9T1ePzVMkWSWWM2wnYsrpLbQLkpNVIOg'
-    
-    sdk = mercadopago.SDK('TEST-6359455923298195-121717-ef84e13d4890009bae8c56d3904036df-68852210')
-
-    #TODO: Mover para produto_service
-    def get_lista_frete_melhorenvio(self, perfil):
-        
-        url = 'https://melhorenvio.com.br/api/v2/me/shipment/calculate'
-        
-        carrinho = self.request.session['carrinho']
-        products = []
-        for variacao_id in carrinho:
-            variacao = Variacao.objects.get(id=variacao_id)
-            product_package =  {
-                "width": variacao.largura,
-                "height": variacao.altura,
-                "length": variacao.comprimento,
-                "weight": variacao.peso,
-                "quantity": carrinho[variacao_id]['quantidade'] 
-            }
-            products.append(product_package)
-
-        perfil = PerfilUsuario.objects.get(usuario=self.request.user)    
-        data = {
-            "from" : {
-                # TODO: Parametrizar
-                "postal_code": "18910066",
-            },
-            "to" : {
-              "postal_code" : perfil.cep,  
-            }, 
-            "products" : products
-        }
-        headers = { 
-                    "Authorization" :  self.bearer_token,
-                    "Content-Type" : "Application/json",
-                    "Accept" : "Application/json"
-                }
-        try:
-            response = requests.post(url, headers=headers, json=data)
-            return response.json()
-        except Exception as error:
-            print(error)
 
     def get(self, *args, **kwargs):
 
@@ -370,7 +326,14 @@ class ResumoDaCompra(DispachProdutosMaisVendidos, View):
             )
             return redirect('produto:lista')
         
-        fretes = self.get_lista_frete_melhorenvio(perfil)                       
+        superuser = User.objects.filter(is_superuser=True).first()
+        config = Configuracao.objects.get(usuario=superuser)
+        empresa_frete = config.empresa_frete_online
+        match empresa_frete:
+            case 'melhorenvio':
+                fretes = ProdutoService().get_lista_frete_melhorenvio(perfil, self.request, config)
+            case 'superfrete':
+                fretes = ProdutoService().get_lista_frete_superfrete(perfil, self.request, config)                      
         
         contexto = {
             'usuario': self.request.user,
