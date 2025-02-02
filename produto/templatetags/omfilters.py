@@ -84,7 +84,6 @@ def get_status_extenso(val):
         case 'E': return 'Enviado'
         case 'F': return 'Finalizado'
 
-#TODO: parametrizar
 @register.filter
 def get_next_step(val):
     match val:
